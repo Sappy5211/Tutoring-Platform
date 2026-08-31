@@ -301,3 +301,29 @@ are constructed and logged to the mock repository from day one for exactly that 
 
 Practice Session is explicitly gated on `research/P1_practice_player_spec.md` landing (still in flight);
 Codex is told to build the rest of its tranche and return to it.
+
+### Lane P2 landed; ADR-006 Amendment 1 — a better answer than either document had alone
+P2 was dispatched before ADR-006 was written and **correctly grepped for it, found nothing, and said so**
+rather than inventing a count. Good executor behaviour; the timing error was mine (same class of mistake
+as the swapped SendMessage and the late-landing corpus — dispatching against artefacts that don't exist yet).
+
+Reading P2 against ADR-006 exposed a real inconsistency in MY original text: §1 set 3 attempts
+(2 for MCQ) while §2 defined a 3-level ladder offered after each failure — so **level 3 was unreachable
+on the ordinary path.** The ladder had a rung nothing could stand on. P2's fix was to raise attempts to 4.
+
+Better answer, from P2's own evidence: **drop level 3 and let the worked solution be the third rung.**
+P2 showed that levels 1–2 are generic-to-skill (~600 items, authored once) while level 3 must be
+question-specific (~1,800 items) — roughly tripling the authoring surface — and that **human review
+bandwidth, not AI spend, is the real constraint** (generation cost is ≈₹170 total, a rounding error).
+Level 3 also carried the lane's hardest mechanical gate (H2: proving a hint doesn't leak the answer,
+checked numerically across 100 parameter seeds).
+
+Since the worked solution is required per question anyway, is already parameter-templated and
+seed-validated, and its first step already IS the concrete next step ("① Add 5 to both sides to isolate
+x"), a separate level-3 hint duplicates content we must produce regardless. Dropping it removes ~1,800
+authoring+review items, retires gate H2, and closes the bottom-out failure mode (Baker/Corbett/Koedinger:
+students who mine hints to bottom-out learn ~2/3 as much) more cleanly than a rule could — there is no
+almost-the-answer rung left to mine. Attempt counts unchanged.
+
+P2 marked with a supersession banner rather than edited, so its reasoning stays legible.
+Still in flight: `research/P1_practice_player_spec.md`.

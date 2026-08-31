@@ -147,6 +147,9 @@ screen.
 ### Tranche B — the learning loop  *(the heart of the product)*
 - **Practice Session** — governed by `decisions/ADR-006-practice-interaction-model.md`: multi-attempt,
   progressive hint ladder, worked solution always shown, per-question teacher-comment box.
+  Hint/solution content model: `research/P2_hints_and_solutions.md` — **but read ADR-006 Amendment 1
+  first**; the hint ladder is **two rungs, not three** (orienting, strategic), and the third rung is
+  step-by-step reveal of the worked solution itself.
   **Wait for `research/P1_practice_player_spec.md` before starting this one** (component tree, the full
   state machine incl. grading-in-flight, and the maths keyboard layout). It is in flight and will land
   before you finish Tranche A. If you reach it first, build everything else in this tranche and come back.

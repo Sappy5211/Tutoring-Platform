@@ -165,3 +165,91 @@ future change to it is visible in the data rather than silently retroactive.
    Leaning yes, with the question re-parameterised so it is not a memory test. Defer to `P3.5`.
 3. Is a ~2500ms floor right for Class 6–8? It is a guess and should be **replaced with a measured
    percentile** from real attempt data once any exists. Flagged as an assumption, not a finding.
+
+---
+# Amendment 1 (2026-08-31) — the hint ladder is two rungs, not three; the solution is the third
+
+**Trigger.** Lane P2 (`research/P2_hints_and_solutions.md`) was dispatched *before* this ADR existed and
+correctly reported, via `grep`, that the document its packet referenced was not on disk. Its hint counts
+were therefore proposed blind. Reading its analysis against §1–§2 above exposed a real inconsistency in
+**my** original text, and then a better answer than either document had alone.
+
+## The inconsistency in the original ADR
+
+§1 sets 3 attempts for open-response types and 2 for MCQ. §2 defines a 3-level hint ladder offered after
+each failure. Those don't fit: with 3 attempts the sequence is fail→hint 1, fail→hint 2, fail→reveal, so
+**level 3 is never reached** on the ordinary path. With 2 attempts, only level 1 is. The ladder was
+specified with a rung nothing could stand on.
+
+Lane P2's fix was to raise attempts to 4 so all three hints fire. That resolves the arithmetic, but it
+buys the third rung at a high price, which P2's own analysis makes visible.
+
+## What P2's analysis actually shows
+
+Two findings from that lane, both well-sourced, point the same way:
+
+1. **Level 3 is the expensive tier.** Levels 1–2 are *generic to the skill* — authored once per `Skill`
+   (~600 items) and reused by every question tagged with it. Level 3 must be *specific to the question*
+   (~1,800 items), because "the concrete next step" isn't concrete unless it references this question's
+   own structure. So level 3 alone roughly triples the authoring surface.
+2. **Human review bandwidth is the real constraint, not AI spend.** P2 computed total generation cost at
+   ≈₹170–211 one-time — a rounding error. What actually costs is a person looking at ~1,800 additional
+   rendered hints before publish.
+
+And level 3 carries the hardest mechanical gate in the lane (P2's `H2`): proving a procedural hint doesn't
+leak the answer, checked numerically across 100 parameter seeds because a string comparison misses an
+equal-but-differently-formatted answer. That gate exists *only* because of level 3.
+
+## Decision
+
+**Drop the level-3 procedural hint. Replace it with step-by-step reveal of the worked solution.**
+
+The revised ladder:
+
+| Failure | Open-response (3 attempts) | MCQ / selection (2 attempts) |
+|---|---|---|
+| after attempt 1 | offer **hint 1 — orienting** (per-skill) | offer **hint 1 — orienting** (per-skill) |
+| after attempt 2 | offer **hint 2 — strategic** (per-skill) | → worked solution |
+| after attempt 3 | → worked solution | — |
+
+**The worked solution reveals one step at a time**, student-paced, with a "show next step" control — not
+as a wall of text. On a *correct* answer it opens fully expanded, per the operator's requirement that the
+ideal method is always visible.
+
+## Why this is better, not just cheaper
+
+- **The solution's first step already *is* the procedural hint.** Per the Dr Frost evidence, a step carries
+  a plain-English reason plus an annotated transformation ("① Add 5 to both sides to isolate x"). Authoring
+  a separate level-3 hint duplicates content we are already required to produce, validate, and review.
+- **It removes ~1,800 items of authoring and human review** — the exact bottleneck P2 identified — while
+  removing nothing a student sees. The scaffolding is identical; only its source changes.
+- **Gate `H2` disappears.** The hardest check in the lane existed to stop a hint becoming the answer.
+  Solution steps are *supposed* to contain the method, so there is nothing to police.
+- **It closes the bottom-out failure mode more cleanly than a rule could.** Baker, Corbett & Koedinger
+  found students who click through to a bottom-out hint learn about two-thirds as much. Under this model
+  there is no almost-the-answer rung to mine: a student gets two genuine category-level nudges, or the
+  worked method with its reasoning attached. The degenerate path now teaches.
+- **Attempt counts from §1 stand unchanged** — including the MCQ reasoning (three attempts against four
+  options makes success by elimination near-certain and the signal worthless).
+
+## Consequences
+
+1. `SkillHintSet` (P2 §4.2) keeps levels 1–2 and **loses level 3**.
+   `Question.hints.proceduralTemplate` (P2 §4.3) is **not built**. The `orientingOverride` /
+   `strategicOverride` escape hatches for unusual questions are retained.
+2. Gate `H2` is **withdrawn**. P2's other gates (`H1`, `H3`–`H9`) stand.
+3. `WorkedSolution` gains a reveal contract: steps are individually addressable and revealed in order.
+   Lane P1 owns the UI; the content schema is P2 §3.2, adopted.
+4. `maxHintLevelReached` (§ schema amendment above) is now `0 | 1 | 2`, not `0 | 1 | 2 | 3`.
+5. **`solutionStepsRevealed: number`** is added to `AttemptEvent` — how far a student walked the solution
+   is a genuine learning signal and costs nothing to capture.
+6. **Mastery scoring is untouched.** First attempt only, per §4. Solution reveal happens after the first
+   attempt is already scored, so it cannot contaminate the estimate.
+7. **Adopt P2's proposed Amendment 2 to ADR-002** (`SolutionStep` / `WorkedSolution` extending
+   `Question.workedSolution` additively). It does not rename or remove existing fields.
+
+## Note for whoever reads P2 next
+`research/P2_hints_and_solutions.md` is otherwise adopted in full — its taxonomy, schemas, prompts, gates,
+parameterisation design and cost model are all sound and better-sourced than anything here. Read it with
+this amendment applied: **its 4-attempt/3-hint mapping in §2.5 and its level-3 machinery are superseded.**
+Its own §12 flagged that mapping as an unconfirmed proposal, which was the right call.
