@@ -21,8 +21,11 @@ Launch curriculum: **CBSE Class 6–8 Mathematics** (ADR-005). Not 9–10. Not c
 
 ## 1. Milestone 1 — what "done" looks like
 
-**A high-fidelity, navigable frontend running on mock data shaped by the real schema types, on a
-foundation that is not throwaway.**
+**The COMPLETE product UI — every screen, student, teacher and author — high-fidelity, navigable, running
+on mock data shaped by the real schema types, on a foundation that is not throwaway.**
+
+Not a subset, not a shell. The operator wants to see and react to the whole product before backend work
+starts. Build every surface in §3b.
 
 The reasoning: the operator's original instruction was UI-first, and there is real value in seeing and
 reacting to the product early. But building a UI against invented data shapes guarantees a rewrite when
@@ -39,10 +42,11 @@ Every mock must be typed against the **real** interfaces from ADR-002, behind a 
 (`SkillRepository`, `NoteRepository`, …) so swapping in Postgres later is an implementation change, not a
 refactor of every component.
 
-**Milestone 1 is complete when:** a person can open the app on a phone-sized viewport, move through the
-student shell (home → syllabus library → topic → notes reader) and the author shell, everything renders
-with real tokens and real component primitives, the CI budget gate passes, and every piece of data on
-screen came from a typed repository backed by fixtures.
+**Milestone 1 is complete when:** every screen in §3b exists and is reachable by navigation on a
+phone-sized viewport and on desktop; all three personas (student, teacher, author) can be walked
+end-to-end; everything renders with real tokens and real component primitives; the CI budget gate passes;
+and every piece of data on screen came from a typed repository backed by fixtures — no hard-coded JSX data,
+no `any`.
 
 ## 2. Stack — already decided, do not re-derive
 
@@ -119,18 +123,93 @@ Phase 1 has a real `studentId` to attach rows to.
 *Accept:* a session exists, roles gate routes, `Student`/`ParentGuardian`/`ConsentRecord` rows can be
 written and read through the repository interface.
 
-### `M1.1` — The student shell on mock data  *(the visible milestone; depends on P0.3, P0.4, P0.6)*
-Home / daily loop · **Syllabus Library (chapter → topic, with mastery state — NOT a reverse-chronological
-document list; that's RemNote's model and it's wrong for a student with a syllabus)** · Topic detail with
-its mode tabs · Notes reader (static rendered blocks for now).
-Mobile: **bottom tab bar, 5 items, Practice emphasised centre.** Desktop: persistent left sidebar.
-*Accept:* navigable at 360px, 768px, 1280px; all data via typed repositories over fixtures; no `any`;
-`prefers-reduced-motion` honoured on every animation.
+## 3b. The full UI build — every surface
 
-## 4. Do NOT build yet
-Practice player and grading (Phase 2 — and **wait for `research/P1_practice_player_spec.md` and
-`research/P2_hints_and_solutions.md`**, in flight now) · adaptive engine · FSRS · AI tutor · payments ·
-teacher booking · voice dictation · knowledge graph · real auth.
+Source of truth for the inventory: `research/A_ui_teardown_and_design_language.md` §6 (screen table with
+job, primary action, key components, priority). Build in tranches; tranches are ordered by dependency,
+screens inside a tranche are parallel.
+
+**Nav model (applies throughout):** mobile = **bottom tab bar, 5 items, Practice emphasised as the centre
+item**; desktop = **persistent left icon+label sidebar**. Cmd+K palette available on every authenticated
+screen.
+
+### Tranche A — shell and the study spine  *(depends on P0.3, P0.4, P0.6)*
+- **App shell + navigation** (both nav models, route skeleton, Cmd+K wired)
+- **Home / Daily Study Loop** — one clear "what do I do today". Streak, mastery-ring summary, due-cards
+  badge, exam-countdown chip, and a *secondary* continue-where-you-left-off strip.
+- **Syllabus Library** — chapter → topic with mastery state and counted filter chips.
+  **NOT a reverse-chronological document list.** That is RemNote's model, correct for a personal knowledge
+  tool and wrong for a student with a syllabus to get through. Recency is demoted to the Home strip.
+- **Topic Detail** — the mode tabs (Notes / Practice / Flashcards / Ask AI) + mastery donut.
+- **Notes Reader** — rendered blocks, KaTeX maths, worked-example progressive disclosure, highlight
+  affordance (the personal layer's UI shell), PDF-export button (stubbed action).
+
+### Tranche B — the learning loop  *(the heart of the product)*
+- **Practice Session** — governed by `decisions/ADR-006-practice-interaction-model.md`: multi-attempt,
+  progressive hint ladder, worked solution always shown, per-question teacher-comment box.
+  **Wait for `research/P1_practice_player_spec.md` before starting this one** (component tree, the full
+  state machine incl. grading-in-flight, and the maths keyboard layout). It is in flight and will land
+  before you finish Tranche A. If you reach it first, build everything else in this tranche and come back.
+- **Assessment / Mock Test** — timed, question-number palette with answered/flagged states, submit
+  confirmation. Per ADR-006: **one attempt, no hints, solutions withheld until submission.**
+- **Assessment Result / Review** — score donut, mastery-band breakdown, per-question review with the
+  solutions now revealed.
+- **Flashcard Review** — card flip, Again/Hard/Good/Easy rating row, due-count badge, session summary.
+- **Diagnostic Placement** — the first-run calibration. Per ADR-006: **one attempt, no hints, no solutions
+  during.** Ends on a "here's where you're starting" result screen.
+
+### Tranche C — help, insight, progress
+- **AI Tutor Chat** — streaming message UI (build it; the previous project's chat has no streaming at all
+  and is reference-only per lane G), citation chips linking back to note blocks, mode indicator, and the
+  **"escalate to a teacher call" action** when the tutor is unconfident. Mock the stream with a timed
+  token emitter so the UI is real even though the model isn't wired.
+- **Knowledge / Brain Graph** — `react-force-graph-2d`, mastery-coloured nodes, node-focus transition.
+  **Mobile fallback is a collapsible curriculum tree, not a shrunk force graph** (lane B). Respect the
+  ~800-node ceiling with filtering above it.
+- **Progress / Analytics** — mastery trend, streak calendar heatmap, exam countdown.
+
+### Tranche D — account, commerce, booking
+- **Sign-up / Login** — phone-OTP shaped, board/grade/exam capture, **and the parent/guardian branch**
+  (DPDP requires verifiable parental consent as the first thing in signup — build the flow shape now even
+  though verification is stubbed).
+- **Book a Teacher Call** — teacher cards with credentials, slot picker, payment sheet (stubbed),
+  confirmation with join link.
+- **Settings / Profile** — theme toggle, language toggle (English only ships, but the toggle and the
+  i18n string layer must exist now), board/grade change, notifications.
+- **Plan / Upgrade** — feature-comparison table, INR pricing, free-tier limits made legible.
+
+### Tranche E — teacher and author consoles
+- **Teacher Dashboard** — per lane A, lift the Dr Frost pattern close to verbatim: identity card with
+  points/rank, one shared mastery donut, quick-action list, activity feed with colour-coded % chips.
+- **Class Roster** · **Assign Practice / Set Homework** · **Student Detail** · **Teacher Availability
+  Calendar**.
+- **Author Console** — TipTap editor shell with the slash menu, block types, MathLive input, the
+  draft→review→published state UI, and the review queue showing **deck type-mix against ADR-003's targets
+  before approval**.
+
+### Cross-cutting acceptance criteria — every screen, no exceptions
+1. Renders at **360px, 768px, 1280px**. No horizontal body scroll at any width.
+2. **Both light and dark themes.** No hard-coded colour outside the token file.
+3. Every animation degrades correctly under **`prefers-reduced-motion`**.
+4. Keyboard navigable; interactive elements labelled; focus visible and managed on route change.
+5. All data through typed repositories over fixtures. **No `any`. No hard-coded data in components.**
+6. **Empty, loading, and error states for every surface** — not just the happy path. Honest empty states,
+   never fake placeholder data that could be mistaken for real.
+7. CI budget gate stays green (≤200KB initial JS gzipped). Route-level code splitting is expected —
+   the graph, the editor, and the maths keyboard must not be in the main bundle.
+
+## 4. Build the UI for everything; build the LOGIC for nothing
+
+Every screen in §3b gets built. What stays mocked at this milestone:
+- **Grading** — the practice player calls a `GradingService` interface that returns canned results.
+  No SymPy, no LLM. But the interface shape must match `GradingMethod` (ADR-002) exactly.
+- **Adaptive selection** — a `SelectionService` returns a fixed question order. No BKT, no Elo, no FSRS
+  scheduling maths. `AttemptEvent` objects are still *constructed and logged to the mock repository* with
+  correct `masteryEvidence` values (ADR-006) — get the shape right now, wire the engine later.
+- **AI tutor** — mock the token stream. Real UI, fake model.
+- **Payments, video, voice, real auth, DPDP verification, PDF generation** — stub the action, build the UI.
+
+Do NOT build: backend services, the real database connection, any AI integration, Razorpay, 100ms, ASR.
 
 ## 5. Two rules that will not be relaxed later
 1. **`AttemptEvent` emission is part of the acceptance criteria of every practice, flashcard, and

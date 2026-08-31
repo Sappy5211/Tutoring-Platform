@@ -169,7 +169,11 @@ files it touched. See `MASTER_PLAN.md` §15b. Do not silently rewrite Codex's co
 ## 5d. Build kickoff (2026-08-31) — Codex is building Milestone 1
 - **`CODEX_BUILD_BRIEF.md`** written — Milestone 1 = high-fidelity frontend on mock data shaped by REAL
   ADR-002 types, over a non-throwaway foundation (tokens, component kit, generated types, CI budget gate).
-  Packets `P0.1`, `P0.1b` (bundle spike), `P0.2`, `P0.3`, `P0.4`, `P0.5`, `P0.6`, `M1.1`.
+  Packets `P0.1`, `P0.1b` (bundle spike), `P0.2`, `P0.3`, `P0.4`, `P0.5`, `P0.6`, then **§3b: the FULL
+  UI** — every student, teacher and author surface in five tranches (A shell+study spine, B learning loop,
+  C tutor/graph/progress, D account/commerce/booking, E teacher+author consoles). Scope widened on
+  operator instruction: build the UI for everything, the logic for nothing (grading, selection, tutor,
+  payments all behind mocked service interfaces whose SHAPES match the real contracts).
 - **`decisions/ADR-006-practice-interaction-model.md`** — the operator's Q&A model (multiple attempts,
   progressive hints, worked solution always shown). **The load-bearing part is that mastery is scored on
   the FIRST attempt only** (`masteryEvidence: positive|negative|excluded`, written not derived) — otherwise

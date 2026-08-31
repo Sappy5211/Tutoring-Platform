@@ -284,3 +284,20 @@ types behind repository interfaces**, over a foundation that is not throwaway. R
 UI-first was the operator's instruction and has real value, but building against invented data shapes
 guarantees a rewrite when the backend lands. `P0.1b` (the bundle spike) is called out as potentially
 plan-changing and told to stop-and-report rather than absorb a breach silently.
+
+### Scope widened same session: full UI, not a shell
+Operator instructed Codex to build the **complete product UI**, not Milestone 1's four-screen subset.
+`CODEX_BUILD_BRIEF.md` §1 and §3b rewritten: every surface from lane A's §6 inventory across all three
+personas, in five dependency-ordered tranches, plus cross-cutting acceptance criteria applied to every
+screen (three breakpoints, both themes, reduced-motion, keyboard/a11y, typed repositories, empty+loading+
+error states, route-level code splitting to protect the 200KB gate).
+
+The §4 "do not build" list was rewritten rather than merely trimmed — it had become actively wrong under
+the new scope. New framing: **build the UI for everything, the logic for nothing.** Grading, selection,
+the tutor stream, payments, video and ASR are all mocked behind service interfaces **whose shapes match
+the real contracts** (`GradingMethod`, `AttemptEvent` with correct `masteryEvidence` per ADR-006), so
+wiring the engines later is an implementation swap rather than a component rewrite. `AttemptEvent` objects
+are constructed and logged to the mock repository from day one for exactly that reason.
+
+Practice Session is explicitly gated on `research/P1_practice_player_spec.md` landing (still in flight);
+Codex is told to build the rest of its tranche and return to it.
