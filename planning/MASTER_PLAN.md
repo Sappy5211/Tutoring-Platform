@@ -367,7 +367,9 @@ covers `SkillEdge` authoring incl. ADR-004 `curriculumScope` overrides.
 checks gating free-tier limits, and the in-app mandate-cancellation flow lane E requires. Scheduled here
 because this is where "unlimited adaptive practice" first needs a gate. **This is the revenue mechanism
 and it had no packet at all in the first draft of this plan.**
-`P3.5` FSRS queue via `ts-fsrs` + card types + **ADR-003 mix policy and the two-deck split**, **and, per the
+`P3.5` FSRS queue via `ts-fsrs` (MIT) + card types + **ADR-003 mix policy and the deck split**, plus
+**`.apkg` import/export per ADR-009** (interoperability only — Anki's own code is AGPL and must never be
+linked, vendored or ported; imported decks land in `personal_import` and never touch mastery), **and, per the
 Phase 2 correction above, `AttemptEvent` emission is part of `P3.5`'s own acceptance criteria too — every
 flashcard review must log one.** `P3.6` Exam object + the five exam-scheduler mechanisms — **for Class
 6–8, per ADR-005, this is student/parent-set, not platform-published.**
@@ -398,6 +400,7 @@ handoff. `P5.6` teacher console.
 | **Teacher payout rises to ₹350–400 → call 4-pack goes margin-negative** | Watch the payout-to-price spread; re-run lane E's script on every change; subscription is the profit centre, not calls | Operator |
 | **Disintermediation** — student and teacher move the relationship off-platform after the first call | Never expose teacher personal contact; keep join links platform-issued and single-use; make the pre-call context handoff and follow-up assignment the reason to stay; monitor repeat-booking drop-off | P5 |
 | **Account sharing / credential resale** — a routine revenue leak in Indian edtech | Device-count limits per account, concurrent-session limits, per-user PDF watermarking (already specified), anomaly detection on impossible-travel logins | P3.7 / P6 |
+| **A copyleft dependency arriving unnoticed** (agents install packages; one AGPL package obliges us to open-source the platform) | CI licence allowlist — MIT/ISC/BSD/Apache-2.0 only, build fails otherwise (ADR-009) | P0.1 |
 | Free-tier abuse of AI tutor and grading (cost leak) | Server-side `Entitlement` checks, never client-trusted; per-day caps | P3.7 |
 | Student-submitted text abuse / prompt injection into the tutor | Own moderation layer — do not assume a vendor endpoint exists | P4 |
 

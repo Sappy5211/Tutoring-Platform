@@ -396,3 +396,39 @@ subjects, so splitting them mostly buys a worse checkout. Operator decides befor
 array-index fallback needed a non-empty tuple type), `pnpm test` 17/17, `pnpm build` succeeds at
 **132 kB gzip** main bundle against the 200 kB gate. Both surfaces rendered in a browser and the dropdown
 interacted with: light and dark, the lock states display correctly.
+
+---
+## 2026-08-31 — Session 7: Anki — interoperate, don't integrate (ADR-009)
+
+Operator asked to integrate `ankitects/anki`. **Checked the licence before anything else**, which was the
+right call: it is **AGPL-3.0** (read `LICENSE` on `main` directly; GitHub reports `NOASSERTION` only
+because a few vendored files carry more permissive licences). AGPL §13 means a network-served application
+containing that code must offer its complete source to users — which for a commercial platform is
+disqualifying, not a trade-off.
+
+Operator followed up that we would only take features and restyle it. That instinct points exactly where
+this landed, but one part of the intuition needed correcting: **restyling does not launder code.** The
+licence attaches to source, not appearance — a recoloured copy of AGPL code is still AGPL code. What IS
+free is the other half: **features and ideas are not copyrightable.** Spaced repetition, cloze, image
+occlusion, deck options, the review queue — all in scope, all ours to build.
+
+So: build the features ourselves, take zero code. That is also the better build independently of the
+licence, because our cards must carry `skillTags`, feed the prerequisite graph, respect ADR-003's mix
+policy and render maths through KaTeX — none of which Anki's desktop-first Rust/Qt internals assume.
+
+The substance survives intact: **FSRS is Anki's own scheduler and is separately available as `ts-fsrs`
+under MIT** (v5.4.1, verified on npm). Lane C already chose it; nothing in the plan changes.
+
+Added `.apkg` import/export as genuine interoperability (file format, not program derivation; permissive
+tooling exists — `anki-apkg-export` MIT, `anki-apkg-parser` ISC). Real acquisition hook in India where
+Anki is widespread in NEET prep, and export matters for trust and DPDP portability.
+
+**The design point that would have been got wrong by default:** imported decks pass neither the human
+approval gate nor the card-type mix policy, and carry no `skillTags` — so they must never update
+`pMastery`. Mechanically this is the deck split we already have: `Flashcard.deck` gains
+`"personal_import"`, scheduled by FSRS like anything else but excluded from mastery estimation, exactly
+as `exam_rehearsal` is.
+
+**New standing risk + mitigation:** agents install packages, so a copyleft dependency can arrive without
+anyone reading a LICENSE. Added a CI dependency-licence allowlist (MIT/ISC/BSD/Apache-2.0) to `P0.1` and
+to the risk table. Cheap now, very expensive to retrofit after a release.

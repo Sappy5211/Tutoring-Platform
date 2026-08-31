@@ -73,6 +73,9 @@ Vite + React 18 + TS + Tailwind v4. Router with the route skeleton. Base layout 
 a mid-tier-Android / Fast-4G profile. Wire this on day one — a budget added later is a budget already blown.
 *Accept:* `npm run build` succeeds; a deliberately oversized import makes CI go red; the gate's threshold
 is read from one config constant, not scattered.
+**Also add a dependency-licence allowlist gate** (MIT / ISC / BSD / Apache-2.0; fail on anything else).
+Rationale in ADR-009: agents install packages, and a single AGPL dependency would legally oblige us to
+open-source the whole platform. Cheap now, very expensive after a release.
 
 ### `P0.1b` — Bundle-budget spike **(do this before P0.4, it can change the architecture)**
 Build a throwaway route importing TipTap + KaTeX + MathLive + `motion` together and **measure the real
@@ -230,6 +233,11 @@ Every screen in §3b gets built. What stays mocked at this milestone:
 - **Payments, video, voice, real auth, DPDP verification, PDF generation** — stub the action, build the UI.
 
 Do NOT build: backend services, the real database connection, any AI integration, Razorpay, 100ms, ASR.
+
+**Never add Anki (`ankitects/anki`) as a dependency, in any form — it is AGPL-3.0** and would oblige us to
+release VIDYA's source. Its *features* (spaced repetition, cloze, image occlusion, the review queue) are
+all in scope and we build them ourselves; its scheduler is available separately as `ts-fsrs` (MIT). See
+`decisions/ADR-009-anki-interoperability.md`.
 
 ## 5. Two rules that will not be relaxed later
 1. **`AttemptEvent` emission is part of the acceptance criteria of every practice, flashcard, and
