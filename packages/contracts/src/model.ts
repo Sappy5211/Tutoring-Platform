@@ -148,6 +148,10 @@ export interface QueueCounts { newCards: number; learning: number; review: numbe
 
 export interface Folder {
   folderId: Id;
+  /** Depth gives the shelf metaphor its labels: a top-level folder is a book,
+   *  anything nested inside one is a chapter. Stored rather than derived so a
+   *  book can be moved without silently becoming a chapter. */
+  kind: "book" | "chapter";
   /** null = top level. Folders nest arbitrarily. */
   parentId: Id | null;
   title: string;
@@ -158,7 +162,9 @@ export interface Folder {
   order: number;
 }
 
-export type NotebookItemKind = "document" | "folder" | "pdf";
+/** "handwritten" is a stylus/finger note - strokes, not text. It can still carry
+ *  cards: an arrow region is anchored over the canvas rather than inline. */
+export type NotebookItemKind = "document" | "folder" | "pdf" | "handwritten";
 
 export interface NotebookDoc {
   docId: Id;

@@ -477,3 +477,91 @@ a { color: inherit; text-decoration: none; }
   .nb-index__sort { margin-left: auto; }
   .nb-row__more { opacity: 1; }
 }
+
+/* ── Folder page (book → chapter → pages) ───────────────────────────── */
+.folder { max-width: 1080px; }
+.folder__trail { display: flex; align-items: center; gap: 5px; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+.folder__trail span { display: inline-flex; align-items: center; gap: 5px; }
+.folder__trail a:hover { color: var(--ink); text-decoration: underline; }
+.folder__head { display: flex; align-items: center; gap: 13px; flex-wrap: wrap; }
+.folder__icon { display: grid; place-items: center; width: 46px; height: 46px; flex-shrink: 0; border-radius: 13px; }
+.folder__icon--book { background: var(--primary-faint); color: var(--primary); }
+.folder__icon--chapter { background: var(--accent-soft); color: var(--accent); }
+.folder__title { flex: 1 1 240px; min-width: 160px; padding: 2px 4px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); font-size: 38px; font-weight: 800; letter-spacing: -.04em; }
+.folder__title:focus { outline: none; background: var(--surface-soft); }
+.folder__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.folder__primary, .folder__ghost { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 16px; border-radius: 12px; font-size: 14px; font-weight: 750; cursor: pointer; }
+.folder__primary { border: 1px solid transparent; background: var(--primary); color: #fff; }
+.folder__primary:hover { background: var(--primary-strong); }
+.folder__ghost { border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); }
+.folder__ghost:hover { background: var(--surface-soft); }
+.folder__ghost--icon { padding: 0 11px; }
+.folder__add { position: relative; }
+.folder__menu { position: absolute; right: 0; top: calc(100% + 7px); z-index: 45; display: grid; min-width: 176px; padding: 6px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); }
+.folder__menu button { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 0; border-radius: 9px; background: transparent; font-size: 14px; font-weight: 650; text-align: left; cursor: pointer; color: var(--ink); }
+.folder__menu button:hover { background: var(--surface-soft); }
+.folder__menu svg { color: var(--muted); }
+
+.folder__body { margin-top: 24px; }
+.folder__empty { display: grid; justify-items: center; gap: 10px; padding: 62px 24px 72px; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); }
+.folder__empty p { margin: 0; max-width: 320px; text-align: center; font-size: 16px; color: var(--muted); line-height: 1.5; }
+.folder__art { width: 240px; height: 200px; }
+.folder__art path[stroke-dasharray] { stroke: var(--line-strong); stroke-width: 1.6; }
+.folder__art-tile, .folder__art-page rect { fill: var(--surface-strong); stroke: var(--line); stroke-width: 1; }
+.folder__art-page text { fill: var(--muted); font-size: 9px; font-weight: 700; text-anchor: middle; }
+.folder__art-folder path { fill: none; stroke: var(--line-strong); stroke-width: 1.8; }
+
+.folder__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 12px; }
+.folder__card { display: grid; gap: 4px; padding: 17px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); text-align: left; cursor: pointer; }
+.folder__card:hover { border-color: var(--line-strong); background: var(--surface-soft); }
+.folder__card strong { font-size: 15px; }
+.folder__card span:last-child { font-size: 12.5px; color: var(--muted); }
+.folder__card-icon { display: grid; place-items: center; width: 36px; height: 36px; margin-bottom: 5px; border-radius: 10px; background: var(--surface-strong); color: var(--muted); }
+.folder__card--folder .folder__card-icon { background: var(--primary-faint); color: var(--primary); }
+
+.folder__dialog-backdrop { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 20px; background: rgba(10,18,15,.45); backdrop-filter: blur(3px); }
+.folder__dialog { display: grid; gap: 10px; width: min(430px, 100%); padding: 24px; border-radius: 20px; background: var(--surface); box-shadow: var(--shadow); }
+.folder__dialog h2 { margin: 0; font-size: 21px; }
+.folder__dialog > p { margin: -4px 0 6px; font-size: 13.5px; color: var(--muted); }
+.folder__choice { display: flex; align-items: flex-start; gap: 13px; padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: transparent; text-align: left; cursor: pointer; }
+.folder__choice:hover { border-color: var(--primary); background: var(--primary-faint); }
+.folder__choice > span { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px; background: var(--surface-strong); color: var(--primary); }
+.folder__choice strong { display: block; font-size: 15px; }
+.folder__choice small { display: block; margin-top: 2px; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+.folder__dialog-close { justify-self: end; padding: 8px 14px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font-weight: 700; cursor: pointer; }
+
+/* ── Handwriting ────────────────────────────────────────────────────── */
+.hw { display: grid; gap: 10px; margin-top: 20px; }
+.hw__tools { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; padding: 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.hw__tools button { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 11px; border: 1px solid transparent; border-radius: 9px; background: transparent; font-size: 13px; font-weight: 650; cursor: pointer; color: var(--muted); }
+.hw__tools button:hover:not(:disabled) { background: var(--surface-soft); color: var(--ink); }
+/* Swatches carry their own ink colour as the background, so the generic active
+   style must not repaint them - only the ring changes. */
+.hw__tools button.is-active:not(.hw__swatch) { border-color: var(--primary); background: var(--primary-faint); color: var(--primary-strong); }
+.hw__tools button:disabled { opacity: .4; cursor: not-allowed; }
+.hw__swatches { display: inline-flex; gap: 5px; margin: 0 4px; padding-left: 9px; border-left: 1px solid var(--line); }
+/* Specificity note: `.hw__tools button` (0,1,1) out-ranks a bare `.hw__swatch`
+   (0,1,0), so it was overriding the swatch background to transparent and the
+   padding to 11px - the swatches rendered as one blank pill. Scoping these the
+   same way restores both. */
+.hw__tools .hw__swatch { width: 22px; min-height: 22px; height: 22px; padding: 0; border: 2px solid transparent; border-radius: 50%; cursor: pointer; }
+.hw__tools .hw__swatch.is-active { border-color: var(--ink); }
+.hw__tools .hw__swatch--ink { background: var(--ink); }
+.hw__tools .hw__swatch--primary { background: var(--primary); }
+.hw__tools .hw__swatch--accent { background: var(--accent); }
+.hw__tools .hw__swatch--danger { background: var(--danger); }
+.hw__tools .hw__swatch:hover { background-color: currentColor; }
+.hw__canvas { width: 100%; height: min(58vh, 520px); border: 1px solid var(--line); border-radius: 18px; background: var(--surface);
+  background-image: radial-gradient(circle, var(--line) 1px, transparent 1px); background-size: 22px 22px; cursor: crosshair; }
+.hw__hint { margin: 0; font-size: 12.5px; color: var(--muted); }
+.hw-card { display: grid; gap: 9px; margin-top: 14px; padding: 16px; border: 1px solid var(--primary); border-radius: 16px; background: var(--primary-faint); }
+.hw-card__badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 750; color: var(--primary-strong); }
+.hw-card input { min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); color: var(--ink); }
+.hw-card .folder__primary { justify-self: start; }
+
+@media (max-width: 720px) {
+  .folder__title { font-size: 28px; flex-basis: 100%; }
+  .folder__actions { width: 100%; }
+  .folder__primary, .folder__ghost { flex: 1; justify-content: center; }
+  .folder__grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}

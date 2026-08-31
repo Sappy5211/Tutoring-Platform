@@ -156,10 +156,10 @@ export function NotebookIndex() {
             {folderRows.map((folder) => (
               <article key={folder.folderId} className="nb-row">
                 <span className="nb-row__icon nb-row__icon--folder"><FolderOpen size={16} /></span>
-                <div className="nb-row__body">
+                <button className="nb-row__body" onClick={() => navigate(`/app/notebook/folder/${folder.folderId}`)}>
                   <strong>{folder.title}</strong>
-                  <span>{DOCS.filter((d) => d.folderId === folder.folderId).length} items</span>
-                </div>
+                  <span>{folder.kind === "book" ? "Book" : "Chapter"} · {DOCS.filter((d) => d.folderId === folder.folderId).length} pages</span>
+                </button>
                 <button className="nb-row__more" aria-label={`More options for ${folder.title}`}>
                   <MoreHorizontal size={17} />
                 </button>

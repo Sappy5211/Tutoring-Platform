@@ -543,3 +543,39 @@ Verified: typecheck clean, 17/17 tests, build green, facet filtering and search 
 3. Remove the layout `<select>` on card rows; use `--` as the card trigger instead of `==`, to stop
    mirroring RemNote's syntax.
 4. Margins / spacing pass against the RemNote reference.
+
+---
+## 2026-08-31 — Session 11: folder page, book→chapter→page model, handwritten notes
+
+Operator's model: **folder = book, subfolder = chapter, notes = pages**, created via "Create notes",
+which offers either bullet notes or handwritten (stylus) — and the arrow/card feature works in both.
+
+Built `/app/notebook/folder/:folderId`: breadcrumb, folder icon, inline-editable title, and the action
+row `Create notes` · `Upload PDF` · `Record` · `+`, where `+` offers a child folder and an **Exam**.
+`Folder.kind` is stored (`"book" | "chapter"`) rather than derived from depth, so a book keeps its
+identity if it is ever moved — and the `+` menu labels itself from it ("Chapter" inside a book,
+"Subfolder" deeper), which expresses the shelf metaphor instead of making the reader infer it.
+Illustrated empty state as inline SVG so it themes with the palette and costs no request.
+
+`Create notes` opens a two-way choice — **Bullet notes** or **Handwritten** — and `HandwritingCanvas` is
+a real implementation, not a placeholder: pointer events with `pressure` driving stroke width,
+`pointerType` distinguishing pen from finger, coalesced-event sampling, DPR-aware sizing, pen/eraser
+(`destination-out`), four inks, and undo/redo/clear. `touch-action: none` so a touch drag draws instead
+of scrolling the page. The handwritten page carries an **Add card** action, so a card can be attached to
+a page whose question is in the student's own handwriting.
+
+### Three bugs, all found by exercising the thing rather than reading it
+1. **`getCoalescedEvents()` returns an empty array** for untrusted/dispatched events (and in some
+   browsers generally). The move handler looped over that empty array, so **no points were ever recorded
+   and nothing drew at all**. Now falls back to the event itself when the coalesced list is empty.
+2. **`pointFrom` read `event.currentTarget`**, which is `null` on coalesced events — every intermediate
+   sample would have been positioned against a null rect. Now reads the rect from the canvas ref.
+3. **Two CSS specificity bugs on the ink swatches.** `.hw__tools button` (0,1,1) out-ranked
+   `.hw__swatch` (0,1,0), forcing the backgrounds transparent and the padding to 11px — the four
+   swatches rendered as a single blank pill. Fixing that exposed a second one: `.hw__tools
+   button.is-active` then repainted the *selected* swatch with `--primary-faint`, so the active ink lost
+   its colour. Scoped both, with the reason recorded in the stylesheet.
+
+Verified: typecheck clean, 17/17 tests, build green, and in the browser — folder menus (`+` → Subfolder /
+Exam, `Create notes` → Bullet / Handwritten), a drawn stroke measured at 6,166 painted pixels, undo to 0,
+redo back, and all four swatches confirmed distinct with only the ring changing on selection.

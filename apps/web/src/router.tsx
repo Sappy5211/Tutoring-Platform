@@ -6,6 +6,8 @@ import { SurfacePage } from "./features/SurfacePage";
 import { GraphPage } from "./features/student/GraphPage";
 import { SignInPage } from "./features/auth/SignInPage";
 import { FlashcardReview } from "./features/flashcards/FlashcardReview";
+import { FolderPage } from "./features/notebook/FolderPage";
+import { HandwrittenPage } from "./features/notebook/HandwrittenPage";
 import { NotebookIndex } from "./features/notebook/NotebookIndex";
 import { NotebookPage } from "./features/notebook/NotebookPage";
 import {
@@ -55,6 +57,8 @@ export const router = createBrowserRouter([
           services.repository.getTopic(params.skillId ?? ""),
       },
       { path: "/app/notebook", element: <NotebookIndex /> },
+      { path: "/app/notebook/folder/:folderId", element: <FolderPage /> },
+      { path: "/app/notebook/new/handwritten", element: <HandwrittenPage /> },
       { path: "/app/notebook/:docId", element: <NotebookPage /> },
       {
         path: "/app/notes/:noteId?",

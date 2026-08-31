@@ -3,12 +3,12 @@ import type { Folder, NotebookDoc, OutlineNode } from "@vidya/contracts";
 /** Mock notebook. Shapes are the contract types, so swapping in the repository
  *  at P1.2 is a data change rather than a component rewrite. */
 export const FOLDERS: Folder[] = [
-  { folderId: "f-maths", parentId: null, title: "Mathematics", owner: "platform", order: 0, colour: "primary" },
-  { folderId: "f-number", parentId: "f-maths", title: "Number", owner: "platform", order: 0 },
-  { folderId: "f-algebra", parentId: "f-maths", title: "Algebra", owner: "platform", order: 1 },
-  { folderId: "f-geometry", parentId: "f-maths", title: "Geometry", owner: "platform", order: 2 },
-  { folderId: "f-mine", parentId: null, title: "My notes", owner: "student", order: 1, colour: "accent" },
-  { folderId: "f-mine-revision", parentId: "f-mine", title: "Revision", owner: "student", order: 0 },
+  { folderId: "f-maths", kind: "book", parentId: null, title: "Mathematics", owner: "platform", order: 0, colour: "primary" },
+  { folderId: "f-number", kind: "chapter", parentId: "f-maths", title: "Number", owner: "platform", order: 0 },
+  { folderId: "f-algebra", kind: "chapter", parentId: "f-maths", title: "Algebra", owner: "platform", order: 1 },
+  { folderId: "f-geometry", kind: "chapter", parentId: "f-maths", title: "Geometry", owner: "platform", order: 2 },
+  { folderId: "f-mine", kind: "book", parentId: null, title: "My notes", owner: "student", order: 1, colour: "accent" },
+  { folderId: "f-mine-revision", kind: "chapter", parentId: "f-mine", title: "Revision", owner: "student", order: 0 },
 ];
 
 /** Dates are relative to today so the date-grouped index never goes stale. */
