@@ -276,3 +276,61 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   .subject-menu, .auth__quote { animation: none; transition: none; }
 }
+
+/* ── Flashcard review (P3: Anki mechanics, reimplemented) ───────────── */
+.review { max-width: 720px; margin: 0 auto; display: grid; gap: 15px; }
+.review__bar { display: flex; align-items: center; gap: 14px; }
+.review__counts { display: flex; gap: 7px; flex: 1; }
+.review__count { padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 750; }
+.review__count--new { background: var(--primary-faint); color: var(--primary-strong); }
+.review__count--learn { background: var(--warning-soft); color: var(--warning); }
+.review__count--due { background: var(--surface-strong); color: var(--muted); }
+.review__deck { font-size: 11.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.review__leech { display: flex; align-items: center; gap: 10px; padding: 12px 15px; border: 1px solid var(--warning); border-radius: 14px; background: var(--warning-soft); }
+.review__leech p { margin: 0; flex: 1; font-size: 13.5px; font-weight: 600; color: var(--warning); }
+.review__leech svg { color: var(--warning); flex-shrink: 0; }
+.review__leech-cta { font-size: 13px; font-weight: 750; color: var(--primary); white-space: nowrap; }
+.review__card { display: grid; gap: 18px; padding: 40px 34px; min-height: 236px; align-content: center; text-align: center; }
+.review__prompt { margin: 0; font-size: 25px; line-height: 1.35; font-weight: 650; letter-spacing: -.02em; }
+.review__answer { display: grid; gap: 13px; animation: review-reveal .18s ease-out; }
+.review__answer hr { width: 56px; margin: 0 auto; border: 0; border-top: 2px solid var(--line-strong); }
+.review__answer p { margin: 0; font-size: 18px; line-height: 1.5; color: var(--ink); }
+.review__answer .math-render { display: block; padding: 9px 15px; border-radius: 11px; background: var(--surface-soft); }
+.review__reveal { justify-self: center; }
+.review__reveal kbd { margin-left: 8px; padding: 1px 6px; border-radius: 5px; background: rgba(255,255,255,.22); font-size: 11px; }
+@keyframes review-reveal { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .review__answer { animation: none; } }
+
+.review__ratings { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+.review__rating { display: grid; gap: 2px; justify-items: center; padding: 13px 6px 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); cursor: pointer; transition: border-color .14s ease, transform .14s ease; }
+.review__rating:hover { transform: translateY(-1px); }
+.review__rating strong { font-size: 14px; font-weight: 780; }
+/* The interval preview - the cost of each button, shown before it is pressed. */
+.review__rating span { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.review__rating kbd { margin-top: 3px; padding: 0 5px; border-radius: 4px; background: var(--surface-strong); font-size: 10px; color: var(--muted); }
+.review__rating--again { border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); }
+.review__rating--again strong { color: var(--danger); }
+.review__rating--hard strong { color: var(--warning); }
+.review__rating--good { border-color: color-mix(in srgb, var(--primary) 45%, var(--line)); }
+.review__rating--good strong { color: var(--primary); }
+.review__rating--easy strong { color: var(--success); }
+@media (prefers-reduced-motion: reduce) { .review__rating:hover { transform: none; } }
+
+.review__tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-top: 4px; }
+.review__tools button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--muted); font-size: 12.5px; font-weight: 650; cursor: pointer; }
+.review__tools button:hover { color: var(--ink); }
+.review__tools-note { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; font-size: 11.5px; color: var(--muted); }
+.review-done { display: grid; justify-items: center; gap: 13px; padding: 60px 30px; text-align: center; }
+.review-done svg { color: var(--primary); }
+.review-done h1 { margin: 0; font-size: 30px; letter-spacing: -.03em; }
+.review-done p { margin: 0; color: var(--muted); }
+
+@media (max-width: 640px) {
+  .review__card { padding: 30px 20px; min-height: 200px; }
+  .review__prompt { font-size: 21px; }
+  .review__ratings { gap: 6px; }
+  .review__rating { padding: 11px 3px 8px; }
+  .review__rating strong { font-size: 12.5px; }
+  .review__rating span { font-size: 11px; }
+  .review__tools-note { display: none; }
+}

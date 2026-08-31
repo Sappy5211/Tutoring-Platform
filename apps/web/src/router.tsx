@@ -5,6 +5,7 @@ import { services } from "./lib/services";
 import { SurfacePage } from "./features/SurfacePage";
 import { GraphPage } from "./features/student/GraphPage";
 import { SignInPage } from "./features/auth/SignInPage";
+import { FlashcardReview } from "./features/flashcards/FlashcardReview";
 import {
   HomePage,
   NotesPage,
@@ -78,11 +79,7 @@ export const router = createBrowserRouter([
         element: <SurfacePage />,
         loader: surface("diagnostic", "student"),
       },
-      {
-        path: "/app/flashcards",
-        element: <SurfacePage />,
-        loader: surface("flashcards", "student"),
-      },
+      { path: "/app/flashcards", element: <FlashcardReview /> },
       { path: "/app/tutor", element: <TutorPage /> },
       { path: "/app/graph", element: <GraphPage /> },
       {

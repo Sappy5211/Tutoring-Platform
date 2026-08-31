@@ -78,6 +78,72 @@ export interface Entitlement {
   callCreditsRemaining: number;
 }
 
+/* ── Flashcards (ADR-003 deck split, ADR-009 import, P3 Anki mechanics) ── */
+
+export type CardType =
+  | "basic" | "concept" | "descriptor" | "cloze" | "multiple_choice" | "image_occlusion";
+
+/** ADR-003 + ADR-009. Only "mastery" updates pMastery: exam-rehearsal MCQs can be
+ *  answered by elimination, and imported decks pass no quality gate and carry no
+ *  skillTags, so neither is evidence of understanding. */
+export type DeckKind = "mastery" | "exam_rehearsal" | "personal_import";
+
+export interface Flashcard {
+  flashcardId: Id;
+  type: CardType;
+  deck: DeckKind;
+  direction: "forward" | "reverse" | "both" | "none";
+  enabled: boolean;
+  front: string;
+  back: string;
+  /** LaTeX rendered with KaTeX; plain prose stays in front/back. */
+  frontLatex?: string;
+  backLatex?: string;
+  /** Cards generated from the same note block are siblings and are buried
+   *  together for the session - see P3 section 3. Matters more here than in Anki
+   *  because our cards are auto-generated, so one block yields near-duplicates. */
+  sourceBlockId?: Id;
+  skillIds: Id[];
+  status: PublishStatus;
+}
+
+export type CardPhase = "new" | "learning" | "review" | "relearning";
+/** Again / Hard / Good / Easy - keyboard 1-4, matching the convention students
+ *  who already use Anki will know. */
+export type ReviewRating = 1 | 2 | 3 | 4;
+
+export interface CardState {
+  studentId: Id;
+  flashcardId: Id;
+  stability: number;
+  difficulty: number;
+  due: string;
+  lastReview: string | null;
+  reps: number;
+  lapses: number;
+  phase: CardPhase;
+  /** Hidden until end of day (bury) or until released (suspend). */
+  buriedUntil: string | null;
+  suspended: boolean;
+  /** P3 section 4: at threshold we do NOT suspend like Anki does - that would
+   *  silently drop required syllabus. We route it to a teacher instead. */
+  isLeech: boolean;
+  flaggedForHelp: boolean;
+}
+
+export interface ReviewLogEntry {
+  reviewId: Id;
+  studentId: Id;
+  flashcardId: Id;
+  rating: ReviewRating;
+  reviewedAt: string;
+  elapsedMs: number;
+  phaseBefore: CardPhase;
+  scheduledDays: number;
+}
+
+export interface QueueCounts { newCards: number; learning: number; review: number }
+
 export interface Skill {
   id: Id;
   slug: string;

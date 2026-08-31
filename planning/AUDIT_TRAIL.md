@@ -432,3 +432,43 @@ as `exam_rehearsal` is.
 **New standing risk + mitigation:** agents install packages, so a copyleft dependency can arrive without
 anyone reading a LICENSE. Added a CI dependency-licence allowlist (MIT/ISC/BSD/Apache-2.0) to `P0.1` and
 to the risk table. Cheap now, very expensive to retrofit after a release.
+
+---
+## 2026-08-31 — Session 8: Anki mechanics extracted and the flashcard system built
+
+Operator: take Anki's mechanics and add them. Harvested Anki's **behaviour documentation**
+(`docs.ankiweb.net` → `corpus/anki-*.md`, 12 pages). **No source code was read, copied or ported** — the
+whole basis of ADR-009 is that features are not copyrightable while AGPL source is.
+
+`research/P3_anki_mechanics.md` records the extraction with ADOPT / SIMPLIFY / REJECT per mechanic. The
+judgement running through it: **Anki exposes ~40 deck options because its users are adults optimising
+20,000-card decks. Our students are 11–14.** Every one of those knobs is a way for a child to make their
+own scheduling worse, so almost all are rejected — daily limits are *derived* from the exam-date goal
+rather than typed in, retention is fixed at the documented 0.90 default, and the single student-facing
+control kept is "how much time do you have today?", which is the only one a child can actually answer.
+
+Three mechanics adopted with a deliberate change:
+- **Interval preview on every rating button.** Adopted verbatim and called out as non-optional: it is what
+  makes rating honest, because the cost of pressing "Easy" is visible before you press it.
+- **Sibling burying** — matters *more* for us than for Anki, because our cards are auto-generated from
+  note blocks (ADR-003), so one block easily yields four near-identical questions about one fact.
+- **Leeches — action changed.** Anki suspends a leech. On a *required* syllabus that silently deletes the
+  content the student is struggling with most. Ours stops normal review, marks the skill, and raises a
+  teacher-call prompt with the lapse history attached — a leech is the best-qualified signal we get that a
+  human is needed, and ADR-001 says that human is the moat.
+
+Built: `Flashcard`/`CardState`/`ReviewLogEntry`/`QueueCounts` in contracts, a `ts-fsrs` (MIT) scheduler
+adapter, and the review surface at `/app/flashcards` with queue counts, reveal, four ratings with live
+interval previews, bury, ask-about-this, leech prompt, and KaTeX-rendered answers.
+
+### Two real bugs found by testing, not by reading
+1. **Buried new cards stayed in the queue.** The filter short-circuited on `phase === "new"` before
+   checking buried state, so sibling burying silently did nothing for new cards — which is *every* card in
+   a first session. Caught because the count went 5→4 when the mechanic required 5→3.
+2. **An index over a shrinking queue skipped cards.** Rated and buried cards leave the queue, so
+   incrementing an index skips whichever card slid into the vacated slot. Removed the index entirely and
+   render `queue[0]`. Caught because the count was right and the *next card* was wrong — the kind of
+   thing that reads as correct until you check both.
+
+Verified: typecheck clean, 17/17 tests, build **137 kB gzip** (budget 200 kB), and a scripted four-card
+session driven in the browser confirming correct queue transitions, sibling burying, and completion.
