@@ -311,8 +311,11 @@ Every packet: strict file ownership, exact verification command, no git without 
 
 **Phase 0 — Foundations (blocking everything).**
 `P0.1` repo scaffold, Vite+TS+Tailwind v4, CI with the 200KB/LCP budget as a failing gate.
-**`P0.1b` bundle-budget spike** — build a throwaway route importing TipTap + KaTeX + MathLive + `motion`
-and measure. If it breaches, the reader render path changes before anything is built on it.
+**`P0.1b` bundle-budget spike** — **partly pre-empted: the maths libraries are already measured**
+(MathLive 211KB gzip, KaTeX 73KB — ADR-007, which is why MathLive is out). Still measure TipTap +
+`motion` + router + product code. Retains authority to stop the build if the remainder breaches.
+**`P0.7` constrained maths input** (ADR-007) — write the LaTeX-subset grammar down first, then build.
+On the critical path for Tranche B.
 `P0.2` implement ADR-002 schema **including Amendment 1** (User, Student, ParentGuardian, ConsentRecord,
 Subscription, Entitlement, PersonalAnnotation, Misconception) as Postgres migrations + generated TS types.
 **Single source of truth.**

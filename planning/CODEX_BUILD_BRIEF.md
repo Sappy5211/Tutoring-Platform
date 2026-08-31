@@ -52,7 +52,7 @@ no `any`.
 
 React 18 · TypeScript · **Vite** · **Tailwind v4** (`@theme` tokens, not a config file) · React Router ·
 **Zustand** for client state · `motion` imported via the **`LazyMotion` + `m`** pattern (~4.6KB, not the
-~50KB full import) · `lucide-react` icons · **KaTeX** for maths rendering, **MathLive** for maths input ·
+~50KB full import) · `lucide-react` icons · **KaTeX** for maths rendering · **a purpose-built constrained maths input, NOT MathLive** (ADR-007 — MathLive is 211KB gzip, more than the entire app budget) ·
 TipTap v2 for both author editor and reader (reader = same instance, `editable:false`) ·
 `@xyflow/react` and `react-force-graph-2d` for canvases · Dexie for offline (later phases).
 
@@ -92,6 +92,21 @@ Implement **ADR-002 including Amendment 1** as migrations + generated TS types: 
 *Accept:* migrations run clean against a local Postgres; generated types compile; **`blockId` immutability
 and no-reuse is enforced by a constraint or a documented trigger, not a convention** — the entire personal
 annotation layer anchors to it.
+
+### `P0.7` — The constrained maths input  *(ADR-007; on the critical path for Tranche B)*
+Do **not** use MathLive. It measures 211KB gzipped — more than the whole app's 200KB budget — and it was
+chosen back when the launch curriculum was Class 9–10. Class 6–8 needs integers, decimals, fractions,
+mixed numbers, ratios, percentages, simple linear expressions, small powers, roots of perfect squares,
+units and a few geometry symbols. That is a small grammar.
+**Write the LaTeX-subset grammar down first**, with a parser/validator — it is the contract between the
+input, the grading ladder and the answer key. Then build the component: numeric pad, fraction template
+with placeholder navigation, sign toggle, variable keys, layered like Dr Frost (Main/ABC/Funcs/Symbs).
+Keyboard layouts are already specified in `research/P1_practice_player_spec.md` and are reusable as-is.
+Live preview renders through KaTeX, which is loaded anyway.
+*Accept:* grammar documented and versioned; every key labelled and keyboard-operable; component ≤25KB
+gzip; round-trips its own output; OS keyboard suppressed on mobile without trapping focus.
+*Escape hatch:* if this proves worse than MathLive in real use, MathLive loads lazily behind the same
+interface — but revisit ADR-007 rather than expanding the grammar to rescue it.
 
 ### `P0.6` — Seed the Class 6–8 skill graph  *(depends on P0.2)*
 `Skill`, `Chapter`, `CurriculumPlacement` and `SkillEdge` rows for **CBSE Class 6–8 Maths**, as a
@@ -147,6 +162,8 @@ screen.
 ### Tranche B — the learning loop  *(the heart of the product)*
 - **Practice Session** — governed by `decisions/ADR-006-practice-interaction-model.md`: multi-attempt,
   progressive hint ladder, worked solution always shown, per-question teacher-comment box.
+  UI spec: `research/P1_practice_player_spec.md` — **read its ADR-007 banner first**; the spec stands
+  except that `MathAnswerField` wraps our own input, not MathLive.
   Hint/solution content model: `research/P2_hints_and_solutions.md` — **but read ADR-006 Amendment 1
   first**; the hint ladder is **two rungs, not three** (orienting, strategic), and the third rung is
   step-by-step reveal of the worked solution itself.

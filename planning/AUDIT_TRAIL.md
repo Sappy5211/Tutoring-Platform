@@ -327,3 +327,33 @@ almost-the-answer rung left to mine. Attempt counts unchanged.
 
 P2 marked with a supersession banner rather than edited, so its reasoning stays legible.
 Still in flight: `research/P1_practice_player_spec.md`.
+
+### Lane P1 landed and broke a stack decision — ADR-007
+P1 measured rather than cited: it fetched MathLive and gzipped it locally, cross-checking against
+Bundlephobia. **≈221KB gzip.** The coordinator verified independently from a separate fetch: **211KB**
+(different version, same conclusion), with KaTeX at 73KB and MathQuill at 21KB + jQuery.
+
+`MASTER_PLAN.md` §4 sets a hard **200KB gzipped initial-JS** CI gate. **MathLive alone exceeds the entire
+application budget**; with KaTeX it is 284KB before React, TipTap, router, or any product code.
+
+**Why it was missed is the more useful finding.** Lane B chose MathLive when the launch curriculum was
+Class 9–10, where surds and rearranged algebra make a full WYSIWYG maths editor defensible. **ADR-005 then
+moved the launch to Class 6–8 and nobody revisited the input decision.** The requirement shrank by an order
+of magnitude; the library did not. General lesson, recorded: **when a scope decision changes, decisions
+downstream of the old scope need an explicit re-check — they do not fail loudly, they quietly stay wrong.**
+
+`decisions/ADR-007-maths-input-strategy.md`: build a constrained structured input for Class 6–8 emitting a
+small versioned LaTeX subset, rendered by KaTeX (needed anyway). ≈15–25KB of our own code.
+Rejected MathQuill (needs jQuery, unmaintained, weaker a11y for a children's product claiming WCAG 2.2 AA).
+Rejected "just lazy-load MathLive" — it passes the initial-bundle gate while landing 211KB on the
+most-used screen in the product, which is gaming our own metric rather than meeting it; at lane E's own
+~1s-per-170KB parse cost on a low-end CPU that is a multi-second penalty on the core loop.
+MathLive is deferred, not deleted: it loads lazily behind the same interface when Class 9–10 arrives.
+
+Honest risk recorded in the ADR: input components are deceptively hard, and we are now building one. The
+mitigation is the deliberately tiny grammar plus the escape hatch — and the instruction to revisit the ADR
+if `P0.7` overruns rather than expanding the grammar to rescue it.
+
+New packet `P0.7`, on the critical path for Tranche B. P1's keyboard layout work is reusable as-is (it was
+already scoped to Class 6–8 and the Dr Frost layer pattern). P1 also predates ADR-006, so it is bannered
+for the two-rung hint ladder as well.
