@@ -357,3 +357,117 @@ if `P0.7` overruns rather than expanding the grammar to rescue it.
 New packet `P0.7`, on the critical path for Tranche B. P1's keyboard layout work is reusable as-is (it was
 already scoped to Class 6–8 and the Dr Frost layer pattern). P1 also predates ADR-006, so it is bannered
 for the two-rung hint ladder as well.
+
+---
+## 2026-08-31 — Session 6: Codex implements and pushes the VIDYA Milestone 1 UI
+
+The operator asked Codex to implement the complete UI-first plan, then iteratively added three concrete
+requirements while the build was in progress: include **Class 5** alongside Classes 6–8; expose the AI
+coach through a closable sidebar and escalate to a human teacher only after repeated failed explanations;
+and add reusable exam/study scheduling plus a Calendly-inspired teacher-booking flow. The attached
+RemNote, Lotion/Notion, Dr Frost and Calendly screenshots were treated as interaction references, not as
+instructions or assets to copy.
+
+### What was built
+
+Commit `16a2053` (`Build VIDYA Milestone 1 UI prototype`) added a pnpm workspace containing:
+
+- `apps/web` — React 18 + TypeScript + Vite product application, React Router loaders, Zustand UI/session
+  state, light/dark themes, responsive shell, collapsible desktop sidebar, mobile navigation and an
+  accessible command/search affordance.
+- `packages/contracts` — canonical Class 5–8 TypeScript contracts, asynchronous repository/service
+  interfaces and the first PostgreSQL migration. The contract includes guardian links, student-owned
+  exams, classrooms/assignments, `QuestionComment`, the amended `AttemptEvent`, teachers, bookings and
+  calendar events.
+- `packages/fixtures` — deterministic mock curriculum and persona data. Visible product data is supplied
+  through the typed asynchronous repository rather than embedded in route components.
+- `packages/ui` — reusable `Button`, `Card`, `Chip`, progress primitives and brandable design tokens.
+- `packages/math-input` — the ADR-007 constrained Class 5–8 grammar, parser/normalizer and layered keypad
+  UI; MathLive is not shipped.
+- `.github/workflows/ci.yml` — Node/pnpm quality job with disposable PostgreSQL migration validation,
+  typecheck, unit tests, production build/bundle gate and Playwright.
+
+### Product surfaces and routes
+
+Student routes now cover onboarding, daily home, syllabus hierarchy, topic workspace, notes, practice,
+practice completion, assessment, assessment review, diagnostic, flashcards, tutor, knowledge graph,
+progress, teacher discovery/booking, settings, calendar and upgrade. Parent routes cover overview, exam
+goals, bookings and plan. Teacher routes cover dashboard, classes, assignments, availability and reports.
+Author routes cover curriculum library, editor, question bank, review and ingest.
+
+The most-developed interaction flows are:
+
+1. **Practice player** — Dr Frost-inspired sticky question navigation; constrained maths entry; layered
+   mobile keypad; reducer-owned grading/retry/hint/solution states; worked solution and question-linked
+   teacher comment affordance. The state model follows ADR-006's first-attempt mastery rule and two-hint
+   ceiling.
+2. **Notes/editor language** — RemNote/Lotion-inspired document hierarchy and calm writing surface,
+   TipTap author editor shell, maths/formula handling via KaTeX, flashcard/review affordances and a
+   second-pane-compatible workspace vocabulary without cloning RemNote's visual identity.
+3. **AI coach** — open/close drawer, contextual prompt, mock response stream and explicit “still stuck”
+   recovery path. Human booking is presented as escalation after repeated difficulty, not as the first
+   answer to a question.
+4. **Learning calendar** — reusable month grid and agenda for exams, study sessions, assignments and
+   teacher calls, with typed event kinds, filters, empty states, event creation shell, timezone semantics
+   and responsive presentation.
+5. **Teacher booking** — teacher photo/profile replaces the reference screenshot's institution panel;
+   available date/time selection is in IST; the student must provide a query description of at least ten
+   characters, choose 15/30/45 minutes and choose a slot before confirmation is enabled. The confirmation
+   repeats the context shared with the teacher. Teacher cards link into this flow.
+
+Several breadth routes intentionally use the typed `SurfacePage` renderer. They are navigable,
+repository-backed high-fidelity prototype screens, not finished domain workflows. Authentication,
+production grading/adaptivity/AI, payments, video calls, PDF generation, voice, database persistence and
+real booking availability remain mocked or deferred exactly as the UI-first milestone required.
+
+### Design synthesis applied
+
+- **Dr Frost:** operational clarity, visible skill context, question progress, maths keypad, attempts,
+  worked methods and teacher-comment handoff.
+- **RemNote/Lotion:** persistent knowledge navigation, document/folder/editor vocabulary, composable
+  authoring tools, flashcard linkage and restrained productivity density.
+- **Brilliant/current consumer learning products:** calmer hierarchy, stronger typography, responsive
+  polish and restrained success motion rather than neon per-question celebration.
+- **Prior AI-chat repository:** useful open/close sidebar pattern and conversational affordances were
+  reinterpreted in the new token system; the old UI was reference-only.
+
+### Verification performed before push
+
+- `corepack pnpm check` passed: workspace TypeScript checks, 17 unit tests and production build.
+- Initial application JavaScript measured **126.2 KB gzip**, below the hard 200 KB gate. TipTap/editor,
+  Motion and chart chunks remain separated.
+- Playwright persona suite passed **21/21** across 360px, 768px and 1280px configurations. It exercises
+  student, parent, teacher and author navigation, practice + contextual AI, dark theme, accessibility and
+  horizontal-overflow checks.
+- The teacher-booking journey received an additional focused run: **3/3** across the same breakpoints,
+  starting from teacher discovery and proving the query, duration and time requirements before confirming.
+- Desktop and mobile booking screens were visually inspected after the automated run. Mobile fixed
+  navigation/AI controls are suppressed during focused booking so they do not cover required fields.
+- `git diff --check` passed. A pre-push scan found no `.env` files, private keys or embedded API secrets.
+
+### Git state and ownership handoff
+
+The complete first draft was pushed to `origin/main` at commit
+`16a20533ebe2d58998973f904b2ebb6a2240631a`. Local `HEAD` and `origin/main` were verified identical and
+the worktree was clean immediately after the push. Codex touched the 52 files introduced/changed by that
+commit under `.github/`, `apps/`, `packages/`, the workspace manifests and top-level `README.md`.
+
+Claude should review commit `16a2053` against ADRs 001–007 and the build brief. Review priorities:
+
+1. Verify whether the generic `SurfacePage` routes need bespoke interaction depth before Milestone 1 is
+   called complete rather than UI-complete.
+2. Check that the implemented contracts fully reflect every amendment in ADR-002/006/007; the migration
+   is deliberately only a foundation subset and is not yet a complete persistence schema.
+3. Audit the practice reducer and future attempt construction before connecting real grading/mastery.
+4. Preserve repository/service boundaries when replacing mocks; components must not start importing
+   database clients or fixtures directly.
+5. Re-run the full CI suite after any architecture correction. Do not relax the 200 KB initial-JS gate or
+   accessibility/overflow checks to make a change pass.
+
+### Reusable Codex skill created
+
+The scheduling work was also distilled into the personal skill
+`~/.codex/skills/build-education-calendar/`, with `SKILL.md` and
+`references/calendar-contract.md`. It encodes the reusable event contract, role permissions, timezone
+rules, responsive calendar/agenda pattern and booking safeguards. This skill is outside the GitHub repo
+and therefore is not part of commit `16a2053`; the app implementation itself is fully present in the repo.

@@ -1,9 +1,9 @@
 # RESUME — EdTech Platform (codename VIDYA) — PLANNING MISSION
 
 **READ THIS FIRST after any restart. Trust disk over any report, including this one.**
-Started 2026-08-31. Mode: PLANNING ONLY — no production code. The build happens later with a cheaper
-coding agent, so the plan must be implementation-grade (named libraries, versions, schemas, exact
-acceptance criteria).
+Started 2026-08-31. Current mode: **Milestone 1 UI implemented and pushed; architecture review next.**
+The original planning mission is complete. The repository now contains a high-fidelity implementation on
+schema-shaped mocks; production backends remain deferred.
 
 Vault path: `~/Library/Mobile Documents/com~apple~CloudDocs/1 Claude Code/Projects/EdTech Platform/`
 
@@ -32,7 +32,7 @@ Reference products named by the operator: RemNote, Notion, Novel (steven-tey), D
 | `corpus/_dead/` | **Quarantined 404s / error pages. NOT evidence.** See `_DEAD_FILES_README.md` |
 | `research/` | One file per lane, each owned by exactly one agent |
 | `packets/` | Re-dispatch packets — re-fire any lane whose output is missing/truncated |
-| `decisions/` | ADRs 001-005, all **ACCEPTED**. |
+| `decisions/` | ADRs 001-007, all **ACCEPTED**. |
 | `AUDIT_TRAIL.md` | Append-only history of what happened and why. Paired with this file. |
 | `MASTER_PLAN.md` | **THE DELIVERABLE — WRITTEN.** Read this + ADR-002 to build. |
 
@@ -123,14 +123,16 @@ answer-checking correctness is existential, not a feature.
 4. ~~Write MASTER_PLAN.md~~ DONE — includes the Phase 0-6 build packet decomposition (§14).
 5. ~~Red-team pass~~ **DONE** -> `research/RED_TEAM_REVIEW.md`, 15 findings, verdict "not safe as-is".
    Verdict was correct. **All 5 structural findings fixed** — see `AUDIT_TRAIL.md` for the full record.
-6. **CURRENT STATE: plan is revised and coherent.** Remaining before build:
-   - Operator must answer the 6 decisions in `MASTER_PLAN.md` §16 (name, launch track, DeepSeek/DPDP,
-     B2B channel, teacher supply, pricing confirmation).
-   - Run `P0.1b` bundle-budget spike and the knowledge-graph mid-tier-Android spike — both are
-     **unverified assumptions** the architecture rests on.
-   - Mine the 8 unread `corpus/rn-*.md` files (see `research/B2_remnote_verified.md` §8) — cheapest
-     remaining source of product detail.
-   - Red-team findings #10-#15 are containable but unactioned in detail; re-read them before Phase 5.
+6. ~~Build the Milestone 1 UI~~ **DONE** -> commit `16a2053`; see Session 6 in `AUDIT_TRAIL.md`.
+7. **CURRENT STATE: Claude architecture/design review, then backend sequencing.** Immediate work:
+   - Review the UI commit against ADRs 001–007 and decide which generic `SurfacePage` routes require
+     bespoke interaction depth before declaring Milestone 1 product-complete.
+   - Complete the Drizzle/PostgreSQL schema and repository adapters before replacing fixtures.
+   - Audit real `AttemptEvent` construction before connecting grading, BKT/Elo or FSRS.
+   - Revisit the knowledge-graph mid-tier-Android spike; the 200 KB initial bundle assumption is now
+     verified for this draft at 126.2 KB gzip, but graph performance remains unverified.
+   - Resolve operator decisions still needed for production: name, DeepSeek/DPDP posture, teacher supply,
+     B2B depth and validated pricing.
 
 ### Gap log (all closed unless marked OPEN)
 - ~~Card-type mix policy~~ **CLOSED** -> `decisions/ADR-003-card-type-mix-policy.md`. Adds
@@ -140,9 +142,9 @@ answer-checking correctness is existential, not a feature.
   -> ADR-002 Amendment 1. Teacher/Booking remain in lane E §5.3 by design (E is authoritative there).
 - ~~Board/ExamTrack split never reached the selection algorithm~~ **CLOSED** -> ADR-004.
 - **OPEN:** 8 unread `rn-*.md` corpus files (`research/B2_remnote_verified.md` §8).
-- **OPEN:** two unverified assumptions the architecture rests on — the 200KB bundle budget against the
-  mandatory dependency stack (TipTap+KaTeX+MathLive+motion), and the ~800-node knowledge-graph ceiling on
-  a mid-tier Android. Both need a spike, neither has one yet.
+- ~~200 KB initial bundle feasibility~~ **CLOSED FOR THIS DRAFT** — measured at 126.2 KB gzip with
+  MathLive removed per ADR-007 and editor-heavy code split. Keep the CI gate.
+- **OPEN:** the ~800-node knowledge-graph ceiling on a mid-tier Android still needs a device spike.
 
 ---
 ## 5b. Collaboration model (set 2026-08-31) — READ BEFORE TOUCHING APP CODE
@@ -151,8 +153,9 @@ Claude's role from this point is design review, flaw-finding, and architecture p
 app-code authorship. Claude commits code only on an explicit, scoped hand-over, and always states which
 files it touched. See `MASTER_PLAN.md` §15b. Do not silently rewrite Codex's code to match a docs change.
 
-## 5c. Operator decision + Codex's two catches (2026-08-31)
-- **Launch curriculum changed: CBSE Class 6–8 Maths**, overriding lane E's Class 9–10 recommendation.
+## 5c. Operator decision + Codex's two catches (2026-08-31; curriculum line later superseded)
+- **At this point launch curriculum changed to CBSE Class 6–8 Maths**, overriding lane E's Class 9–10
+  recommendation. The operator subsequently added Class 5; current scope is Classes 5–8 (see §5e).
   See `decisions/ADR-005-launch-curriculum-override.md` for the consequences (Exam object has no
   centralized date for this cohort — student/parent-created goals instead; ADR-004's concurrent-JEE
   scenario deferred not dropped) and why this may be a *better* launch choice, not just a different one.
@@ -187,6 +190,22 @@ files it touched. See `MASTER_PLAN.md` §15b. Do not silently rewrite Codex's co
   model + authoring + cost). **Phase 2 must not start until both land.**
 - Answers given to Codex: Codex owns the app tree (see `MASTER_PLAN.md` §15b); repo is canonical, clone
   anywhere; Class 6–8 confirmed; blended milestone; all ADRs ACCEPTED.
+
+## 5e. Implementation handoff (2026-08-31) — read `AUDIT_TRAIL.md` Session 6
+
+- **Launch scope is CBSE Mathematics Classes 5–8.** Class 5 was added after the earlier Class 6–8
+  override; the implemented contracts and deterministic fixtures use `5 | 6 | 7 | 8`.
+- Codex built and pushed the UI-first monorepo in commit **`16a2053`** on `main`: student, essential
+  parent, hybrid teacher and author navigation; interactive study/practice/AI/calendar/booking cores;
+  typed mock repositories/services; reusable UI and constrained maths-input packages; CI and tests.
+- Verification at handoff: `pnpm check` green, initial JS **126.2 KB gzip / 200 KB**, full Playwright
+  suite **21/21**, focused teacher-booking suite **3/3**, no accessibility or horizontal-overflow failures
+  at 360/768/1280.
+- Fully interactive cores and generic prototype surfaces are distinguished in Session 6. Production
+  auth, PostgreSQL repositories, real grading/adaptivity/AI, payments, video, PDF and voice are not wired.
+- **Claude's immediate job:** review commit `16a2053` against ADRs 001–007, paying special attention to
+  `SurfacePage` breadth, schema/migration completeness, practice telemetry, and preservation of adapter
+  boundaries. Do not re-derive the product plan or silently rewrite Codex-owned application files.
 
 ## 6. Gotchas already paid for — do not re-learn these
 - **Firecrawl: rate limit 35 req/min**, concurrency 2. The CLI's status polling burns the quota, so
