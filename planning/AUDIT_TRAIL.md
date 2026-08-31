@@ -579,3 +579,38 @@ a page whose question is in the student's own handwriting.
 Verified: typecheck clean, 17/17 tests, build green, and in the browser — folder menus (`+` → Subfolder /
 Exam, `Create notes` → Bullet / Handwritten), a drawn stroke measured at 6,166 painted pixels, undo to 0,
 redo back, and all four swatches confirmed distinct with only the ring changing on selection.
+
+---
+## 2026-08-31 — Session 12: the "crash" was data loss; editor toolbars; example material
+
+Operator reported clicking something and it "crashed and reverted back to original without changes."
+**Reproduced it, and it was worse than a crash — it was silent data destruction.**
+
+Switching to the "My notes" tab, typing one character, and switching back took the document from
+**9 rows / 4 cards to 1 row / 0 cards.** Root cause: that tab rendered a filtered slice
+(`nodes.filter(n => n.parentId === null).slice(0, 1)`) and passed it to `Outliner`, whose every edit maps
+over the array it was given and hands the whole thing back via `onChange`. So one keystroke wrote a
+one-node subset back as the entire document.
+
+This is the general trap of writing derived state back to its source. Fixed two ways:
+1. **"My notes" is now its own document** with its own node array — which is what the two-layer model
+   actually says it is, so the bug was a symptom of modelling it wrongly in the first place.
+2. **A prominent contract comment on `Outliner`** stating that `nodes` must be the complete list and that
+   a different document means a different array, never a filter over this one. The rule needs to be
+   written where the next person will hit it.
+
+Also added, per the operator's reference screenshots:
+- **Editor toolbar** with real dropdowns — Flashcard (Single line / Multi line / Concept / Descriptor /
+  Multiple choice / Cloze), Heading, Todo, Image, Table, More, Undo. Concept and Descriptor are ours
+  rather than copied: they are the card types the mix policy actively wants authors reaching for.
+  Multiple choice is present but labelled as exam rehearsal, since it does not score for mastery.
+- **Document `⋯` menu** — flashcards in page, change icon, learn with the AI tutor, share, undo,
+  find, status, open in another pane, move, print, export, stats, delete.
+- **Working undo** with a 24-step history, wired to both the toolbar and the menu.
+- **Richer example material**: the course document now has four sections (equivalent fractions, adding,
+  simplifying, comparing) across 18 rows and 9 cards, exercising all three answer layouts — inline with
+  KaTeX, a down-arrow list answer, and two block answers (diagram and graph).
+
+Verified: typecheck clean, 17/17 tests, build green. In the browser: course notes hold at 18 rows /
+9 cards across a My-notes edit and back, the personal edit persists in its own document, and every
+dropdown was opened and its contents read.

@@ -3,7 +3,8 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Folder, OutlineNode } from "@vidya/contracts";
 import { Card, Chip } from "@vidya/ui";
-import { DOCS, FOLDERS, SEED_NODES } from "./data";
+import { DOCS, FOLDERS, MY_NOTES_SEED, SEED_NODES } from "./data";
+import { DocumentMenu, EditorToolbar } from "./EditorToolbar";
 import { Outliner } from "./Outliner";
 
 type Tab = "notes" | "my-notes" | "my-cards" | "map";
@@ -79,12 +80,35 @@ export function NotebookPage() {
   const [openIds, setOpenIds] = useState<Set<string>>(new Set(["f-maths", "f-number", "f-mine"]));
   const [activeDoc, setActiveDoc] = useState("d-fractions");
   const [nodes, setNodes] = useState<OutlineNode[]>(SEED_NODES);
+  // A separate document, not a filtered view of the one above. Passing a slice
+  // into Outliner and letting it write back destroyed the page - see Outliner.
+  const [myNodes, setMyNodes] = useState<OutlineNode[]>(MY_NOTES_SEED);
+  const [history, setHistory] = useState<OutlineNode[][]>([]);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const editCourse = (next: OutlineNode[]) => {
+    setHistory((h) => [...h.slice(-24), nodes]);
+    setNodes(next);
+  };
+  const undo = () => setHistory((h) => {
+    if (!h.length) return h;
+    setNodes(h[h.length - 1]!);
+    return h.slice(0, -1);
+  });
+  const insert = (kind: string) => {
+    const label: Record<string, string> = {
+      basic: "Single-line card", multi_line: "Multi-line card", concept: "Concept card",
+      descriptor: "Descriptor card", multiple_choice: "Multiple-choice card", cloze: "Cloze card",
+    };
+    setToast(`${label[kind] ?? kind} inserted at the cursor`);
+    window.setTimeout(() => setToast(null), 2200);
+  };
 
   const toggle = (id: string) =>
     setOpenIds((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
 
   const doc = DOCS.find((d) => d.docId === activeDoc);
-  const cards = useMemo(() => nodes.filter((n) => n.cardTrigger !== null), [nodes]);
+  const cards = useMemo(() => [...nodes, ...myNodes].filter((n) => n.cardTrigger !== null), [nodes, myNodes]);
   const aiPending = cards.filter((c) => c.aiDrafted).length;
 
   const TABS: { id: Tab; label: string; icon: typeof StickyNote }[] = [
@@ -115,6 +139,11 @@ export function NotebookPage() {
           <div className="notebook__meta">
             <Chip tone="primary">{cards.length} cards</Chip>
             {aiPending > 0 && <Chip tone="warning">{aiPending} AI draft{aiPending === 1 ? "" : "s"} to review</Chip>}
+            <DocumentMenu onPick={(id) => {
+              if (id === "undo") undo();
+              else if (id === "tutor") window.dispatchEvent(new Event("vidya:open-ai"));
+              else { setToast(`“${id}” is not wired up in this prototype`); window.setTimeout(() => setToast(null), 2200); }
+            }} />
           </div>
         </header>
 
@@ -135,8 +164,9 @@ export function NotebookPage() {
               <kbd>Enter</kbd> for a new bullet, <kbd>Tab</kbd> to indent.
             </p>
             <Card className="notebook__paper">
-              <Outliner nodes={nodes} onChange={setNodes} />
+              <Outliner nodes={nodes} onChange={editCourse} />
             </Card>
+            <EditorToolbar onInsert={insert} onUndo={undo} />
           </>
         )}
 
@@ -146,7 +176,7 @@ export function NotebookPage() {
               Your own notes sit alongside the course ones and are never overwritten when a course note is
               updated. Same editor, same card shortcuts.
             </p>
-            <Outliner nodes={nodes.filter((n) => n.parentId === null).slice(0, 1)} onChange={setNodes} />
+            <Outliner nodes={myNodes} onChange={setMyNodes} />
           </Card>
         )}
 
@@ -182,6 +212,7 @@ export function NotebookPage() {
           </Card>
         )}
       </section>
+      {toast && <div className="notebook__toast" role="status">{toast}</div>}
     </div>
   );
 }

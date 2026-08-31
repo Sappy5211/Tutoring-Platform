@@ -20,6 +20,12 @@ function InlineMath({ value }: { value: string }) {
   }} />;
 }
 
+/** IMPORTANT: `nodes` must be the COMPLETE node list for the document. Every
+ *  edit maps over it and hands the whole array back, so passing a filtered
+ *  subset would write that subset back as the entire document and delete
+ *  everything else. That bug shipped once - a tab rendered a one-node slice and
+ *  a single keystroke wiped the page. A different document means a different
+ *  node array, never a filter over this one. */
 export function Outliner({ nodes, onChange }: {
   nodes: OutlineNode[];
   onChange: (next: OutlineNode[]) => void;

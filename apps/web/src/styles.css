@@ -565,3 +565,26 @@ a { color: inherit; text-decoration: none; }
   .folder__primary, .folder__ghost { flex: 1; justify-content: center; }
   .folder__grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 }
+
+/* ── Editor toolbar + document menu ─────────────────────────────────── */
+.etb { position: sticky; bottom: 14px; z-index: 30; display: flex; align-items: center; gap: 2px; justify-self: center; width: fit-content; max-width: 100%; margin: 16px auto 0; padding: 5px; border: 1px solid var(--line); border-radius: 16px; background: color-mix(in srgb, var(--surface) 94%, transparent); backdrop-filter: blur(14px); box-shadow: var(--shadow); overflow-x: auto; }
+.etb__item { position: relative; }
+.etb__btn { display: grid; justify-items: center; gap: 2px; min-width: 62px; padding: 7px 9px; border: 0; border-radius: 11px; background: transparent; color: var(--muted); font-size: 10.5px; font-weight: 650; cursor: pointer; }
+.etb__btn:hover, .etb__btn.is-open { background: var(--surface-soft); color: var(--ink); }
+.etb__btn span { white-space: nowrap; }
+.etb__caret { opacity: .55; margin-top: -2px; }
+.etb__menu { position: absolute; bottom: calc(100% + 9px); left: 50%; transform: translateX(-50%); z-index: 40; display: grid; min-width: 232px; padding: 6px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); box-shadow: var(--shadow); }
+.etb__menu-head { padding: 6px 10px 4px; font-size: 10.5px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.etb__menu button { display: grid; gap: 1px; padding: 8px 10px; border: 0; border-radius: 9px; background: transparent; text-align: left; cursor: pointer; }
+.etb__menu button:hover { background: var(--surface-soft); }
+.etb__menu strong { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.etb__menu small { font-size: 11.5px; color: var(--muted); }
+
+.doc-menu { position: relative; }
+.doc-menu__panel { position: absolute; right: 0; top: calc(100% + 7px); z-index: 60; display: grid; min-width: 226px; padding: 5px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); }
+.doc-menu__panel button { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 11px; border: 0; border-radius: 9px; background: transparent; font-size: 13.5px; text-align: left; cursor: pointer; color: var(--ink); }
+.doc-menu__panel button:hover { background: var(--surface-soft); }
+.doc-menu__panel button.is-danger { color: var(--danger); }
+.doc-menu__panel kbd { padding: 1px 5px; border: 1px solid var(--line); border-radius: 4px; font-size: 10.5px; color: var(--muted); }
+.notebook__toast { position: fixed; left: 50%; bottom: 92px; z-index: 80; transform: translateX(-50%); padding: 10px 16px; border-radius: 12px; background: var(--ink); color: var(--surface); font-size: 13px; font-weight: 650; box-shadow: var(--shadow); }
+@media (max-width: 720px) { .etb__btn span { display: none; } .etb__btn { min-width: 44px; } }
