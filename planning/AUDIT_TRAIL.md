@@ -472,3 +472,42 @@ interval previews, bury, ask-about-this, leech prompt, and KaTeX-rendered answer
 
 Verified: typecheck clean, 17/17 tests, build **137 kB gzip** (budget 200 kB), and a scripted four-card
 session driven in the browser confirming correct queue transitions, sibling burying, and completion.
+
+---
+## 2026-08-31 — Session 9: notebook — filing system + RemNote-style outliner + embedded graph
+
+Operator was right that the filing system did not exist: `grep` for folder/subfolder across the app and
+contracts returned **zero matches**, `TiptapEditor.tsx` was an 11-line stub and `GraphPage.tsx` a 13-line
+one. Verified before building rather than taking the claim or the repo at face value.
+
+Built the notebook at `/app/notebook`:
+- **Filing system** — `Folder` (arbitrary nesting, `parentId`) + `NotebookDoc` in contracts, with a
+  sidebar tree. Folders carry `owner: "platform" | "student"`, which is lane B's two-layer model made
+  concrete: course folders are published and read-only, "My notes" is the student's own and is badged.
+- **Outliner with the RemNote card mechanic.** Ending a bullet with `==` (or `->`, `<-`, `<->`) strips the
+  trigger, converts the bullet to a card, renders an arrow, and moves the cursor to the answer.
+- **AI-drafted answers**: a ghost suggestion appears with a `Tab` hint; accepting marks the card
+  `aiDrafted` and surfaces it as "N AI drafts to review" in the header. ADR-003's gate — nothing
+  AI-written is silently treated as reviewed — expressed as an interaction rather than a policy document.
+- **Three answer layouts**, per the operator's description: `inline` (→ answer on the line),
+  `children` (↓ answer is the indented bullets below — a list card), and `block` (a diagram, graph or
+  derivation that will not fit on a line).
+- **Tabs**: Course notes · My notes · My flashcards · Knowledge map. The map is an embedded compact
+  graph rather than only a separate page, because a knowledge map is most useful beside the note it
+  describes.
+
+### Engineering note worth recording
+The outliner uses **one controlled input per bullet, not `contenteditable`**. Contenteditable is where
+rich-text editors go to die — IME composition, caret restoration, selection across nodes, undo. For an
+outliner where each row is a single line of text, per-row inputs give correct mobile keyboards, real
+`aria-label`s, and free undo, at the cost of not supporting inline rich formatting inside a bullet. That
+is the right trade for this shape of content and should be revisited only if inline styling is needed.
+
+### Bug found by the compiler
+A local `Math` component shadowed the global `Math` object, breaking `Math.random()` in the same module.
+Renamed to `InlineMath`. Trivial, but exactly the class of thing that would have shipped silently if the
+typecheck had not been run.
+
+Verified: typecheck clean, 17/17 tests, build **141 kB gzip** (budget 200 kB), and the `==` → arrow →
+Tab-accept path driven end-to-end in the browser — card count 4→5, trigger stripped from the question,
+answer populated, and the AI-draft flag raised in the header.

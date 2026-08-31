@@ -6,6 +6,7 @@ import { SurfacePage } from "./features/SurfacePage";
 import { GraphPage } from "./features/student/GraphPage";
 import { SignInPage } from "./features/auth/SignInPage";
 import { FlashcardReview } from "./features/flashcards/FlashcardReview";
+import { NotebookPage } from "./features/notebook/NotebookPage";
 import {
   HomePage,
   NotesPage,
@@ -52,6 +53,7 @@ export const router = createBrowserRouter([
         loader: ({ params }) =>
           services.repository.getTopic(params.skillId ?? ""),
       },
+      { path: "/app/notebook", element: <NotebookPage /> },
       {
         path: "/app/notes/:noteId?",
         element: <NotesPage />,

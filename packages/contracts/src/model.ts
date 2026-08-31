@@ -144,6 +144,60 @@ export interface ReviewLogEntry {
 
 export interface QueueCounts { newCards: number; learning: number; review: number }
 
+/* ── Notebook: filing system + outliner (RemNote-style) ───────────────── */
+
+export interface Folder {
+  folderId: Id;
+  /** null = top level. Folders nest arbitrarily. */
+  parentId: Id | null;
+  title: string;
+  colour?: string;
+  /** Published curriculum vs the student's own. Lane B's two-layer model:
+   *  published folders are read-only to students, personal ones are theirs. */
+  owner: "platform" | "student";
+  order: number;
+}
+
+export interface NotebookDoc {
+  docId: Id;
+  folderId: Id | null;
+  title: string;
+  owner: "platform" | "student";
+  updatedAt: string;
+}
+
+/** How a card trigger was written, and which directions it generates.
+ *  `==` (or `->`) = forward, `<-` = reverse, `<->` = both. Renders as an arrow. */
+export type CardTrigger = "forward" | "reverse" | "both";
+
+/** Where the answer lives relative to the question bullet:
+ *  - "inline"   → arrow on the same line, one short answer
+ *  - "children" ↓ arrow, answer is the bullet's indented children (a list card)
+ *  - "block"    the answer is a block that will not fit on a line - a diagram,
+ *               a graph, a worked derivation. */
+export type AnswerLayout = "inline" | "children" | "block";
+
+export interface OutlineNode {
+  nodeId: Id;
+  docId: Id;
+  parentId: Id | null;
+  order: number;
+  /** The bullet's own text. When it carries a card, this is the question side. */
+  text: string;
+  /** Present when answerLayout === "inline". */
+  answer?: string;
+  answerLatex?: string;
+  /** Present when answerLayout === "block" - a graph/diagram/derivation. */
+  blockKind?: "graph" | "diagram" | "derivation";
+  /** null = an ordinary bullet, not a card. */
+  cardTrigger: CardTrigger | null;
+  answerLayout: AnswerLayout;
+  collapsed: boolean;
+  /** The answer was drafted by AI and has not been accepted by a human yet.
+   *  ADR-003's gate: nothing AI-written reaches a learner unreviewed. */
+  aiDrafted: boolean;
+}
+
 export interface Skill {
   id: Id;
   slug: string;

@@ -1,4 +1,4 @@
-import { BookOpen, Bot, BrainCircuit, CalendarDays, ChevronDown, CircleUserRound, FilePenLine, GraduationCap, Home, LibraryBig, Menu, Moon, PanelLeftClose, PanelLeftOpen, Search, Settings, Sparkles, Sun, UsersRound, X } from "lucide-react";
+import { BookOpen, Bot, BrainCircuit, CalendarDays, ChevronDown, CircleUserRound, FilePenLine, GraduationCap, Home, LibraryBig, Menu, Moon, NotebookPen, PanelLeftClose, PanelLeftOpen, Search, Settings, Sparkles, Sun, UsersRound, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import type { UserRole } from "@vidya/contracts";
@@ -8,7 +8,7 @@ import { SubjectSwitcher } from "./SubjectSwitcher";
 
 const nav: Record<UserRole, Array<{ to: string; label: string; icon: typeof Home }>> = {
   student: [
-    { to: "/app/home", label: "Home", icon: Home }, { to: "/app/syllabus", label: "Learn", icon: LibraryBig }, { to: "/app/practice", label: "Practice", icon: Sparkles }, { to: "/app/tutor", label: "Ask VIDYA", icon: Bot }, { to: "/app/progress", label: "Progress", icon: BrainCircuit },
+    { to: "/app/home", label: "Home", icon: Home }, { to: "/app/syllabus", label: "Learn", icon: LibraryBig }, { to: "/app/notebook", label: "Notebook", icon: NotebookPen }, { to: "/app/practice", label: "Practice", icon: Sparkles }, { to: "/app/tutor", label: "Ask VIDYA", icon: Bot }, { to: "/app/progress", label: "Progress", icon: BrainCircuit },
     { to: "/app/flashcards", label: "Flashcards", icon: BookOpen }, { to: "/app/calendar", label: "Schedule", icon: CalendarDays }, { to: "/app/teachers", label: "Teachers", icon: UsersRound }, { to: "/app/settings", label: "Settings", icon: Settings }
   ],
   parent: [{ to: "/parent/overview", label: "Overview", icon: Home }, { to: "/parent/goals", label: "Exam goals", icon: CalendarDays }, { to: "/parent/bookings", label: "Bookings", icon: UsersRound }, { to: "/parent/plan", label: "Plan", icon: Sparkles }],
