@@ -1,0 +1,71 @@
+Scrape ID: 01a053fc-6f77-73ea-8403-ea41b4400ec5
+OK   brilliant
+Scrape ID: 01a053fc-6f77-74ca-bddc-d09db127f55f
+OK   drfrostmaths
+Scrape ID: 01a053fc-8427-75d1-b147-9ee680114591
+OK   mathacademy
+Scrape ID: 01a053fc-8465-749e-8eab-c5346e3df6d7
+OK   khanacademy
+Scrape ID: 01a053fc-8a3f-762c-ab4a-c877f1ad4604
+OK   remnote
+Scrape ID: 01a053fc-8a41-778d-ad25-bc1b05e1d165
+OK   remnote-features
+Scrape ID: 01a053fc-a1e9-72df-92b7-ff13c54b5830
+OK   novel-repo
+Scrape ID: 01a053fc-a203-7347-a238-39078caf405d
+OK   notion-product
+Scrape ID: 01a053fc-b8f0-7724-989f-49d3acb2b59d
+OK   anki
+Scrape ID: 01a053fc-b915-744e-b1c7-7a335c741bf0
+OK   mochi
+Error: Rate limit exceeded. Consumed (req/min): 11, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 34s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL pwlive  https://www.pw.live/
+Error: Rate limit exceeded. Consumed (req/min): 12, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 34s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL embibe  https://www.embibe.com/
+Error: Rate limit exceeded. Consumed (req/min): 13, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 33s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL unacademy  https://unacademy.com/
+Error: Rate limit exceeded. Consumed (req/min): 14, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 33s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL vedantu  https://www.vedantu.com/
+Error: Rate limit exceeded. Consumed (req/min): 15, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 32s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL cuemath  https://www.cuemath.com/
+Error: Rate limit exceeded. Consumed (req/min): 16, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 32s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL byjus  https://byjus.com/
+Error: Rate limit exceeded. Consumed (req/min): 17, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 31s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL doubtnut  https://www.doubtnut.com/
+Error: Rate limit exceeded. Consumed (req/min): 18, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 31s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL toppr  https://www.toppr.com/
+Error: Rate limit exceeded. Consumed (req/min): 20, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 30s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+Error: Rate limit exceeded. Consumed (req/min): 19, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 30s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL infinitylearn  https://infinitylearn.com/
+FAIL allendigital  https://www.allen.ac.in/
+Error: Rate limit exceeded. Consumed (req/min): 21, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 29s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+Error: Rate limit exceeded. Consumed (req/min): 22, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 29s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL mathspace  https://www.mathspace.co/
+FAIL deltamath  https://www.deltamath.com/
+Error: Rate limit exceeded. Consumed (req/min): 23, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 27s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+Error: Rate limit exceeded. Consumed (req/min): 24, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 27s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL ixl-math  https://uk.ixl.com/math/
+FAIL sparxmaths  https://sparxmaths.com/
+Error: Rate limit exceeded. Consumed (req/min): 25, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 26s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL photomath  https://photomath.com/
+Error: Rate limit exceeded. Consumed (req/min): 26, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 25s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL symbolab  https://www.symbolab.com/
+Error: Rate limit exceeded. Consumed (req/min): 27, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 24s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+Error: Rate limit exceeded. Consumed (req/min): 28, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 24s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL gauthmath  https://www.gauthmath.com/
+FAIL duolingo  https://www.duolingo.com/
+Error: Rate limit exceeded. Consumed (req/min): 29, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 23s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL wyzant  https://www.wyzant.com/
+Error: Rate limit exceeded. Consumed (req/min): 30, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 23s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL preply  https://preply.com/
+Error: Rate limit exceeded. Consumed (req/min): 31, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 22s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL deepseek-api  https://api-docs.deepseek.com/
+Error: Rate limit exceeded. Consumed (req/min): 32, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 22s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL superprof-in  https://www.superprof.co.in/
+Error: Rate limit exceeded. Consumed (req/min): 33, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 21s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+Error: Rate limit exceeded. Consumed (req/min): 34, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 21s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL tiptap  https://tiptap.dev/docs/editor/getting-started/overview
+FAIL quizlet  https://quizlet.com/
+Error: Rate limit exceeded. Consumed (req/min): 35, Remaining (req/min): 0. Upgrade your plan at https://firecrawl.dev/pricing for increased rate limits or please retry after 20s, resets at Sun Aug 30 2026 18:45:07 GMT+0000 (Coordinated Universal Time)
+FAIL seneca  https://senecalearning.com/en-GB/
+HARVEST_COMPLETE
