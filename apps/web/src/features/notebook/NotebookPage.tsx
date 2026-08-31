@@ -1,4 +1,4 @@
-import { BrainCircuit, ChevronRight, FileText, FolderClosed, FolderOpen, Layers, Plus, StickyNote } from "lucide-react";
+import { BrainCircuit, ChevronRight, FileText, FolderClosed, FolderOpen, Layers, PanelLeftClose, PanelLeftOpen, Plus, StickyNote } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Folder, OutlineNode } from "@vidya/contracts";
@@ -78,6 +78,7 @@ function FolderTree({ folders, openIds, onToggle, activeDoc, onOpenDoc }: {
 export function NotebookPage() {
   const [tab, setTab] = useState<Tab>("notes");
   const [openIds, setOpenIds] = useState<Set<string>>(new Set(["f-maths", "f-number", "f-mine"]));
+  const [treeOpen, setTreeOpen] = useState(true);
   const [activeDoc, setActiveDoc] = useState("d-fractions");
   const [nodes, setNodes] = useState<OutlineNode[]>(SEED_NODES);
   // A separate document, not a filtered view of the one above. Passing a slice
@@ -119,9 +120,18 @@ export function NotebookPage() {
   ];
 
   return (
-    <div className="page notebook">
+    <div className={`page notebook${treeOpen ? "" : " is-tree-collapsed"}`}>
       <aside className="notebook__sidebar" aria-label="Notebook files">
         <div className="notebook__sidebar-head">
+          <button
+            className="icon-button notebook__tree-toggle"
+            onClick={() => setTreeOpen((v) => !v)}
+            aria-expanded={treeOpen}
+            aria-label={treeOpen ? "Collapse file list" : "Expand file list"}
+            title={treeOpen ? "Collapse file list" : "Expand file list"}
+          >
+            {treeOpen ? <PanelLeftClose size={16} /> : <PanelLeftOpen size={16} />}
+          </button>
           <strong>Notebook</strong>
           <button className="icon-button" aria-label="New folder or note"><Plus size={16} /></button>
         </div>

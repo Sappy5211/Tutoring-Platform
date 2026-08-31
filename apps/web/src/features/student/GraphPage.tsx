@@ -1,13 +1,146 @@
-import { useState } from "react";
+import { Focus, Layers, Lightbulb, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Filter, Focus, ListTree, Search } from "lucide-react";
-import { Card, Chip, ProgressBar } from "@vidya/ui";
+import { Button, Card, Chip, ProgressBar } from "@vidya/ui";
+import { BrainGraph, type SkillNode } from "../graph/BrainGraph";
+import { ControlPanel } from "../graph/ControlPanel";
+import { DEFAULT_FORCES, type GraphForces } from "../graph/constants";
 
-const nodes = [
-  { id: "integers", label: "Integers", x: 18, y: 34, mastery: 82 }, { id: "fractions", label: "Fractions", x: 38, y: 18, mastery: 74 }, { id: "ratio", label: "Ratio", x: 60, y: 30, mastery: 56 }, { id: "percent", label: "Percentages", x: 78, y: 18, mastery: 42 }, { id: "algebra", label: "Algebra", x: 45, y: 58, mastery: 67 }, { id: "equations", label: "Equations", x: 68, y: 64, mastery: 48 }, { id: "geometry", label: "Geometry", x: 22, y: 73, mastery: 71 }, { id: "mensuration", label: "Mensuration", x: 47, y: 83, mastery: 36 }
+const SEED: SkillNode[] = [
+  { id: "integers", label: "Integers", mastery: 82, unlocked: true, x: 22, y: 26, vx: 0, vy: 0 },
+  { id: "fractions", label: "Fractions", mastery: 74, unlocked: true, x: 44, y: 18, vx: 0, vy: 0 },
+  { id: "decimals", label: "Decimals", mastery: 61, unlocked: true, x: 66, y: 24, vx: 0, vy: 0 },
+  { id: "ratio", label: "Ratio", mastery: 56, unlocked: true, x: 40, y: 46, vx: 0, vy: 0 },
+  { id: "percent", label: "Percentages", mastery: 38, unlocked: true, x: 66, y: 52, vx: 0, vy: 0 },
+  { id: "algebra", label: "Algebra", mastery: 64, unlocked: true, x: 24, y: 58, vx: 0, vy: 0 },
+  { id: "equations", label: "Equations", mastery: 44, unlocked: true, x: 44, y: 72, vx: 0, vy: 0 },
+  { id: "geometry", label: "Geometry", mastery: 70, unlocked: true, x: 76, y: 74, vx: 0, vy: 0 },
+  { id: "mensuration", label: "Perimeter & area", mastery: 33, unlocked: true, x: 60, y: 86, vx: 0, vy: 0 },
 ];
-const edges: Array<readonly [number, number]> = [[0,1],[1,2],[2,3],[0,4],[1,4],[4,5],[6,7],[4,7]];
+
+const EDGES: { from: string; to: string }[] = [
+  { from: "integers", to: "fractions" }, { from: "fractions", to: "decimals" },
+  { from: "fractions", to: "ratio" }, { from: "ratio", to: "percent" },
+  { from: "decimals", to: "percent" }, { from: "integers", to: "algebra" },
+  { from: "algebra", to: "equations" }, { from: "ratio", to: "equations" },
+  { from: "geometry", to: "mensuration" }, { from: "algebra", to: "mensuration" },
+];
+
 export function GraphPage() {
-  const [selected, setSelected] = useState(nodes[5]!);
-  return <div className="page graph-page"><header className="page-header"><div><span className="eyebrow">Knowledge map</span><h1>See how ideas connect</h1><p>Focus on weak spots without losing sight of what supports them.</p></div><div className="graph-actions"><button><Search />Find a skill</button><button><Filter />Weak spots</button></div></header><div className="graph-layout"><Card className="graph-canvas"><div className="graph-toolbar"><Chip tone="primary">Class 7 · Maths</Chip><button><Focus />Centre</button></div><svg viewBox="0 0 100 100" role="img" aria-label="Connected mathematics skills">{edges.map(([a,b], index) => <line key={index} x1={nodes[a]!.x} y1={nodes[a]!.y} x2={nodes[b]!.x} y2={nodes[b]!.y} />)}{nodes.map((node) => <g key={node.id} className={selected.id === node.id ? "selected" : ""} onClick={() => setSelected(node)} role="button" tabIndex={0}><circle cx={node.x} cy={node.y} r="5" className={node.mastery >= 70 ? "secure" : node.mastery >= 45 ? "developing" : "starting"} /><text x={node.x} y={node.y + 9}>{node.label}</text></g>)}</svg><div className="graph-mobile-tree"><ListTree /><p>The interactive graph becomes a curriculum tree on smaller screens.</p></div></Card><Card className="graph-detail"><span className="eyebrow">Selected skill</span><h2>{selected.label}</h2><p>{selected.mastery}% mastery</p><ProgressBar value={selected.mastery} /><h3>Why this matters</h3><p>This skill unlocks the next connected ideas and appears in your current exam goal.</p><Link to="/app/practice">Practise this skill</Link></Card></div></div>;
+  const [selectedId, setSelectedId] = useState<string | null>("percent");
+  const [forces, setForces] = useState<GraphForces>(DEFAULT_FORCES);
+  const [frozen, setFrozen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  const selected = SEED.find((n) => n.id === selectedId) ?? null;
+
+  const needs = useMemo(
+    () => EDGES.filter((e) => e.to === selectedId).map((e) => SEED.find((n) => n.id === e.from)!),
+    [selectedId]);
+  const unlocks = useMemo(
+    () => EDGES.filter((e) => e.from === selectedId).map((e) => SEED.find((n) => n.id === e.to)!),
+    [selectedId]);
+
+  /** The map's point: the weakest skill whose prerequisites are already solid.
+   *  Not "here is your data" but "start here, and here is why". */
+  const suggestion = useMemo(() => {
+    const ready = SEED.filter((node) => {
+      const prereqs = EDGES.filter((e) => e.to === node.id).map((e) => SEED.find((n) => n.id === e.from)!);
+      return prereqs.length > 0 && prereqs.every((p) => p.mastery >= 60);
+    });
+    return ready.sort((a, b) => a.mastery - b.mastery)[0] ?? null;
+  }, []);
+
+  const shaky = needs.filter((n) => n.mastery < 60);
+
+  return (
+    <div className="page graph-page">
+      <header className="page-header">
+        <div>
+          <span className="eyebrow">Knowledge map</span>
+          <h1>See how ideas connect</h1>
+          <p>Hover to light up a skill and everything it touches. Click to inspect, double-click to zoom in.</p>
+        </div>
+      </header>
+
+      {suggestion && (
+        <Card className="graph-suggestion">
+          <span className="graph-suggestion__icon"><Lightbulb size={19} /></span>
+          <div>
+            <strong>Start with {suggestion.label}</strong>
+            <p>Its prerequisites are secure and it is your weakest ready skill, so time here moves the most.</p>
+          </div>
+          <Button onClick={() => setSelectedId(suggestion.id)}>Show me</Button>
+        </Card>
+      )}
+
+      <div className="graph-layout">
+        <Card className="graph-canvas">
+          <div className="graph-toolbar">
+            <Chip tone="primary">Class 7 · Maths</Chip>
+            <button onClick={() => setSelectedId(null)}><Focus size={15} /> Clear focus</button>
+          </div>
+          <ControlPanel forces={forces} setForces={setForces} frozen={frozen} setFrozen={setFrozen}
+            query={query} setQuery={setQuery} />
+          <BrainGraph nodes={SEED} edges={EDGES} forces={forces} frozen={frozen}
+            selectedId={selectedId} onSelect={setSelectedId} searchQuery={query} />
+        </Card>
+
+        <Card className="graph-detail">
+          {selected ? (
+            <>
+              <span className="eyebrow">Selected skill</span>
+              <h2>{selected.label}</h2>
+              <ProgressBar value={selected.mastery} />
+              <p className="graph-detail__pct">{selected.mastery}% mastery</p>
+
+              {needs.length > 0 && (
+                <>
+                  <h3>Needs first</h3>
+                  <ul className="graph-list">
+                    {needs.map((n) => (
+                      <li key={n.id}>
+                        <button onClick={() => setSelectedId(n.id)}>{n.label}</button>
+                        <Chip tone={n.mastery >= 60 ? "success" : "warning"}>{n.mastery}%</Chip>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+
+              {shaky.length > 0 && (
+                <p className="graph-detail__warn">
+                  <Sparkles size={14} aria-hidden />
+                  {shaky.map((s) => s.label).join(" and ")} {shaky.length === 1 ? "is" : "are"} shaky —
+                  that is usually why this one feels hard.
+                </p>
+              )}
+
+              {unlocks.length > 0 && (
+                <>
+                  <h3>Unlocks</h3>
+                  <ul className="graph-list">
+                    {unlocks.map((n) => (
+                      <li key={n.id}>
+                        <button onClick={() => setSelectedId(n.id)}>{n.label}</button>
+                        <Chip tone="neutral">{n.mastery}%</Chip>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+
+              <Link to="/app/practice"><Button className="graph-detail__cta">Practise {selected.label}</Button></Link>
+            </>
+          ) : (
+            <div className="graph-detail__empty">
+              <Layers size={24} aria-hidden />
+              <h2>Nothing selected</h2>
+              <p>Pick a skill on the map to see what it rests on and what it opens up.</p>
+            </div>
+          )}
+        </Card>
+      </div>
+    </div>
+  );
 }

@@ -25,17 +25,27 @@ export function Shell() {
   const [palette, setPalette] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  // When collapsed the sidebar is not gone, it is peekable: hovering the toggle
+  // (or the left edge) slides it out as an overlay, leaving is enough to hide it
+  // again, and clicking the toggle locks it back open.
+  const [peek, setPeek] = useState(false);
   const location = useLocation(); const navigate = useNavigate();
   useEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
   useEffect(() => { const routeRole: UserRole = location.pathname.startsWith("/parent/") ? "parent" : location.pathname.startsWith("/teacher/") ? "teacher" : location.pathname.startsWith("/author/") ? "author" : "student"; if (routeRole !== role) setRole(routeRole); }, [location.pathname, role, setRole]);
   useEffect(() => { setOpen(false); window.scrollTo({ top: 0 }); }, [location.pathname]);
   useEffect(() => { const listener = (event: KeyboardEvent) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); setPalette((value) => !value); } }; window.addEventListener("keydown", listener); return () => window.removeEventListener("keydown", listener); }, []);
   useEffect(() => { const openCoach = () => setAiOpen(true); window.addEventListener("vidya:open-ai", openCoach); return () => window.removeEventListener("vidya:open-ai", openCoach); }, []);
+  useEffect(() => { const alt = (event: KeyboardEvent) => { if (event.altKey && event.key.toLowerCase() === "s") { event.preventDefault(); setSidebarCollapsed((v) => !v); setPeek(false); } }; window.addEventListener("keydown", alt); return () => window.removeEventListener("keydown", alt); }, []);
+  useEffect(() => { if (!sidebarCollapsed) setPeek(false); }, [sidebarCollapsed]);
   const chooseRole = (next: UserRole) => { setRole(next); navigate(startFor[next]); };
-  return <div className={`app-shell ${sidebarCollapsed ? "is-sidebar-collapsed" : ""}`}>
+  return <div className={`app-shell ${sidebarCollapsed ? "is-sidebar-collapsed" : ""} ${peek ? "is-peeking" : ""}`}>
     <a className="skip-link" href="#main-content">Skip to content</a>
     <header className="topbar">
       <button className="icon-button mobile-menu" onClick={() => setOpen(!open)} aria-label="Open navigation">{open ? <X /> : <Menu />}</button>
+      <span className="sidebar-toggle-wrap" onPointerEnter={() => sidebarCollapsed && setPeek(true)}>
+        <button className="icon-button sidebar-toggle" onClick={() => { setSidebarCollapsed((v) => !v); setPeek(false); }} aria-label={sidebarCollapsed ? "Lock sidebar open" : "Collapse sidebar"} aria-expanded={!sidebarCollapsed}>{sidebarCollapsed ? <PanelLeftOpen /> : <PanelLeftClose />}</button>
+        <span className="sidebar-tip" role="tooltip">{sidebarCollapsed ? "Lock sidebar open" : "Collapse sidebar"} · <kbd>⌥</kbd><kbd>S</kbd></span>
+      </span>
       <NavLink to={startFor[role]} className="brand"><span className="brand__mark">V</span><span>VIDYA</span></NavLink>
       {role === "student" && <SubjectSwitcher />}
       <button className="search-trigger" onClick={() => setPalette(true)}><Search size={18} /><span>Search anything</span><kbd>⌘ K</kbd></button>
@@ -45,8 +55,7 @@ export function Shell() {
         <label className="role-switcher"><CircleUserRound size={19} /><select value={role} onChange={(event) => chooseRole(event.target.value as UserRole)} aria-label="Preview persona"><option value="student">Student</option><option value="parent">Parent</option><option value="teacher">Teacher</option><option value="author">Author</option></select><ChevronDown size={15} /></label>
       </div>
     </header>
-    <aside className={`sidebar ${open ? "is-open" : ""}`} aria-label="Primary navigation">
-      <button className="sidebar-toggle" onClick={() => setSidebarCollapsed((value) => !value)} aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>{sidebarCollapsed ? <PanelLeftOpen /> : <PanelLeftClose />}</button>
+    <aside className={`sidebar ${open ? "is-open" : ""}`} aria-label="Primary navigation" onPointerEnter={() => sidebarCollapsed && setPeek(true)} onPointerLeave={() => setPeek(false)}>
       <div className="sidebar__context"><span className="avatar">{role === "student" ? "AS" : role === "parent" ? "PS" : role === "teacher" ? "MI" : "AU"}</span><div><strong>{role === "student" ? "Aarav Sharma" : role === "parent" ? "Priya Sharma" : role === "teacher" ? "Meera Iyer" : "Content team"}</strong><span>{role === "student" ? "CBSE · Class 7" : `${role[0]!.toUpperCase()}${role.slice(1)} workspace`}</span></div></div>
       <nav>{nav[role].map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} title={sidebarCollapsed ? label : undefined} aria-label={sidebarCollapsed ? label : undefined} className={({ isActive }) => isActive ? "active" : ""}><Icon size={19} /><span>{label}</span></NavLink>)}</nav>
       <div className="sidebar__footer"><span className="signal-dot" />Mock workspace · all systems safe</div>

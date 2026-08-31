@@ -614,3 +614,45 @@ Also added, per the operator's reference screenshots:
 Verified: typecheck clean, 17/17 tests, build green. In the browser: course notes hold at 18 rows /
 9 cards across a My-notes edit and back, the personal edit persists in its own document, and every
 dropdown was opened and its contents read.
+
+---
+## 2026-08-31 — Session 13: sidebar peek/lock, notebook collapse, brain graph rebuilt
+
+**Sidebar.** The collapse control was `position: absolute; right: -17px` — literally hanging off the
+sidebar's edge, which is what the operator meant by "sticking out". Moved into the top bar at the far
+left, and implemented the behaviour from their screenshot: collapsed hides the sidebar, hovering the
+toggle or the left edge **peeks it out as an overlay**, leaving hides it again, clicking **locks it
+open**, with a tooltip and an ⌥S shortcut. Verified: collapsed → `margin-left: -260px`; peeking → 0
+**while the main content's padding stays put**, so hovering never reflows the page.
+
+Two cascade collisions on the way there: `transform` is used by the mobile `.sidebar` rules and `left`
+is written by the base rule's `inset` shorthand, so both were overridden. Settled on `margin-left`,
+which nothing else touches, with the reason recorded in the stylesheet.
+
+**Notebook file panel** is now collapsible to a rail, with its toggle as the first item in its own
+header rather than floating outside the panel.
+
+**Brain graph — and an approach reversal worth recording.** The operator asked for CarbonAnswer's graph
+"exactly". Read that implementation (`react-force-graph-2d`: hover 1-hop highlight + dim, click select,
+double-click zoom, zoom-threshold labels, force sliders, reduced-motion freeze) and installed the same
+package. It **crashed the whole route into the error boundary**: under pnpm's strict layout
+`react-force-graph-2d` resolves its own copy of React, giving "Invalid hook call ... more than one copy
+of React". Tried `resolve.dedupe`, then an explicit alias (which broke `react/jsx-dev-runtime` because
+it aliased the entry file rather than the package directory), then the directory form — still failing.
+
+**Three failed attempts is the signal the approach is wrong, not that a fourth will land.** Removed the
+dependency and rebuilt the same *interaction model* on our own SVG simulation: hover lights a node and
+its one-hop neighbourhood and dims the rest, click selects for the inspector, double-click zooms, labels
+appear past a zoom threshold, five force sliders, freeze, search, band legend, and reduced-motion
+settles-then-stops. Same behaviour, no duplicate-React landmine, and a few KB instead of ~130KB against
+a 200KB budget.
+
+**The bug behind the "weird blobs".** Throughout the above the graph card showed four giant rounded
+shapes. They were never the graph: `elementFromPoint` identified them as `svg.lucide-focus` — the
+toolbar's *icon*, rendered 518px tall by a leftover `.graph-canvas svg { width: 100%; height: 500px }`
+rule from the previous stub, which was sizing every SVG in the card. Scoped it. **Chasing the graph
+library for three attempts while the actual symptom was a CSS selector is the lesson here: identify what
+is on screen before attributing it to the thing you just changed.**
+
+Verified: typecheck clean, 17/17 tests, build 151 kB gzip (budget 200 kB); graph shows 9 nodes with
+6 dimmed and 2 edges lit on selection, 5 sliders, 4-band legend, and freeze halting the simulation.
