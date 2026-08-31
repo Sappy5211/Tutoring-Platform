@@ -1,6 +1,8 @@
 # ADR-004 — Curriculum-scoped prerequisites and concurrent exam goals
 
-Status: PROPOSED (coordinator). Date: 2026-08-31.
+Status: ACCEPTED (2026-08-31). Its motivating scenario (concurrent CBSE+JEE) is deferred by ADR-005's
+Class 6-8 launch override, but the schema/algorithm change is adopted now regardless — cheap today,
+expensive to retrofit.
 Raised by `research/RED_TEAM_REVIEW.md` finding #4. **Amends ADR-002 and lane C §5.**
 
 ## Context

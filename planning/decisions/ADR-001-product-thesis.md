@@ -1,6 +1,6 @@
 # ADR-001 — Product thesis and competitive position
 
-Status: PROPOSED (coordinator). Date: 2026-08-31. Decider: operator.
+Status: ACCEPTED (2026-08-31). Date: 2026-08-31. Decider: operator.
 Evidence: firecrawl corpus of 33 competitor pages, `corpus/` (see `_harvest*.log`).
 
 ## Context

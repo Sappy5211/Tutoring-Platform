@@ -32,7 +32,7 @@ Reference products named by the operator: RemNote, Notion, Novel (steven-tey), D
 | `corpus/_dead/` | **Quarantined 404s / error pages. NOT evidence.** See `_DEAD_FILES_README.md` |
 | `research/` | One file per lane, each owned by exactly one agent |
 | `packets/` | Re-dispatch packets — re-fire any lane whose output is missing/truncated |
-| `decisions/` | ADRs. `ADR-001-product-thesis.md` written. |
+| `decisions/` | ADRs 001-005, all **ACCEPTED**. |
 | `AUDIT_TRAIL.md` | Append-only history of what happened and why. Paired with this file. |
 | `MASTER_PLAN.md` | **THE DELIVERABLE — WRITTEN.** Read this + ADR-002 to build. |
 
@@ -145,6 +145,27 @@ answer-checking correctness is existential, not a feature.
   a mid-tier Android. Both need a spike, neither has one yet.
 
 ---
+## 5b. Collaboration model (set 2026-08-31) — READ BEFORE TOUCHING APP CODE
+**Codex is the primary build collaborator and default owner of every file in the application tree.**
+Claude's role from this point is design review, flaw-finding, and architecture partnership — not primary
+app-code authorship. Claude commits code only on an explicit, scoped hand-over, and always states which
+files it touched. See `MASTER_PLAN.md` §15b. Do not silently rewrite Codex's code to match a docs change.
+
+## 5c. Operator decision + Codex's two catches (2026-08-31)
+- **Launch curriculum changed: CBSE Class 6–8 Maths**, overriding lane E's Class 9–10 recommendation.
+  See `decisions/ADR-005-launch-curriculum-override.md` for the consequences (Exam object has no
+  centralized date for this cohort — student/parent-created goals instead; ADR-004's concurrent-JEE
+  scenario deferred not dropped) and why this may be a *better* launch choice, not just a different one.
+- Codex caught two real contract inconsistencies in `MASTER_PLAN.md`, both fixed:
+  1. §5 said `AttemptEvent` "ships with the frontend in Phase 1" while §14 scheduled emission at `P2.5`.
+     Fixed by correcting the §5 prose (Phase 1 has nothing to attempt yet) and folding emission into
+     `P2.4`'s and `P3.5`'s own acceptance criteria, so it can no longer be a separate, skippable packet.
+  2. The red-team review (finding #8) explicitly said skill-graph seeding belongs in **Phase 0** (pure
+     data-loading against `P0.2`'s tables, no engine code needed first); the master plan had instead
+     placed it at `P1.0`, one phase later than recommended, for no real reason. Fixed: now `P0.6`.
+- All four prior ADRs (001–004) flipped from PROPOSED to **ACCEPTED**. ADR-005 (the curriculum override)
+  written and accepted the same session.
+
 ## 6. Gotchas already paid for — do not re-learn these
 - **Firecrawl: rate limit 35 req/min**, concurrency 2. The CLI's status polling burns the quota, so
   parallel scraping fails en masse (first attempt lost 25 of 35 URLs to 429s). **Run sequentially with

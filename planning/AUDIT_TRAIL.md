@@ -168,3 +168,67 @@ from the synthesis, and disintermediation and account-sharing had zero coverage 
 *every* lane assumes and *no* lane owns — identity, billing, notifications. Parallel lanes each defer the
 shared foundation to "someone else's lane," and the gap is invisible until synthesis. A "who owns the
 User table?" question at dispatch time would have cost one sentence.
+
+---
+## 2026-08-31 — Session 3: handed off to Codex as build collaborator
+
+Operator introduced Codex as the collaborator doing the main implementation; my role going forward is
+design review, flaw-finding, and architecture partnership — not primary app-code authorship.
+
+Cloned `https://github.com/Sappy5211/Tutoring-Platform` (pre-existing `main` branch, one empty initial
+commit), copied the full planning output (`00_MISSION_BRIEF.md`, `MASTER_PLAN.md`, `RESUME.md`,
+`AUDIT_TRAIL.md`, `decisions/`, `research/`, `packets/`, `corpus/`) into `planning/` there, wrote a
+top-level `README.md` pointing at `MASTER_PLAN.md` first and the ADRs in dependency order, and pushed to
+`main` (commit `bd86ba3`, 108 files). No secrets or unrelated files were in the diff — checked before
+pushing.
+
+**Two copies now exist and must be kept in sync**: the iCloud vault (source of truth for the planning
+mission itself) and `planning/` in the GitHub repo (what Codex reads). If the plan changes, update the
+vault and re-push.
+
+---
+## 2026-08-31 — Session 4: Codex catches two real contract bugs; curriculum re-scoped
+
+Operator relayed Codex's catch-up summary and two questions of substance, plus a product decision:
+**launch curriculum changes from CBSE Class 9–10 to Class 6–8.**
+
+### Verified, not assumed, before responding
+Grepped the actual files rather than trusting memory of what I'd written:
+- Confirmed `MASTER_PLAN.md` §5 literally said "`AttemptEvent` ships with the frontend in Phase 1" while
+  §14's build sequence scheduled emission as `P2.5` — a real self-contradiction I introduced, not a
+  misreading by Codex. Root cause: Phase 1 (content spine) has no practice/flashcard surface at all, so
+  there was nothing to attach telemetry to that early — the correct fix is not "move it to Phase 1" but
+  "stop treating it as a separate, deferrable packet" — folded into `P2.4` and `P3.5`'s own acceptance
+  criteria instead.
+- Confirmed the red-team review's finding #8 literally recommended Phase 0 for skill-graph seeding
+  ("pull the CBSE Class 9–10 skill-graph... into Phase 0... it doesn't need BKT/Elo/FSRS code to exist
+  first, only the ADR-002 tables from P0.2"). My master plan had instead placed it at `P1.0` — one phase
+  later than my own red-team review told me to. No good reason for the discrepancy; fixed to `P0.6`.
+- Also found, while fixing the curriculum swap, that `ADR-002`'s `CurriculumPlacement.gradeLevel` comment
+  hard-coded a `6–12`-excluding `8–12` range — a latent bug the Class 6–8 decision surfaced before it
+  could bite a coding agent.
+
+### Changes made
+- `decisions/ADR-005-launch-curriculum-override.md` — new. Records the Class 6–8 decision, its two real
+  consequences (Exam object needs a student/parent-created path for this cohort since CBSE board exams
+  don't exist below Class 10; ADR-004's concurrent-JEE scenario is deferred not dropped), and the honest
+  case that this may be a *better* launch choice — a less crowded segment, better fit with Math Academy's
+  own "foundational mastery before exam-pressure years" proof point, and a genuinely harder/better testbed
+  for the answer-equivalence grading ladder (younger-grade maths has more correct-answer format variance).
+- `decisions/ADR-002-canonical-data-model.md` — fixed the grade-range bug, updated the `Exam` example
+  comment, status flipped to ACCEPTED.
+- `decisions/ADR-001,003,004` — status flipped to ACCEPTED (operator is actively directing implementation
+  and has not disputed the architecture; Codex explicitly asked before anchoring further work to them).
+- `MASTER_PLAN.md` — curriculum references updated throughout; the `AttemptEvent` and skill-graph-seeding
+  fixes described above; new §15b recording the implementation-ownership protocol (Codex owns all app
+  files by default; Claude codes only on explicit scoped hand-over, and names the files it touched).
+
+### Answered for Codex (see chat reply)
+Implementation ownership (Codex default owner, Claude reviews unless explicitly handed a file) · clone
+location (GitHub repo is canonical, clone wherever fits Codex's environment, no need to nest under the
+vault) · launch curriculum (Class 6–8, confirmed) · first milestone (blended: real tokens/component-kit/
+schema-types now, high-fidelity frontend on schema-shaped mock data next, defer live DB/full auth) · ADR
+acceptance (all five now ACCEPTED).
+
+Synced: vault copy updated first, then re-copied into `planning/` in the GitHub repo and pushed, so the
+two copies do not drift.

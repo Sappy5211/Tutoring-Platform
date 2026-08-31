@@ -1,6 +1,6 @@
 # ADR-003 — Card-type mix policy and the AI generation quality gate
 
-Status: PROPOSED (coordinator). Date: 2026-08-31.
+Status: ACCEPTED (2026-08-31).
 Closes the gap flagged in `MASTER_PLAN.md` §8 and `research/B2_remnote_verified.md` §2.
 
 ## Context

@@ -1,6 +1,6 @@
 # ADR-002 — The canonical data model spine
 
-Status: PROPOSED (coordinator). Date: 2026-08-31.
+Status: ACCEPTED (2026-08-31, incorporating Amendment 1 below and the ADR-004/ADR-005 amendments).
 Supersedes the conflicting model fragments in lanes C, E, F and B where they disagree.
 **This is the contract. A coding agent implements this file, not the individual lane files.**
 
@@ -94,7 +94,7 @@ export interface CurriculumPlacement {
   skillId: string;
   board: Board | null;         // null when placed purely by exam track
   examTrack: ExamTrack | null; // null when placed purely by board
-  gradeLevel: number | null;   // 8–12; null for exam-track-only placement
+  gradeLevel: number | null;   // 6–12 (ADR-005 corrected this from a buggy 8–12 that excluded 6–7); null for exam-track-only placement
   chapterId: string;           // FK -> Chapter
   sequenceInChapter: number;   // authored teaching order within the chapter
   isCore: boolean;             // in the examinable syllabus vs enrichment
@@ -199,7 +199,8 @@ export interface CardState {        // per (student, flashcard) FSRS state — N
 
 // ═══ EXAM (first-class, per B2 §3) ════════════════════════════════
 export interface Exam {                       // PUBLISHED by the platform
-  examId: string; title: string;              // "CBSE Class 10 Board — Mathematics"
+  examId: string; title: string;              // e.g. "CBSE Class 10 Board — Mathematics" (platform-published,
+  // has a national date) OR a student/parent-created goal for grades with no board exam — see ADR-005.
   board: Board | null; examTrack: ExamTrack | null;
   gradeLevel: number | null;
   examDate: string;                            // ISO date

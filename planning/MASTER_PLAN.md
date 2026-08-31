@@ -29,7 +29,8 @@ ships notes + auto-flashcards + quizzes + mastery tracking + AI tutor in one pro
 produces a worse-funded clone.
 
 Two gaps none of them fill: **curriculum binding** (they are all syllabus-agnostic; an Indian student is
-not learning "maths", they are passing CBSE Class 10) and **a human on demand** (no global tool puts a
+not learning "maths", they are passing a specific board's syllabus for their grade) and **a human on
+demand** (no global tool puts a
 real teacher on a call, and Indian study culture is built on tuition).
 
 So the competitive ordering is the inverse of how the pillars were described:
@@ -119,9 +120,12 @@ daily goal; secondary exams contribute scope, not pacing).
 
 Three invariants a coding agent must not break:
 - **`blockId` is immutable and never reused.** The entire personal-annotation layer anchors to it.
-- **`AttemptEvent` ships with the frontend in Phase 1**, including `selectionPropensity` and
-  `policyVersion`. They cost nothing now and are the only reason the adaptive engine can be upgraded
-  later without a rewrite. If the frontend ships without them, the history is gone forever.
+- **`AttemptEvent` ships in the same packet as every practice/flashcard/assessment surface — never as a
+  later, separate, skippable packet.** (Corrected: an earlier draft of this line said "ships with the
+  frontend in Phase 1," which was imprecise — Phase 1 is the content spine and has nothing to attempt yet.
+  The real rule, applied in §14 Phase 2/3: no such surface is done without emitting it.) Includes
+  `selectionPropensity` and `policyVersion` — they cost nothing now and are the only reason the adaptive
+  engine can be upgraded later without a rewrite. Skip them once and the history is gone forever.
 - **One `GradingMethod` enum**, matching lane D's verified ladder.
 
 ---
@@ -234,7 +238,13 @@ wrong answers, weak skills, the AI tutor transcript. That has consent implicatio
 
 ## 11. Commercial and compliance (lane E)
 
-- **Launch on CBSE Class 9–10 Mathematics.** Note the honest tension the research surfaced: ~92% of
+- **Launch on CBSE Class 6–8 Mathematics** (operator override of lane E's Class 9–10 recommendation —
+  full reasoning and consequences in `decisions/ADR-005-launch-curriculum-override.md`). Two things a
+  build must know: **the Exam object has no centralized board-exam date for this cohort** — Class 6–8
+  exams are school-set, not national, so `Exam` rows here are student/parent-created goals, not
+  platform-published ones (same schema, different origin). And ADR-004's concurrent-JEE scenario is
+  deferred, not dropped — the schema stays, the urgency moves to whenever Class 9–10 is added.
+  Note the honest tension the research surfaced about the wider Indian market: ~92% of
   higher-secondary exam-takers are on state boards and only ~8% on CBSE+ICSE — but CBSE families are the
   ones targeting engineering/medical entrance, with correspondingly higher willingness to pay, and CBSE
   is a *single* national syllabus whereas "state boards" is ~30 different syllabi in multiple languages —
@@ -310,33 +320,46 @@ the skeleton must exist now, or Phase 1 has nowhere to attach data.
 a real gap, not a flag flip) and the shared 4-band mastery scale. Verify computed contrast, don't eyeball.
 `P0.4` component kit + the command palette lifted from CarbonAnswer (`features/command-palette` — the
 standout asset, full ARIA combobox, zero deps).
+**`P0.6` seed the skill graph and `CurriculumPlacement` for CBSE Class 6–8 Maths.** Corrected placement:
+the red-team review (finding #8) is right that this belongs in **Phase 0, immediately after `P0.2`**, not
+in Phase 1 as an earlier draft of this plan had it — it is pure data-loading against tables `P0.2` already
+created, needs no engine code (BKT/Elo/FSRS) to exist first, and Phase 1's blocks (`skillTags`) and
+Phase 2's questions (`skillIds`) both require real skill rows to tag against from their first packet, or
+everything gets retro-tagged later. Grade band per ADR-005.
 
-**Phase 1 — The content spine.** `P1.0` **seed the skill graph and `CurriculumPlacement` for CBSE
-Class 9–10 Maths** — moved forward from Phase 3, because `P1.1`'s blocks require `skillTags` and `P2.1`'s
-questions require `skillIds`; authoring content against a taxonomy that does not exist yet means
-retro-tagging everything later. `P1.1` TipTap author editor + MathLive + block types.
+**Phase 1 — The content spine.** `P1.1` TipTap author editor + MathLive + block types.
 `P1.2` publish pipeline: draft→review→published, versioning, immutable `blockId`, the human gate.
 `P1.3` notes reader (same TipTap instance, `editable:false`). `P1.3b` **personal annotation layer** — highlights/notes anchored to immutable `blockId`, with the `orphaned` state surfaced when a block is deleted. `P1.4` PDF export via Paged.js.
 `P1.5` **author-console dictation** (lane H's v1 — the operator's own bottleneck).
-*Demo: operator authors a Class 10 chapter, publishes it, downloads the PDF.*
+*Demo: operator authors a Class 6–8 chapter, publishes it, downloads the PDF.*
 
 **Phase 2 — Practice and the grading ladder.** `P2.1` question bank + parameterised variants + sandboxed
 evaluator. `P2.2` **the grading ladder incl. the SymPy service with its timeout guard.**
 `P2.3` **the golden-set evaluation harness — a launch gate, and it gates itself: no LLM rung goes live
-until it clears the accuracy bar.** `P2.4` practice player + MathLive answer entry + feedback animation.
-`P2.5` `AttemptEvent` emission (must land here or the engine is unretrofittable).
-*Demo: a student answers `2x+6` where the key says `2(x+3)` and is marked correct, with reasoning shown.*
+until it clears the accuracy bar.** `P2.4` practice player + MathLive answer entry + feedback animation —
+**`AttemptEvent` emission is part of `P2.4`'s own acceptance criteria, not a separate trailing packet.**
+(Corrected: an earlier draft both said "ships with the frontend" in §5 above and then scheduled emission
+as an independent `P2.5` after the player — which is exactly the "build it, bolt telemetry on after"
+pattern the mission brief warned against. Phase 1 has nothing to log — there is no practice surface yet —
+so the actually-correct rule is: **no practice, flashcard, or assessment surface may be marked done
+without emitting `AttemptEvent`, full stop, checked in the same packet's acceptance test.** The same
+requirement applies to `P3.5`'s flashcard queue below.)
+*Demo: a student answers `2x+6` where the key says `2(x+3)` and is marked correct, with reasoning shown,
+and an `AttemptEvent` row exists for it.*
 
-**Phase 3 — Adaptive + flashcards.** `P3.1` ~~skill graph seeding~~ **moved to `P1.0`**; this packet now covers `SkillEdge` authoring incl.
-ADR-004 `curriculumScope` overrides.
+**Phase 3 — Adaptive + flashcards.** `P3.1` ~~skill graph seeding~~ **moved to `P0.6`**; this packet now
+covers `SkillEdge` authoring incl. ADR-004 `curriculumScope` overrides.
 `P3.2` BKT+Elo mastery (filter to `deck: "mastery"` only). `P3.3` frontier selection at the 85% zone,
 **taking `CurriculumContext` per ADR-004 §2**. `P3.4` diagnostic placement.
 `P3.7` **subscription and entitlement** — Razorpay Subscriptions / UPI Autopay, server-side entitlement
 checks gating free-tier limits, and the in-app mandate-cancellation flow lane E requires. Scheduled here
 because this is where "unlimited adaptive practice" first needs a gate. **This is the revenue mechanism
 and it had no packet at all in the first draft of this plan.**
-`P3.5` FSRS queue via `ts-fsrs` + card types + **ADR-003 mix policy and the two-deck split**. `P3.6` Exam object + the five
-exam-scheduler mechanisms. *Demo: placement test → personalised daily plan → "on track for 14 March".*
+`P3.5` FSRS queue via `ts-fsrs` + card types + **ADR-003 mix policy and the two-deck split**, **and, per the
+Phase 2 correction above, `AttemptEvent` emission is part of `P3.5`'s own acceptance criteria too — every
+flashcard review must log one.** `P3.6` Exam object + the five exam-scheduler mechanisms — **for Class
+6–8, per ADR-005, this is student/parent-set, not platform-published.**
+*Demo: placement test → personalised daily plan → "on track for [student-set exam date]".*
 
 **Phase 4 — AI tutor.** `P4.1` chunking + embeddings + pgvector (note: CarbonAnswer's chat has **no
 streaming** — build it, don't lift it). `P4.2` retrieval + citations back to note blocks.
@@ -366,9 +389,19 @@ handoff. `P5.6` teacher console.
 | Free-tier abuse of AI tutor and grading (cost leak) | Server-side `Entitlement` checks, never client-trusted; per-day caps | P3.7 |
 | Student-submitted text abuse / prompt injection into the tutor | Own moderation layer — do not assume a vendor endpoint exists | P4 |
 
+## 15b. Implementation ownership (added 2026-08-31, per operator + Codex)
+
+**Codex is the default owner of every file in the application tree.** Claude does not commit app code
+unless a specific task is explicitly handed over for that session — and when it is, Claude states exactly
+which files it touched in the commit message so Codex can merge without guessing. Absent an explicit
+hand-over, Claude's role is: review Codex's work against the ADRs, find architecture and correctness
+flaws, and update the planning documents (`MASTER_PLAN.md`, `decisions/*.md`) — never silently rewrite
+app code to match a documentation change. One owner per file, at all times.
+
 ## 16. Decisions the operator owes before build
 1. **Product name.**
-2. **Launch track** — CBSE Class 9–10 Maths is recommended; confirm or override.
+2. ~~**Launch track**~~ **ANSWERED 2026-08-31: CBSE Class 6–8 Maths** (operator override — see
+   `decisions/ADR-005-launch-curriculum-override.md`). Class 9–10 deferred, not cancelled.
 3. **DeepSeek and student data** — self-host, India-host, anonymise, or accept. Blocks Phase 4.
 4. **B2B channel** — is a Dr Frost-style school/tuition-centre console in scope? Recommendation: model
    for it, don't build it until B2C retains. Changes the surface inventory materially.
