@@ -4,6 +4,7 @@ import { Shell } from "./app/Shell";
 import { services } from "./lib/services";
 import { SurfacePage } from "./features/SurfacePage";
 import { GraphPage } from "./features/student/GraphPage";
+import { SignInPage } from "./features/auth/SignInPage";
 import {
   HomePage,
   NotesPage,
@@ -30,6 +31,7 @@ const surface = (id: string, role: UserRole) => async () =>
 export const router = createBrowserRouter([
   { path: "/", element: <Navigate to="/onboarding" replace /> },
   { path: "/onboarding", element: <OnboardingPage /> },
+  { path: "/signin", element: <SignInPage /> },
   {
     element: <Shell />,
     children: [

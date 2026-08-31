@@ -39,11 +39,50 @@ export interface ConsentRecord {
   grantedAt: string | null;
 }
 
+/** ADR-008. Class 6-8 CBSE teaches Mathematics and Science as single subjects;
+ *  Physics/Chemistry/Biology only separate from Class 11. They are modelled here
+ *  so the switcher and pricing can show them, but they are grade-gated, not
+ *  plan-gated, at launch. */
+export type Subject =
+  | "maths"
+  | "science"
+  | "physics"
+  | "chemistry"
+  | "biology";
+
+export type SubjectAccess =
+  /** In the student's plan and available at their grade. */
+  | { state: "unlocked" }
+  /** Available at this grade, but not in the student's plan. Sells. */
+  | { state: "locked_plan"; requiredTier: PlanTier }
+  /** In the plan or not, the curriculum does not cover it at this grade yet.
+   *  Deliberately NOT an upsell - it is not for sale at Class 6-8. */
+  | { state: "locked_grade"; availableFromGrade: number };
+
+export type PlanTier = "free" | "single_subject" | "all_subjects";
+
+export interface SubjectEntitlement {
+  subject: Subject;
+  access: SubjectAccess;
+}
+
+export interface Entitlement {
+  userId: Id;
+  tier: PlanTier;
+  /** Server-evaluated. Never trust a client-side copy of this for gating
+   *  anything that costs money or exposes paid content. */
+  subjects: SubjectEntitlement[];
+  practiceQuestionsPerDay: number | null;
+  tutorMessagesPerDay: number | null;
+  pdfExportEnabled: boolean;
+  callCreditsRemaining: number;
+}
+
 export interface Skill {
   id: Id;
   slug: string;
   title: string;
-  subject: "maths";
+  subject: Subject;
   description: string;
   seedDifficulty: number;
 }
@@ -53,7 +92,7 @@ export interface Chapter {
   title: string;
   board: "CBSE";
   gradeLevel: GradeLevel;
-  subject: "maths";
+  subject: Subject;
   sequence: number;
 }
 

@@ -4,6 +4,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import type { UserRole } from "@vidya/contracts";
 import { useAppStore } from "../lib/store";
 import { AiCoachDrawer } from "../features/student/AiCoachDrawer";
+import { SubjectSwitcher } from "./SubjectSwitcher";
 
 const nav: Record<UserRole, Array<{ to: string; label: string; icon: typeof Home }>> = {
   student: [
@@ -35,7 +36,8 @@ export function Shell() {
     <a className="skip-link" href="#main-content">Skip to content</a>
     <header className="topbar">
       <button className="icon-button mobile-menu" onClick={() => setOpen(!open)} aria-label="Open navigation">{open ? <X /> : <Menu />}</button>
-      <NavLink to={startFor[role]} className="brand"><span className="brand__mark">V</span><span>VIDYA</span><small>Maths</small></NavLink>
+      <NavLink to={startFor[role]} className="brand"><span className="brand__mark">V</span><span>VIDYA</span></NavLink>
+      {role === "student" && <SubjectSwitcher />}
       <button className="search-trigger" onClick={() => setPalette(true)}><Search size={18} /><span>Search anything</span><kbd>⌘ K</kbd></button>
       <div className="topbar__actions">
         {role === "student" && <button className="ask-vidya-trigger" onClick={() => setAiOpen(true)}><Bot size={17} /><span>Ask VIDYA</span></button>}
