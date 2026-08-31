@@ -158,12 +158,20 @@ export interface Folder {
   order: number;
 }
 
+export type NotebookItemKind = "document" | "folder" | "pdf";
+
 export interface NotebookDoc {
   docId: Id;
   folderId: Id | null;
   title: string;
   owner: "platform" | "student";
   updatedAt: string;
+  kind: NotebookItemKind;
+  /** Ancestor folder titles, outermost first - rendered as the breadcrumb under
+   *  a row so a document is locatable without opening the tree. */
+  path: string[];
+  tags: string[];
+  cardCount: number;
 }
 
 /** How a card trigger was written, and which directions it generates.

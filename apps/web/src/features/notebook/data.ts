@@ -11,13 +11,22 @@ export const FOLDERS: Folder[] = [
   { folderId: "f-mine-revision", parentId: "f-mine", title: "Revision", owner: "student", order: 0 },
 ];
 
+/** Dates are relative to today so the date-grouped index never goes stale. */
+const daysAgo = (n: number) => {
+  const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10);
+};
+
 export const DOCS: NotebookDoc[] = [
-  { docId: "d-fractions", folderId: "f-number", title: "Fractions", owner: "platform", updatedAt: "2026-08-28" },
-  { docId: "d-percent", folderId: "f-number", title: "Percentages", owner: "platform", updatedAt: "2026-08-26" },
-  { docId: "d-ratio", folderId: "f-number", title: "Ratio and proportion", owner: "platform", updatedAt: "2026-08-24" },
-  { docId: "d-linear", folderId: "f-algebra", title: "Simple equations", owner: "platform", updatedAt: "2026-08-27" },
-  { docId: "d-angles", folderId: "f-geometry", title: "Lines and angles", owner: "platform", updatedAt: "2026-08-29" },
-  { docId: "d-my-fractions", folderId: "f-mine-revision", title: "Fractions — my summary", owner: "student", updatedAt: "2026-08-30" },
+  { docId: "d-fractions", folderId: "f-number", title: "Fractions", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Mathematics", "Number"], tags: ["Class 7"], cardCount: 12 },
+  { docId: "d-ratio", folderId: "f-number", title: "Ratio and proportion", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Mathematics", "Number"], tags: ["Class 7"], cardCount: 9 },
+  { docId: "d-percent", folderId: "f-number", title: "Percentages", owner: "platform", updatedAt: daysAgo(1), kind: "document", path: ["Mathematics", "Number"], tags: ["Class 7", "Exam"], cardCount: 14 },
+  { docId: "d-linear", folderId: "f-algebra", title: "Simple equations", owner: "platform", updatedAt: daysAgo(1), kind: "document", path: ["Mathematics", "Algebra"], tags: ["Class 7"], cardCount: 11 },
+  { docId: "d-angles", folderId: "f-geometry", title: "Lines and angles", owner: "platform", updatedAt: daysAgo(2), kind: "document", path: ["Mathematics", "Geometry"], tags: ["Class 7"], cardCount: 8 },
+  { docId: "d-integers", folderId: "f-number", title: "Integers", owner: "platform", updatedAt: daysAgo(3), kind: "document", path: ["Mathematics", "Number"], tags: [], cardCount: 10 },
+  { docId: "d-my-fractions", folderId: "f-mine-revision", title: "Fractions — my summary", owner: "student", updatedAt: daysAgo(3), kind: "document", path: ["My notes", "Revision"], tags: ["Mine"], cardCount: 4 },
+  { docId: "d-mensuration", folderId: "f-geometry", title: "Perimeter and area", owner: "platform", updatedAt: daysAgo(6), kind: "document", path: ["Mathematics", "Geometry"], tags: ["Exam"], cardCount: 7 },
+  { docId: "d-worksheet", folderId: "f-number", title: "Half-yearly worksheet.pdf", owner: "platform", updatedAt: daysAgo(9), kind: "pdf", path: ["Mathematics", "Number"], tags: ["Exam"], cardCount: 0 },
+  { docId: "d-formula", folderId: "f-mine", title: "Formula sheet.pdf", owner: "student", updatedAt: daysAgo(14), kind: "pdf", path: ["My notes"], tags: ["Mine"], cardCount: 0 },
 ];
 
 const n = (

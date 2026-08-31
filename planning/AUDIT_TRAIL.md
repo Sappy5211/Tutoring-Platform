@@ -511,3 +511,35 @@ typecheck had not been run.
 Verified: typecheck clean, 17/17 tests, build **141 kB gzip** (budget 200 kB), and the `==` → arrow →
 Tab-accept path driven end-to-end in the browser — card count 4→5, trigger stripped from the question,
 answer populated, and the AI-draft flag raised in the header.
+
+---
+## 2026-08-31 — Session 10: Notebook index (item 1 of the operator's list)
+
+Operator gave a prioritised list and said to do it one at a time. First item: the Notebook landing body
+should follow the RemNote "Documents & Folders" screen — same controls, titled **Notebook**, sidebar
+explicitly out of scope.
+
+Built `/app/notebook` as an index; the document editor moved to `/app/notebook/:docId`.
+Header with `Upload & learn PDF` + `Create`, a search field, counted facet chips, a sort control, and a
+date-grouped list whose rows carry a breadcrumb path and a hover overflow menu.
+
+One deliberate departure: RemNote's sixth chip is "Daily Notes". We have no daily-note concept, so that
+slot is **Flashcards** — the thing a student actually wants to filter by. Copying a chip for a feature we
+do not have would have been cargo-culting the layout.
+
+`NotebookDoc` gained `kind`, `path`, `tags` and `cardCount` to support the row rendering, and the seed
+data now uses dates relative to today so the date grouping never goes stale.
+
+**Bug found by testing:** under the "All" facet, the search filtered documents but not folders, so
+searching "angles" narrowed the document list while leaving all six folders on screen — which reads as
+broken. Fixed; verified "angles" now returns only the matching document and "geo" returns the Geometry
+folder plus its documents.
+
+Verified: typecheck clean, 17/17 tests, build green, facet filtering and search driven in the browser.
+
+### Still queued from the operator's list (not started, deliberately one at a time)
+1. Brain graph should move — motion, and "the graph should have a point".
+2. Notebook tree collapsibility.
+3. Remove the layout `<select>` on card rows; use `--` as the card trigger instead of `==`, to stop
+   mirroring RemNote's syntax.
+4. Margins / spacing pass against the RemNote reference.
