@@ -7,7 +7,8 @@ and in `decisions/*.md`.** Where this file and a lane file disagree, this file w
 
 > **For the coding agent that builds this:** read this file, then `decisions/ADR-002-canonical-data-model.md`
 > (the schema contract, **including Amendment 1**), `decisions/ADR-003-card-type-mix-policy.md` and
-> `decisions/ADR-004-curriculum-scoped-selection.md`, then your task packet in §14. Do not implement from the lane research
+> `decisions/ADR-004-curriculum-scoped-selection.md`, `decisions/ADR-005-launch-curriculum-override.md`
+> and `decisions/ADR-006-practice-interaction-model.md`, then your task packet in §14. Do not implement from the lane research
 > files directly — they contain superseded fragments.
 
 ---
@@ -162,6 +163,10 @@ the home screen answers *am I on track for 14 March?*
 This was **verified in-session, not assumed**: SymPy 1.14.0 correctly resolves `2(x+3) == 2x+6`,
 `1/2 == 0.5`, `sin²x+cos²x == 1`, correctly rejects a genuinely wrong answer, and a known SymPy hang case
 is caught cleanly by the 2.0s timeout guard rather than freezing. The timeout is not optional.
+
+**The grading ladder runs inside the multi-attempt loop of ADR-006**, so it may execute several times per
+question. The CAS and LLM rungs are not instant — the player must specify a grading-in-flight state and a
+timeout path (lane P1 owns that UI).
 
 **Misconception tagging** seeded from the Eedi/NeurIPS Diagnostic Questions dataset — wrong answers teach
 the fix, not just "incorrect".
@@ -333,10 +338,14 @@ everything gets retro-tagged later. Grade band per ADR-005.
 `P1.5` **author-console dictation** (lane H's v1 — the operator's own bottleneck).
 *Demo: operator authors a Class 6–8 chapter, publishes it, downloads the PDF.*
 
-**Phase 2 — Practice and the grading ladder.** `P2.1` question bank + parameterised variants + sandboxed
-evaluator. `P2.2` **the grading ladder incl. the SymPy service with its timeout guard.**
+**Phase 2 — Practice and the grading ladder.** Governed by **`decisions/ADR-006-practice-interaction-model.md`**
+(attempts, hint ladder, always-shown solutions, first-attempt-only mastery scoring) with the UI spec in
+`research/P1_practice_player_spec.md` and the content model in `research/P2_hints_and_solutions.md`.
+`P2.1` question bank + parameterised variants + sandboxed evaluator — **plus templated hints and a
+step-structured worked solution per question; a question cannot leave `in_review` without both (ADR-006).** `P2.2` **the grading ladder incl. the SymPy service with its timeout guard.**
 `P2.3` **the golden-set evaluation harness — a launch gate, and it gates itself: no LLM rung goes live
-until it clears the accuracy bar.** `P2.4` practice player + MathLive answer entry + feedback animation —
+until it clears the accuracy bar.** `P2.4` practice player — MathLive answer entry, the on-screen maths keyboard, the multi-attempt + hint-ladder
+state machine, the always-shown worked solution, and the per-question teacher-comment escalation seam (ADR-006 §7) —
 **`AttemptEvent` emission is part of `P2.4`'s own acceptance criteria, not a separate trailing packet.**
 (Corrected: an earlier draft both said "ships with the frontend" in §5 above and then scheduled emission
 as an independent `P2.5` after the player — which is exactly the "build it, bolt telemetry on after"
@@ -349,7 +358,7 @@ and an `AttemptEvent` row exists for it.*
 
 **Phase 3 — Adaptive + flashcards.** `P3.1` ~~skill graph seeding~~ **moved to `P0.6`**; this packet now
 covers `SkillEdge` authoring incl. ADR-004 `curriculumScope` overrides.
-`P3.2` BKT+Elo mastery (filter to `deck: "mastery"` only). `P3.3` frontier selection at the 85% zone,
+`P3.2` BKT+Elo mastery — **two filters: `deck: "mastery"` (ADR-003) AND `masteryEvidence != "excluded"` (ADR-006). Score the FIRST attempt only.** `P3.3` frontier selection at the 85% zone,
 **taking `CurriculumContext` per ADR-004 §2**. `P3.4` diagnostic placement.
 `P3.7` **subscription and entitlement** — Razorpay Subscriptions / UPI Autopay, server-side entitlement
 checks gating free-tier limits, and the in-app mandate-cancellation flow lane E requires. Scheduled here

@@ -232,3 +232,55 @@ acceptance (all five now ACCEPTED).
 
 Synced: vault copy updated first, then re-copied into `planning/` in the GitHub repo and pushed, so the
 two copies do not drift.
+
+---
+## 2026-08-31 — Session 5: practice interaction model + Codex build kickoff
+
+Operator supplied two screenshots of a live **Dr Frost practice session** and specified the Q&A model:
+several attempts, a hint after each, and the full worked solution shown at the end regardless of whether
+the student got it right. Also instructed: get Codex started building.
+
+### Evidence captured
+`corpus/drfrost-practice-ui-screenshots.md` — PRIMARY. The most directly relevant artefact in the whole
+corpus for the practice surface. Notable finds: the skill code and a precise micro-skill title are exposed
+to the student ("201a Change the subject of a linear formula requiring a single step"); per-skill
+remediation ("Watch video") sits on the question itself; the maths keyboard is custom, docked, and layered
+(Main/ABC/Funcs/Symbs) with template insertion (`☐/☐`, `√☐`, `a^☐`); the static `x =` sits OUTSIDE the
+input so the student supplies only the RHS (removing a whole class of false-negative grading); worked
+steps carry a plain-English reason AND a visual annotation of the transformation acting on the equation;
+and there is a **per-question "leave a comment for your teacher" box** — a direct, low-friction feed into
+the teacher-escalation funnel that is ADR-001's stated moat.
+
+### The non-obvious problem this model creates, and the decision made
+`decisions/ADR-006-practice-interaction-model.md`. The UI is the easy half. The real issue is that lane C's
+engine updates BKT and Elo from a **binary** correct/incorrect, but under multi-attempt-plus-hints
+"correct" stops being one thing: first-attempt-unaided and third-attempt-after-two-hints are opposite
+evidence. Written naively, both land as `isCorrect: true`, `pMastery` climbs for students who cannot do the
+skill unaided, and the frontier selector confidently serves them harder material — a silent compounding
+failure that would look like the engine working until retention data contradicted it.
+
+Resolution: **mastery is scored on the first attempt only.** `masteryEvidence: "positive" | "negative" |
+"excluded"`, computed at WRITE time so the rule lives in exactly one place. A hint taken before the first
+attempt flips it negative; subsequent attempts are excluded (still logged in full — valuable for analytics
+and FSRS, just not for mastery). This follows Cognitive Tutor / ASSISTments knowledge-tracing practice and
+means the student can retry and take help freely without lying to the engine.
+
+Also decided: attempts vary by question type (MCQ gets 2, not 3 — with four options, three attempts makes
+success by elimination near-certain and the signal worthless); Assessment and diagnostic-placement modes
+get one attempt, no hints, solutions withheld (a mock test with instant answers is not a test, and a
+contaminated diagnostic mis-calibrates the one measurement the whole adaptive path is built on);
+anti-gaming **excludes the signal rather than punishing the child**.
+
+### Dispatched
+`P1_practice_player_spec.md` (UI: component tree, state machine incl. grading-in-flight, MathLive keyboard
+scoped to Class 6–8 maths not calculus, hint panel UX ethics, motion + reduced-motion) and
+`P2_hints_and_solutions.md` (hint taxonomy, solution step schema, AI drafting behind ADR-003's gate,
+**templated hints/solutions for parameterised questions** — a solution saying "add 5 to both sides" is
+wrong when the parameter made it 7 — and the authoring cost computed by script).
+
+### Codex kickoff
+`CODEX_BUILD_BRIEF.md`. Milestone 1 = high-fidelity frontend on mock data **shaped by the real ADR-002
+types behind repository interfaces**, over a foundation that is not throwaway. Rationale for the blend:
+UI-first was the operator's instruction and has real value, but building against invented data shapes
+guarantees a rewrite when the backend lands. `P0.1b` (the bundle spike) is called out as potentially
+plan-changing and told to stop-and-report rather than absorb a breach silently.

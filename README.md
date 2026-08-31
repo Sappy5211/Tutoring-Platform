@@ -6,6 +6,9 @@ an AI tutor grounded in the platform's own notes, and 30-minute booked calls wit
 
 ## Start here
 
+**Building? → [`planning/CODEX_BUILD_BRIEF.md`](planning/CODEX_BUILD_BRIEF.md)** — Milestone 1 scope,
+packets with acceptance criteria, stack decisions already made, and what not to build yet. Start there.
+
 **[`planning/MASTER_PLAN.md`](planning/MASTER_PLAN.md)** — the build plan: positioning, architecture, every
 subsystem, the surface inventory, and a Phase 0–6 task decomposition. Read this first.
 
@@ -17,7 +20,11 @@ Then, in order:
    — flashcard generation quality gate.
 3. **[`planning/decisions/ADR-004-curriculum-scoped-selection.md`](planning/decisions/ADR-004-curriculum-scoped-selection.md)**
    — amends ADR-002; how prerequisite order varies by board/exam track.
-4. **[`planning/decisions/ADR-001-product-thesis.md`](planning/decisions/ADR-001-product-thesis.md)** —
+4. **[`planning/decisions/ADR-005-launch-curriculum-override.md`](planning/decisions/ADR-005-launch-curriculum-override.md)**
+   — launch curriculum is **CBSE Class 6–8 Maths**, and what follows from that.
+5. **[`planning/decisions/ADR-006-practice-interaction-model.md`](planning/decisions/ADR-006-practice-interaction-model.md)**
+   — attempts, hint ladder, always-shown worked solutions, and the first-attempt-only mastery rule.
+6. **[`planning/decisions/ADR-001-product-thesis.md`](planning/decisions/ADR-001-product-thesis.md)** —
    why the product is positioned the way it is (context for the priority calls in the plan).
 
 **[`planning/research/RED_TEAM_REVIEW.md`](planning/research/RED_TEAM_REVIEW.md)** — an adversarial review

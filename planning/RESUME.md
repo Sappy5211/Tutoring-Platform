@@ -166,6 +166,24 @@ files it touched. See `MASTER_PLAN.md` §15b. Do not silently rewrite Codex's co
 - All four prior ADRs (001–004) flipped from PROPOSED to **ACCEPTED**. ADR-005 (the curriculum override)
   written and accepted the same session.
 
+## 5d. Build kickoff (2026-08-31) — Codex is building Milestone 1
+- **`CODEX_BUILD_BRIEF.md`** written — Milestone 1 = high-fidelity frontend on mock data shaped by REAL
+  ADR-002 types, over a non-throwaway foundation (tokens, component kit, generated types, CI budget gate).
+  Packets `P0.1`, `P0.1b` (bundle spike), `P0.2`, `P0.3`, `P0.4`, `P0.5`, `P0.6`, `M1.1`.
+- **`decisions/ADR-006-practice-interaction-model.md`** — the operator's Q&A model (multiple attempts,
+  progressive hints, worked solution always shown). **The load-bearing part is that mastery is scored on
+  the FIRST attempt only** (`masteryEvidence: positive|negative|excluded`, written not derived) — otherwise
+  "correct after two hints" inflates `pMastery` and the frontier selector promotes students past
+  prerequisites they never learned. Also: Assessment/diagnostic modes get 1 attempt, no hints, solutions
+  withheld; MCQ gets 2 attempts not 3 (elimination); anti-gaming excludes rather than punishes.
+- `corpus/drfrost-practice-ui-screenshots.md` — PRIMARY evidence, operator-supplied screenshots of a live
+  Dr Frost practice session (question navigator, skill code exposed, MathLive-style keyboard with
+  Main/ABC/Funcs/Symbs layers, annotated worked steps, per-question teacher-comment box).
+- In flight: `research/P1_practice_player_spec.md` (UI) and `research/P2_hints_and_solutions.md` (content
+  model + authoring + cost). **Phase 2 must not start until both land.**
+- Answers given to Codex: Codex owns the app tree (see `MASTER_PLAN.md` §15b); repo is canonical, clone
+  anywhere; Class 6–8 confirmed; blended milestone; all ADRs ACCEPTED.
+
 ## 6. Gotchas already paid for — do not re-learn these
 - **Firecrawl: rate limit 35 req/min**, concurrency 2. The CLI's status polling burns the quota, so
   parallel scraping fails en masse (first attempt lost 25 of 35 URLs to 429s). **Run sequentially with
