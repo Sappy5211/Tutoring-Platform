@@ -1,0 +1,12 @@
+CREATE TYPE user_role AS ENUM ('student','parent','teacher','author','admin');
+CREATE TABLE users (id uuid PRIMARY KEY, role user_role NOT NULL, display_name text NOT NULL, phone text, email text, locale text NOT NULL DEFAULT 'en-IN', created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE students (id uuid PRIMARY KEY REFERENCES users(id), board text NOT NULL DEFAULT 'CBSE', grade_level integer NOT NULL CHECK (grade_level BETWEEN 5 AND 8), is_minor boolean NOT NULL DEFAULT true);
+CREATE TABLE guardian_links (guardian_user_id uuid NOT NULL REFERENCES users(id), student_id uuid NOT NULL REFERENCES students(id), relationship text NOT NULL, is_primary boolean NOT NULL DEFAULT false, status text NOT NULL DEFAULT 'pending', PRIMARY KEY (guardian_user_id, student_id));
+CREATE TABLE chapters (id uuid PRIMARY KEY, title text NOT NULL, board text NOT NULL, grade_level integer NOT NULL CHECK (grade_level BETWEEN 5 AND 8), subject text NOT NULL, sequence integer NOT NULL);
+CREATE TABLE skills (id uuid PRIMARY KEY, slug text UNIQUE NOT NULL, title text NOT NULL, subject text NOT NULL, description text NOT NULL, seed_difficulty real NOT NULL DEFAULT 1200);
+CREATE TABLE curriculum_placements (id uuid PRIMARY KEY, skill_id uuid NOT NULL REFERENCES skills(id), chapter_id uuid NOT NULL REFERENCES chapters(id), board text NOT NULL, grade_level integer NOT NULL CHECK (grade_level BETWEEN 5 AND 8), sequence_in_chapter integer NOT NULL, is_core boolean NOT NULL DEFAULT true);
+CREATE TABLE skill_edges (id uuid PRIMARY KEY, from_skill_id uuid NOT NULL REFERENCES skills(id), to_skill_id uuid NOT NULL REFERENCES skills(id), type text NOT NULL, weight real NOT NULL, required boolean NOT NULL, curriculum_scope jsonb);
+CREATE TABLE note_versions (note_id uuid NOT NULL, version integer NOT NULL, status text NOT NULL, content_snapshot jsonb NOT NULL, published_at timestamptz, PRIMARY KEY (note_id, version));
+CREATE TABLE note_block_registry (block_id uuid PRIMARY KEY, note_id uuid NOT NULL, first_version integer NOT NULL, retired_at timestamptz);
+CREATE OR REPLACE FUNCTION prevent_block_id_reuse() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF OLD.retired_at IS NOT NULL THEN RAISE EXCEPTION 'retired blockId cannot be reused'; END IF; RETURN NEW; END $$;
+CREATE TRIGGER block_id_immutable BEFORE UPDATE ON note_block_registry FOR EACH ROW WHEN (OLD.block_id IS DISTINCT FROM NEW.block_id) EXECUTE FUNCTION prevent_block_id_reuse();

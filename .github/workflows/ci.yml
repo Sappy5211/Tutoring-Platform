@@ -1,0 +1,36 @@
+name: VIDYA quality gates
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: vidya
+          POSTGRES_PASSWORD: vidya
+          POSTGRES_DB: vidya_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U vidya -d vidya_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9.15.4 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Validate schema migration
+        env:
+          PGPASSWORD: vidya
+        run: psql -h 127.0.0.1 -U vidya -d vidya_test -v ON_ERROR_STOP=1 -f packages/contracts/migrations/0000_foundation.sql
+      - run: pnpm check
+      - run: pnpm --filter @vidya/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @vidya/web test:e2e

@@ -1,0 +1,8 @@
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  build: { sourcemap: true, rollupOptions: { output: { manualChunks: { charts: ["recharts"], editor: ["@tiptap/react", "@tiptap/starter-kit"], motion: ["motion/react"] } } } }
+});

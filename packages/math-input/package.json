@@ -1,0 +1,11 @@
+{
+  "name": "@vidya/math-input",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.tsx",
+  "scripts": { "test": "vitest run", "typecheck": "tsc -p tsconfig.json --noEmit" },
+  "peerDependencies": { "react": "^18.3.1" },
+  "dependencies": { "katex": "^0.16.21" },
+  "devDependencies": { "@types/katex": "^0.16.7", "@types/react": "^18.3.18", "typescript": "^5.7.3", "vitest": "^2.1.8" }
+}

@@ -4,6 +4,19 @@ India-first online learning platform — Mathematics first, then Physics/Chemist
 notes with PDF export, adaptive practice, AI answer-checking that accepts mathematically equivalent answers,
 an AI tutor grounded in the platform's own notes, and 30-minute booked calls with a real teacher.
 
+## Run the Milestone 1 UI
+
+The UI-first workspace now implements the student, essential parent, hybrid teacher, and author experiences
+for **CBSE Mathematics Classes 5–8** using typed, asynchronous in-memory repositories.
+
+```bash
+corepack pnpm install
+corepack pnpm dev
+```
+
+Open `http://127.0.0.1:5173`. Run every local quality gate with `corepack pnpm check`; browser journeys live
+under `apps/web/e2e` and run with `corepack pnpm --filter @vidya/web test:e2e` after Playwright Chromium is installed.
+
 ## Start here
 
 **Building? → [`planning/CODEX_BUILD_BRIEF.md`](planning/CODEX_BUILD_BRIEF.md)** — Milestone 1 scope,
@@ -21,7 +34,7 @@ Then, in order:
 3. **[`planning/decisions/ADR-004-curriculum-scoped-selection.md`](planning/decisions/ADR-004-curriculum-scoped-selection.md)**
    — amends ADR-002; how prerequisite order varies by board/exam track.
 4. **[`planning/decisions/ADR-005-launch-curriculum-override.md`](planning/decisions/ADR-005-launch-curriculum-override.md)**
-   — launch curriculum is **CBSE Class 6–8 Maths**, and what follows from that.
+   — launch curriculum is **CBSE Class 5–8 Maths**, and what follows from that.
 5. **[`planning/decisions/ADR-006-practice-interaction-model.md`](planning/decisions/ADR-006-practice-interaction-model.md)**
    — attempts, hint ladder, always-shown worked solutions, and the first-attempt-only mastery rule.
 6. **[`planning/decisions/ADR-001-product-thesis.md`](planning/decisions/ADR-001-product-thesis.md)** —
