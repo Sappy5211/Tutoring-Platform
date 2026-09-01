@@ -54,6 +54,28 @@ test("dark theme remains usable", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("Stitch lesson answers and navigation are functional", async ({ page }) => {
+  await page.goto("/app/materials/moving-beyond-thousands");
+  const lesson = page.frameLocator(".stitch-material__frame");
+
+  await lesson.getByPlaceholder("Type here...").fill("67,492");
+  await lesson
+    .getByPlaceholder("Type the words...")
+    .fill("Twelve thousand, five hundred and four");
+  await lesson.getByRole("button", { name: "Check Answers" }).click();
+  await expect(
+    lesson.getByRole("status").filter({ hasText: "Both answers are correct" }),
+  ).toBeVisible();
+
+  const inLessonNext = lesson.getByRole("button", { name: /Next Concept/ });
+  if (await inLessonNext.isVisible()) {
+    await inLessonNext.click();
+  } else {
+    await page.getByRole("link", { name: /Next:/ }).click();
+  }
+  await expect(page).toHaveURL(/which-city-has-more-explorers/);
+});
+
 test("teacher booking requires preparation, duration, and a time", async ({
   page,
 }) => {

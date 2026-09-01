@@ -693,3 +693,9 @@ Follow-up correction from the operator: the canonical chapter hierarchy is **Cla
 Large Numbers and Place Value**. All five Stitch lessons sit beneath that single chapter. “We the
 Travellers” remains untouched only where it is part of the original Stitch document content; it is not
 the VIDYA chapter-folder name.
+
+The Stitch controls were subsequently wired from the VIDYA wrapper without modifying any exported
+`code.html`: header/profile controls, Back/Previous, Next/Finish, and chapter completion now navigate;
+the first lesson's two answer fields validate on Check Answers or Enter with accessible inline feedback;
+and the final lesson flows into the supplied flashcard deck. Keeping the behaviour in the wrapper
+preserves byte-identical source exports while making the mounted experience functional.
