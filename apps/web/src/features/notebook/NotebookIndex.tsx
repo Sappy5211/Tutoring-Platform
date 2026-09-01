@@ -1,14 +1,33 @@
 import {
-  ChevronRight, Clock, FileText, FolderClosed, FolderOpen, Layers, MoreHorizontal,
-  Plus, Search, Tag, Upload, X,
+  ChevronDown, ChevronRight, Clock, FileText, FolderClosed, FolderOpen, Layers, MoreHorizontal,
+  PenLine, Plus, Search, Tag, Upload, X,
 } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { NotebookDoc } from "@vidya/contracts";
+import { Button, EmptyState, HoverRow, Input, Menu, MenuItem, revealOnHover, Toast } from "@vidya/ui";
 import { DOCS, FOLDERS } from "./data";
+
+const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
 
 type Facet = "all" | "documents" | "folders" | "pdfs" | "tags" | "cards";
 type Sort = "newest" | "oldest" | "az";
+
+const SORT_LABEL: Record<Sort, string> = { newest: "Newest first", oldest: "Oldest first", az: "A–Z" };
+
+/** The row's hover-revealed overflow trigger. Not a real <button> — Menu already
+ *  wraps this in one, and a button inside a button is invalid markup. */
+function RowMenuTrigger({ open }: { open: boolean }) {
+  return (
+    <span className={cx(
+      "grid size-8 shrink-0 place-items-center rounded-[8px] text-[var(--muted)]",
+      "hover:bg-[var(--surface-strong)] hover:text-[var(--ink)] transition-colors motion-reduce:transition-none",
+      revealOnHover, open && "opacity-100 bg-[var(--surface-strong)] text-[var(--ink)]",
+    )}>
+      <MoreHorizontal size={16} aria-hidden />
+    </span>
+  );
+}
 
 /** Groups by calendar day, newest first, and labels the recent ones in words -
  *  "Today" is more useful than a date a student has to decode. */
@@ -32,8 +51,18 @@ export function NotebookIndex() {
   const [query, setQuery] = useState("");
   const [facet, setFacet] = useState<Facet>("documents");
   const [sort, setSort] = useState<Sort>("newest");
-  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   const chipsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!createOpen) return;
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setCreateOpen(false); };
+    document.addEventListener("keydown", esc);
+    return () => document.removeEventListener("keydown", esc);
+  }, [createOpen]);
+
+  const notify = (message: string) => setToast(message);
 
   const counts = useMemo(() => ({
     all: DOCS.length + FOLDERS.length,
@@ -87,129 +116,223 @@ export function NotebookIndex() {
     return FOLDERS.filter((f) => f.title.toLowerCase().includes(q));
   }, [facet, query]);
   const grouped = useMemo(() => groupByDay(rows), [rows]);
+  const isEmpty = rows.length === 0 && folderRows.length === 0;
 
   return (
-    <div className="page nb-index">
-      <header className="nb-index__head">
-        <h1>Notebook</h1>
-        <div className="nb-index__actions">
-          <button className="nb-index__upload">
-            <Upload size={16} aria-hidden /> Upload &amp; learn PDF
-          </button>
-          <button className="nb-index__create">
-            <Plus size={16} aria-hidden /> Create
-          </button>
+    <div className="mx-auto w-full max-w-[1040px] pb-16">
+      <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--line)] pb-6">
+        <div>
+          <h1 className="font-display text-[30px] font-bold leading-none tracking-tight text-[var(--ink)] text-balance sm:text-[34px]">
+            Notebook
+          </h1>
+          <p className="mt-2 text-sm text-[var(--muted)]">Course notes, your own pages, and uploaded PDFs.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => notify("Upload & learn PDF is not wired up in this prototype")}
+          >
+            <Upload size={15} aria-hidden /> Upload PDF
+          </Button>
+          <Button size="sm" onClick={() => setCreateOpen(true)}>
+            <Plus size={15} aria-hidden /> Create
+          </Button>
         </div>
       </header>
 
-      <div className="nb-index__filters">
-        <div className="nb-index__search">
-          <Search size={16} aria-hidden />
-          <input
+      <div className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-[300px]">
+          <Search size={15} aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--faint)]" />
+          <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search notebook…"
             aria-label="Search notebook"
+            className="pl-9 pr-8"
           />
           {query && (
-            <button onClick={() => setQuery("")} aria-label="Clear search"><X size={14} /></button>
+            <button
+              onClick={() => setQuery("")}
+              aria-label="Clear search"
+              className="absolute right-2 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full text-[var(--faint)] hover:bg-[var(--surface-soft)] hover:text-[var(--ink)] cursor-pointer"
+            >
+              <X size={13} />
+            </button>
           )}
         </div>
 
-        <div className="nb-index__chips" ref={chipsRef} role="tablist" aria-label="Filter by type">
-          {FACETS.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              role="tab"
-              aria-selected={facet === id}
-              className={`nb-chip${facet === id ? " is-active" : ""}`}
-              onClick={() => setFacet(id)}
-            >
-              <Icon size={13} aria-hidden />
-              {label}
-              <em>{counts[id]}</em>
-            </button>
-          ))}
+        <div className="flex min-w-0 items-center gap-2">
+          <div ref={chipsRef} role="tablist" aria-label="Filter by type" className="flex min-w-0 items-center gap-1 overflow-x-auto">
+            {FACETS.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                role="tab"
+                aria-selected={facet === id}
+                onClick={() => setFacet(id)}
+                className={cx(
+                  "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[12.5px] font-semibold",
+                  "transition-colors motion-reduce:transition-none cursor-pointer",
+                  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]",
+                  facet === id
+                    ? "bg-[var(--primary-faint)] text-[var(--primary)]"
+                    : "text-[var(--muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--ink)]",
+                )}
+              >
+                <Icon size={12} aria-hidden />
+                {label}
+                <span className="tabular-nums">{counts[id]}</span>
+              </button>
+            ))}
+          </div>
           <button
-            className="nb-index__scroll"
             aria-label="Scroll filters"
             onClick={() => chipsRef.current?.scrollBy({ left: 180, behavior: "smooth" })}
+            className="grid size-8 shrink-0 place-items-center rounded-[8px] text-[var(--faint)] hover:bg-[var(--surface-soft)] hover:text-[var(--ink)] cursor-pointer sm:hidden"
           >
             <ChevronRight size={15} />
           </button>
-        </div>
 
-        <label className="nb-index__sort">
-          <Clock size={14} aria-hidden />
-          <select value={sort} onChange={(e) => setSort(e.target.value as Sort)} aria-label="Sort order">
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-            <option value="az">A–Z</option>
-          </select>
-        </label>
+          <Menu
+            label="Sort order"
+            align="end"
+            trigger={(open) => (
+              <span className={cx(
+                "inline-flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[10px] border px-3 text-[13px] font-medium",
+                "border-[var(--line-strong)] text-[var(--ink-soft)] transition-colors motion-reduce:transition-none",
+                open ? "bg-[var(--surface-soft)]" : "bg-[var(--surface)] hover:bg-[var(--surface-soft)]",
+              )}>
+                <Clock size={13} aria-hidden /> {SORT_LABEL[sort]} <ChevronDown size={13} aria-hidden />
+              </span>
+            )}
+          >
+            <MenuItem onClick={() => setSort("newest")}>Newest first</MenuItem>
+            <MenuItem onClick={() => setSort("oldest")}>Oldest first</MenuItem>
+            <MenuItem onClick={() => setSort("az")}>A–Z</MenuItem>
+          </Menu>
+        </div>
       </div>
 
-      <div className="nb-index__list">
+      <div className="flex flex-col gap-8">
         {folderRows.length > 0 && (
           <section>
-            <h2 className="nb-index__day">Folders</h2>
-            {folderRows.map((folder) => (
-              <article key={folder.folderId} className="nb-row">
-                <span className="nb-row__icon nb-row__icon--folder"><FolderOpen size={16} /></span>
-                <button className="nb-row__body" onClick={() => navigate(`/app/notebook/folder/${folder.folderId}`)}>
-                  <strong>{folder.title}</strong>
-                  <span>{folder.kind === "book" ? "Book" : "Chapter"} · {DOCS.filter((d) => d.folderId === folder.folderId).length} pages</span>
-                </button>
-                <button className="nb-row__more" aria-label={`More options for ${folder.title}`}>
-                  <MoreHorizontal size={17} />
-                </button>
-              </article>
-            ))}
+            <h2 className="mb-1 px-3 text-[11px] font-bold uppercase tracking-wide text-[var(--faint)]">Folders</h2>
+            <div>
+              {folderRows.map((folder) => (
+                <HoverRow key={folder.folderId}>
+                  <span className="grid size-8 shrink-0 place-items-center rounded-[8px] bg-[var(--primary-faint)] text-[var(--primary)]">
+                    <FolderOpen size={15} aria-hidden />
+                  </span>
+                  <button
+                    onClick={() => navigate(`/app/notebook/folder/${folder.folderId}`)}
+                    className="flex min-w-0 flex-1 flex-col items-start gap-0.5 py-1 text-left cursor-pointer"
+                  >
+                    <strong className="truncate text-[14.5px] font-semibold text-[var(--ink)]">{folder.title}</strong>
+                    <span className="truncate text-[12.5px] text-[var(--muted)]">
+                      {folder.kind === "book" ? "Book" : "Chapter"} · {DOCS.filter((d) => d.folderId === folder.folderId).length} pages
+                    </span>
+                  </button>
+                  <Menu label={`More options for ${folder.title}`} align="end" trigger={(open) => <RowMenuTrigger open={open} />}>
+                    <MenuItem onClick={() => navigate(`/app/notebook/folder/${folder.folderId}`)}>Open</MenuItem>
+                    <MenuItem onClick={() => notify(`Renaming “${folder.title}” is not wired up in this prototype`)}>Rename</MenuItem>
+                    <MenuItem onClick={() => notify("Move to… is not wired up in this prototype")}>Move to…</MenuItem>
+                  </Menu>
+                </HoverRow>
+              ))}
+            </div>
           </section>
         )}
 
         {grouped.map(([day, docs]) => (
           <section key={day}>
-            <h2 className="nb-index__day">{day}</h2>
-            {docs.map((doc) => (
-              <article key={doc.docId} className="nb-row">
-                <span className={`nb-row__icon${doc.kind === "pdf" ? " nb-row__icon--pdf" : ""}`}>
-                  <FileText size={16} />
-                </span>
-                <button className="nb-row__body" onClick={() => navigate(`/app/notebook/${doc.docId}`)}>
-                  <strong>{doc.title}</strong>
-                  <span>{doc.path.join(" › ")}</span>
-                </button>
-                {doc.cardCount > 0 && <span className="nb-row__cards">{doc.cardCount} cards</span>}
-                <button
-                  className="nb-row__more"
-                  aria-label={`More options for ${doc.title}`}
-                  aria-expanded={menuFor === doc.docId}
-                  onClick={() => setMenuFor(menuFor === doc.docId ? null : doc.docId)}
-                >
-                  <MoreHorizontal size={17} />
-                </button>
-                {menuFor === doc.docId && (
-                  <div className="nb-row__menu" role="menu">
-                    <button role="menuitem" onClick={() => navigate(`/app/notebook/${doc.docId}`)}>Open</button>
-                    <button role="menuitem">Rename</button>
-                    <button role="menuitem">Move to…</button>
-                    <button role="menuitem">Export</button>
-                  </div>
-                )}
-              </article>
-            ))}
+            <h2 className="mb-1 px-3 text-[11px] font-bold uppercase tracking-wide text-[var(--faint)]">{day}</h2>
+            <div>
+              {docs.map((doc) => (
+                <HoverRow key={doc.docId}>
+                  <span className={cx(
+                    "grid size-8 shrink-0 place-items-center rounded-[8px]",
+                    doc.kind === "pdf" ? "bg-[var(--needswork-soft)] text-[var(--needswork)]" : "bg-[var(--surface-strong)] text-[var(--muted)]",
+                  )}>
+                    <FileText size={15} aria-hidden />
+                  </span>
+                  <button
+                    onClick={() => navigate(`/app/notebook/${doc.docId}`)}
+                    className="flex min-w-0 flex-1 flex-col items-start gap-0.5 py-1 text-left cursor-pointer"
+                  >
+                    <strong className="truncate text-[14.5px] font-semibold text-[var(--ink)]">{doc.title}</strong>
+                    <span className="truncate text-[12.5px] text-[var(--muted)]">{doc.path.join(" › ")}</span>
+                  </button>
+                  {doc.cardCount > 0 && (
+                    <span className="hidden shrink-0 text-[12px] tabular-nums text-[var(--faint)] sm:inline">{doc.cardCount} cards</span>
+                  )}
+                  <Menu label={`More options for ${doc.title}`} align="end" trigger={(open) => <RowMenuTrigger open={open} />}>
+                    <MenuItem onClick={() => navigate(`/app/notebook/${doc.docId}`)}>Open</MenuItem>
+                    <MenuItem onClick={() => notify(`Renaming “${doc.title}” is not wired up in this prototype`)}>Rename</MenuItem>
+                    <MenuItem onClick={() => notify("Move to… is not wired up in this prototype")}>Move to…</MenuItem>
+                    <MenuItem onClick={() => notify("Export is not wired up in this prototype")}>Export</MenuItem>
+                  </Menu>
+                </HoverRow>
+              ))}
+            </div>
           </section>
         ))}
 
-        {rows.length === 0 && folderRows.length === 0 && (
-          <div className="nb-index__empty">
-            <FileText size={26} aria-hidden />
-            <h3>Nothing here yet</h3>
-            <p>{query ? `No results for “${query}”.` : "Create a note or upload a PDF to get started."}</p>
-          </div>
+        {isEmpty && (
+          <EmptyState
+            icon={<FileText size={26} aria-hidden />}
+            title="Nothing here yet"
+            body={query ? `No results for “${query}”.` : "Create a note or upload a PDF to get started."}
+            action={!query && (
+              <Button size="sm" onClick={() => setCreateOpen(true)}><Plus size={15} aria-hidden /> Create a note</Button>
+            )}
+          />
         )}
       </div>
+
+      {createOpen && (
+        <div
+          role="presentation"
+          onMouseDown={() => setCreateOpen(false)}
+          className="fixed inset-0 z-[80] grid place-items-center bg-black/30 p-4"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Create a page"
+            onMouseDown={(e) => e.stopPropagation()}
+            className="grid w-full max-w-[400px] gap-3 rounded-[16px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[var(--shadow)]"
+          >
+            <h2 className="font-display text-lg font-bold text-[var(--ink)]">Create a page</h2>
+            <button
+              onClick={() => { setCreateOpen(false); navigate("/app/notebook/d-fractions"); }}
+              className="flex items-center gap-3 rounded-[10px] border border-[var(--line)] p-3 text-left hover:bg-[var(--surface-soft)] cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+            >
+              <span className="grid size-9 shrink-0 place-items-center rounded-[8px] bg-[var(--primary-faint)] text-[var(--primary)]">
+                <FileText size={17} aria-hidden />
+              </span>
+              <span className="grid gap-0.5">
+                <strong className="text-[13.5px] font-semibold text-[var(--ink)]">Bullet notes</strong>
+                <span className="text-[12px] text-[var(--muted)]">Typed outline. End a line with an arrow trigger to make a card.</span>
+              </span>
+            </button>
+            <button
+              onClick={() => { setCreateOpen(false); navigate("/app/notebook/new/handwritten"); }}
+              className="flex items-center gap-3 rounded-[10px] border border-[var(--line)] p-3 text-left hover:bg-[var(--surface-soft)] cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+            >
+              <span className="grid size-9 shrink-0 place-items-center rounded-[8px] bg-[var(--primary-faint)] text-[var(--primary)]">
+                <PenLine size={17} aria-hidden />
+              </span>
+              <span className="grid gap-0.5">
+                <strong className="text-[13.5px] font-semibold text-[var(--ink)]">Handwritten</strong>
+                <span className="text-[12px] text-[var(--muted)]">Write with a stylus or finger.</span>
+              </span>
+            </button>
+            <Button variant="ghost" size="sm" onClick={() => setCreateOpen(false)} className="justify-self-start">Cancel</Button>
+          </div>
+        </div>
+      )}
+
+      {toast && <Toast message={toast} onClose={() => setToast(null)} />}
     </div>
   );
 }

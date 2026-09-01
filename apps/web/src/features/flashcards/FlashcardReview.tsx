@@ -8,6 +8,8 @@ import {
   applyRating, endOfDay, isBuried, isDue, LEECH_THRESHOLD, newCardState, previewIntervals,
 } from "./scheduler";
 
+const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
+
 /** Mock deck. Real cards arrive from the repository at P3.5; the shapes are the
  *  contract types so swapping the source is a data change, not a rewrite. */
 const DECK: Flashcard[] = [
@@ -34,12 +36,18 @@ function MathDisplay({ value }: { value: string }) {
   }} />;
 }
 
-const RATINGS: { rating: ReviewRating; label: string; tone: string }[] = [
-  { rating: 1, label: "Again", tone: "again" },
-  { rating: 2, label: "Hard", tone: "hard" },
-  { rating: 3, label: "Good", tone: "good" },
-  { rating: 4, label: "Easy", tone: "easy" },
+/** Rating colour reuses the shared mastery scale rather than inventing new
+ *  hues: "Again"/"Easy" are literally a recall-confidence signal, the same
+ *  axis mastery bands describe. "Good" carries the single brand accent
+ *  because it is the default, most-travelled choice (and Space maps to it). */
+const RATINGS: { rating: ReviewRating; label: string; text: string; ring: string }[] = [
+  { rating: 1, label: "Again", text: "text-[var(--needswork)]", ring: "hover:border-[var(--needswork)] focus-visible:border-[var(--needswork)]" },
+  { rating: 2, label: "Hard", text: "text-[var(--developing)]", ring: "hover:border-[var(--developing)] focus-visible:border-[var(--developing)]" },
+  { rating: 3, label: "Good", text: "text-[var(--primary)]", ring: "hover:border-[var(--primary)] focus-visible:border-[var(--primary)]" },
+  { rating: 4, label: "Easy", text: "text-[var(--secure)]", ring: "hover:border-[var(--secure)] focus-visible:border-[var(--secure)]" },
 ];
+
+const toolButtonClass = "inline-flex cursor-pointer items-center gap-1.5 rounded-[10px] border border-transparent px-2 py-1.5 text-[12.5px] font-semibold text-[var(--muted)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-soft)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]";
 
 export function FlashcardReview() {
   const [states, setStates] = useState<Record<string, CardState>>(() =>
@@ -123,14 +131,16 @@ export function FlashcardReview() {
   if (!card || !state || !previews) {
     const accuracy = reviewed ? Math.round(((reviewed - again) / reviewed) * 100) : 0;
     return (
-      <div className="page">
-        <Card className="review-done">
-          <Sparkles size={30} aria-hidden />
-          <h1>Deck clear for today</h1>
+      <div className="mx-auto flex min-h-[65vh] max-w-[560px] items-center justify-center px-4">
+        <Card className="grid justify-items-center gap-3 px-8 py-14 text-center shadow-[var(--shadow-sm)]">
+          <span className="grid size-14 place-items-center rounded-full bg-[var(--primary-soft)] text-[var(--primary)]">
+            <Sparkles size={26} aria-hidden />
+          </span>
+          <h1 className="font-display m-0 text-2xl font-bold tracking-tight text-[var(--ink)]">Deck clear for today</h1>
           {reviewed > 0
-            ? <p>{reviewed} card{reviewed === 1 ? "" : "s"} reviewed · {accuracy}% recalled first time.</p>
-            : <p>Nothing is due right now. Cards come back when you're about to forget them.</p>}
-          <Link to="/app/home"><Button>Back to today</Button></Link>
+            ? <p className="m-0 max-w-[38ch] text-sm text-[var(--muted)]">{reviewed} card{reviewed === 1 ? "" : "s"} reviewed · {accuracy}% recalled first time.</p>
+            : <p className="m-0 max-w-[38ch] text-sm text-[var(--muted)]">Nothing is due right now. Cards come back when you're about to forget them.</p>}
+          <Link to="/app/home" className="mt-1"><Button>Back to today</Button></Link>
         </Card>
       </div>
     );
@@ -139,70 +149,127 @@ export function FlashcardReview() {
   const leechWarning = state.lapses >= LEECH_THRESHOLD / 2;
 
   return (
-    <div className="page review">
-      <header className="review__bar">
-        <Link to="/app/home" className="icon-button" aria-label="Leave review"><ArrowLeft size={19} /></Link>
-        <div className="review__counts" aria-label="Cards remaining by queue">
-          <span className="review__count review__count--new">{counts.newCards} new</span>
-          <span className="review__count review__count--learn">{counts.learning} learning</span>
-          <span className="review__count review__count--due">{counts.review} review</span>
+    <div className="mx-auto flex w-full max-w-[640px] flex-col gap-4 px-4 py-4 sm:px-6 sm:py-6">
+      <header className="flex items-center gap-2.5">
+        <Link
+          to="/app/home"
+          aria-label="Leave review"
+          className="grid size-9 flex-shrink-0 place-items-center rounded-[10px] text-[var(--muted)] transition-colors motion-reduce:transition-none hover:bg-[var(--surface-soft)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+        >
+          <ArrowLeft size={18} />
+        </Link>
+
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5" aria-label="Cards remaining by queue">
+          <span className="rounded-full bg-[var(--primary-faint)] px-2.5 py-1 text-[11.5px] font-bold text-[var(--primary-strong)]">
+            {counts.newCards} new
+          </span>
+          <span className="rounded-full bg-[var(--developing-soft)] px-2.5 py-1 text-[11.5px] font-bold text-[var(--developing)]">
+            {counts.learning} learning
+          </span>
+          <span className="rounded-full bg-[var(--surface-strong)] px-2.5 py-1 text-[11.5px] font-bold text-[var(--muted)]">
+            {counts.review} review
+          </span>
         </div>
-        <span className="review__deck">{card.deck === "exam_rehearsal" ? "Exam practice" : "Mastery"}</span>
+
+        <span className="flex-shrink-0 text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--muted)]">
+          {card.deck === "exam_rehearsal" ? "Exam practice" : "Mastery"}
+        </span>
       </header>
 
       {leechWarning && (
         // P3 section 4: Anki suspends a leech. On a required syllabus that
         // silently removes the content the student most needs, so we route it to
         // a human instead - the best-qualified teacher-call signal we get.
-        <div className="review__leech" role="status">
-          <HelpCircle size={17} aria-hidden />
-          <p>This one keeps slipping. Worth ten minutes with a teacher.</p>
-          <Link to="/app/teachers" className="review__leech-cta">Book a call</Link>
+        <div
+          role="status"
+          className="flex items-center gap-2.5 rounded-[14px] border border-[var(--developing)] bg-[var(--developing-soft)] px-4 py-3"
+        >
+          <HelpCircle size={17} className="flex-shrink-0 text-[var(--developing)]" aria-hidden />
+          <p className="m-0 flex-1 text-[13.5px] font-semibold text-[var(--developing)]">
+            This one keeps slipping. Worth ten minutes with a teacher.
+          </p>
+          <Link to="/app/teachers" className="flex-shrink-0 whitespace-nowrap text-[13px] font-bold text-[var(--primary)]">
+            Book a call
+          </Link>
         </div>
       )}
 
-      <Card className="review__card">
-        <p className="review__prompt">{card.front}</p>
+      {/* The card is the quietest thing on screen: no chrome besides the
+          1px border every surface gets, generous padding, and nothing that
+          moves until the student asks it to. */}
+      <Card className="grid min-h-[240px] items-center justify-items-center gap-6 px-6 py-10 text-center sm:px-12">
+        <p className="m-0 max-w-[46ch] text-xl font-semibold leading-snug tracking-tight text-[var(--ink)] sm:text-[22px]">
+          {card.front}
+        </p>
 
         {revealed ? (
-          <div className="review__answer">
-            <hr />
-            <p>{card.back}</p>
-            {card.backLatex && <MathDisplay value={card.backLatex} />}
+          <div className="grid w-full max-w-[46ch] gap-3 motion-safe:animate-[review-reveal_.18s_ease-out] motion-reduce:animate-none">
+            <hr aria-hidden className="mx-auto w-14 border-t-2 border-[var(--line-strong)]" />
+            <p className="m-0 text-[17px] leading-relaxed text-[var(--ink)]">{card.back}</p>
+            {card.backLatex && (
+              <div className="rounded-[11px] bg-[var(--surface-soft)] px-4 py-2.5">
+                <MathDisplay value={card.backLatex} />
+              </div>
+            )}
           </div>
         ) : (
-          <Button className="review__reveal" onClick={() => setRevealed(true)}>
-            Show answer <kbd>Space</kbd>
+          <Button onClick={() => setRevealed(true)} className="gap-2.5">
+            Show answer
+            <kbd className="rounded border border-white/25 bg-white/15 px-1.5 py-0.5 text-[11px] font-semibold">Space</kbd>
           </Button>
         )}
       </Card>
 
       {revealed && (
-        <div className="review__ratings" role="group" aria-label="How well did you recall it?">
-          {RATINGS.map(({ rating, label, tone }) => (
-            <button key={rating} className={`review__rating review__rating--${tone}`} onClick={() => rate(rating)}>
-              <strong>{label}</strong>
+        <div
+          role="group"
+          aria-label="How well did you recall it? Each button shows when the card returns."
+          className="grid grid-cols-2 gap-2 motion-safe:animate-[review-reveal_.18s_ease-out] motion-reduce:animate-none sm:grid-cols-4"
+        >
+          {RATINGS.map(({ rating, label, text, ring }) => (
+            <button
+              key={rating}
+              onClick={() => rate(rating)}
+              className={cx(
+                "grid cursor-pointer justify-items-center gap-1 rounded-[12px] border border-[var(--line)] bg-[var(--surface)] px-2 py-3",
+                "transition-colors motion-reduce:transition-none",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]",
+                ring,
+              )}
+            >
+              <strong className={cx("text-[13.5px] font-bold", text)}>{label}</strong>
               {/* The interval preview is the mechanic that makes rating honest:
-                  the cost of "Easy" is visible before you press it. */}
-              <span>{previews[rating]}</span>
-              <kbd>{rating}</kbd>
+                  the cost of "Easy" is visible before you press it. Kept large
+                  and tabular-numeric so it reads at a glance, not as a footnote. */}
+              <span className="text-[13px] font-semibold tabular-nums text-[var(--ink-soft)]">{previews[rating]}</span>
+              <kbd className="mt-0.5 rounded border border-[var(--line)] bg-[var(--surface-soft)] px-1.5 text-[10px] font-semibold text-[var(--muted)]">
+                {rating}
+              </kbd>
             </button>
           ))}
         </div>
       )}
 
-      <div className="review__tools">
-        <button onClick={() => advance((s) => ({ ...s, buriedUntil: endOfDay(now) }))}>
-          <EyeOff size={16} aria-hidden /> Bury until tomorrow
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 pt-1">
+        <button onClick={() => advance((s) => ({ ...s, buriedUntil: endOfDay(now) }))} className={toolButtonClass}>
+          <EyeOff size={15} aria-hidden /> Bury until tomorrow
         </button>
-        <button onClick={() => advance((s) => ({ ...s, flaggedForHelp: true }))}>
-          <HelpCircle size={16} aria-hidden /> Ask about this
+        <button onClick={() => advance((s) => ({ ...s, flaggedForHelp: true }))} className={toolButtonClass}>
+          <HelpCircle size={15} aria-hidden /> Ask about this
         </button>
-        <button onClick={() => { setRevealed(false); setStates(Object.fromEntries(DECK.map((c) => [c.flashcardId, newCardState("student-demo", c.flashcardId)]))); setReviewed(0); setAgain(0); }}>
-          <RotateCcw size={16} aria-hidden /> Restart session
+        <button
+          onClick={() => {
+            setRevealed(false);
+            setStates(Object.fromEntries(DECK.map((c) => [c.flashcardId, newCardState("student-demo", c.flashcardId)])));
+            setReviewed(0);
+            setAgain(0);
+          }}
+          className={toolButtonClass}
+        >
+          <RotateCcw size={15} aria-hidden /> Restart session
         </button>
-        <span className="review__tools-note">
-          <Layers size={14} aria-hidden /> Cards from the same note are held back until tomorrow
+        <span className="ml-auto hidden items-center gap-1.5 text-[11.5px] text-[var(--faint)] sm:inline-flex">
+          <Layers size={13} aria-hidden /> Cards from the same note are held back until tomorrow
         </span>
       </div>
     </div>

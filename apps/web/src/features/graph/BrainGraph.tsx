@@ -1,3 +1,4 @@
+import { Maximize2, ZoomIn, ZoomOut } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BAND_COLORS, LABEL_ZOOM_THRESHOLD, bandFor, type GraphForces } from "./constants";
 
@@ -159,9 +160,27 @@ export function BrainGraph({
         </g>
       </svg>
       <div className="bg-zoom" role="group" aria-label="Zoom">
-        <button onClick={() => setZoom((z) => Math.min(3, z + 0.3))} aria-label="Zoom in">+</button>
-        <button onClick={() => setZoom((z) => Math.max(0.6, z - 0.3))} aria-label="Zoom out">−</button>
-        <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} aria-label="Reset view">⤢</button>
+        <button
+          onClick={() => setZoom((z) => Math.min(3, z + 0.3))}
+          aria-label="Zoom in"
+          className="grid cursor-pointer place-items-center transition-colors motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+        >
+          <ZoomIn size={14} aria-hidden />
+        </button>
+        <button
+          onClick={() => setZoom((z) => Math.max(0.6, z - 0.3))}
+          aria-label="Zoom out"
+          className="grid cursor-pointer place-items-center transition-colors motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+        >
+          <ZoomOut size={14} aria-hidden />
+        </button>
+        <button
+          onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
+          aria-label="Reset view"
+          className="grid cursor-pointer place-items-center transition-colors motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+        >
+          <Maximize2 size={13} aria-hidden />
+        </button>
       </div>
     </div>
   );

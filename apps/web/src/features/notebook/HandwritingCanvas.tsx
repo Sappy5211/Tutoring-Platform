@@ -1,10 +1,16 @@
 import { Eraser, Pen, Redo2, Trash2, Undo2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { Button, IconButton } from "@vidya/ui";
+
+const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
 
 interface Point { x: number; y: number; pressure: number }
 interface Stroke { points: Point[]; colour: string; width: number; erase: boolean }
 
-const COLOURS = ["ink", "primary", "accent", "danger"] as const;
+// "accent" is gone from the token contract - near-monochrome means every pen
+// colour has to be a real token, so this reaches for "developing" (a warm
+// amber) instead of an undefined custom property.
+const COLOURS = ["ink", "primary", "developing", "danger"] as const;
 
 /** Real stylus input, not a placeholder: pointer events carry `pressure` from a
  *  pen and `pointerType` tells us pen from finger. Coalesced events matter on
@@ -123,34 +129,54 @@ export function HandwritingCanvas() {
   });
 
   return (
-    <div className="hw">
-      <div className="hw__tools" role="toolbar" aria-label="Handwriting tools">
-        <button className={!erasing ? "is-active" : ""} onClick={() => setErasing(false)} aria-pressed={!erasing}>
-          <Pen size={16} aria-hidden /> Pen
-        </button>
-        <button className={erasing ? "is-active" : ""} onClick={() => setErasing(true)} aria-pressed={erasing}>
-          <Eraser size={16} aria-hidden /> Erase
-        </button>
-        <span className="hw__swatches">
+    <div className="overflow-hidden rounded-[16px] border border-[var(--line)] bg-[var(--surface)]">
+      <div role="toolbar" aria-label="Handwriting tools" className="flex flex-wrap items-center gap-3 border-b border-[var(--line)] px-3 py-2">
+        <div className="flex items-center gap-1">
+          <Button size="sm" variant={erasing ? "secondary" : "primary"} onClick={() => setErasing(false)} aria-pressed={!erasing}>
+            <Pen size={15} aria-hidden /> Pen
+          </Button>
+          <Button size="sm" variant={erasing ? "primary" : "secondary"} onClick={() => setErasing(true)} aria-pressed={erasing}>
+            <Eraser size={15} aria-hidden /> Erase
+          </Button>
+        </div>
+
+        <span className="flex items-center gap-1.5" role="group" aria-label="Ink colour">
           {COLOURS.map((c) => (
             <button
               key={c}
-              className={`hw__swatch hw__swatch--${c}${colour === c && !erasing ? " is-active" : ""}`}
               onClick={() => { setColour(c); setErasing(false); }}
               aria-label={`${c} ink`}
               aria-pressed={colour === c && !erasing}
+              style={{ backgroundColor: `var(--${c})` }}
+              className={cx(
+                "size-6 shrink-0 rounded-full border-2 transition-[border-color] motion-reduce:transition-none cursor-pointer",
+                colour === c && !erasing ? "border-[var(--ink)]" : "border-transparent",
+              )}
             />
           ))}
         </span>
-        <button onClick={undo} disabled={!strokes.length} aria-label="Undo stroke"><Undo2 size={16} /></button>
-        <button onClick={redo} disabled={!undone.length} aria-label="Redo stroke"><Redo2 size={16} /></button>
-        <button onClick={() => { setStrokes([]); setUndone([]); }} disabled={!strokes.length} aria-label="Clear page">
-          <Trash2 size={16} />
-        </button>
+
+        <span className="ml-auto flex items-center gap-0.5">
+          <IconButton label="Undo stroke" onClick={undo} disabled={!strokes.length} className="disabled:opacity-40 disabled:pointer-events-none">
+            <Undo2 size={16} />
+          </IconButton>
+          <IconButton label="Redo stroke" onClick={redo} disabled={!undone.length} className="disabled:opacity-40 disabled:pointer-events-none">
+            <Redo2 size={16} />
+          </IconButton>
+          <IconButton
+            label="Clear page"
+            onClick={() => { setStrokes([]); setUndone([]); }}
+            disabled={!strokes.length}
+            className="disabled:opacity-40 disabled:pointer-events-none hover:text-[var(--danger)]"
+          >
+            <Trash2 size={16} />
+          </IconButton>
+        </span>
       </div>
+
       <canvas
         ref={canvasRef}
-        className="hw__canvas"
+        className="h-[min(60vh,480px)] w-full touch-none bg-[var(--surface)]"
         onPointerDown={start}
         onPointerMove={move}
         onPointerUp={end}
@@ -159,7 +185,8 @@ export function HandwritingCanvas() {
         style={{ touchAction: "none" }}
         aria-label="Handwriting area"
       />
-      <p className="hw__hint">
+
+      <p className="border-t border-[var(--line)] px-4 py-3 text-[12.5px] leading-relaxed text-[var(--muted)]">
         Write with a stylus or finger. Pen pressure changes stroke weight.
         You can still add a card here — draw the question, then use the arrow button on the page.
       </p>

@@ -1,8 +1,10 @@
 import {
   ChevronDown, Heading1, Image, Layers, ListChecks, MoreHorizontal, Plus, Table, Undo2,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import type { CardType } from "@vidya/contracts";
+import { Menu, MenuItem } from "@vidya/ui";
+
+const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
 
 /** Card types offered from the toolbar. Verified against Anki/RemNote's real
  *  set, minus the ones our card-type policy caps - MCQ is here because exam
@@ -31,73 +33,65 @@ const MORE = [
   { id: "divider", label: "Divider" }, { id: "code", label: "Code" },
 ];
 
-function Menu({ id, label, Icon, items, open, setOpen, onPick, header }: {
-  id: string; label: string; Icon: typeof Layers;
-  items: { id: string; label: string; hint?: string }[];
-  open: string | null; setOpen: (v: string | null) => void;
-  onPick: (itemId: string) => void; header?: string;
-}) {
-  const isOpen = open === id;
+const TOOLBAR_BTN = "inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-[8px] px-2.5 text-[12.5px] font-medium " +
+  "text-[var(--muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--ink)] transition-colors motion-reduce:transition-none cursor-pointer";
+
+/** Visual content for a menu-opening toolbar item. Not a real <button> — Menu
+ *  already wraps this in one, so nesting a second would be invalid markup. */
+function ToolbarTrigger({ icon: Icon, label, open }: { icon: typeof Layers; label: string; open: boolean }) {
   return (
-    <div className="etb__item">
-      {isOpen && (
-        <div className="etb__menu" role="menu" aria-label={label}>
-          {header && <span className="etb__menu-head">{header}</span>}
-          {items.map((item) => (
-            <button key={item.id} role="menuitem" onClick={() => { onPick(item.id); setOpen(null); }}>
-              <strong>{item.label}</strong>
-              {item.hint && <small>{item.hint}</small>}
-            </button>
-          ))}
-        </div>
-      )}
-      <button
-        className={`etb__btn${isOpen ? " is-open" : ""}`}
-        onClick={() => setOpen(isOpen ? null : id)}
-        aria-haspopup="menu"
-        aria-expanded={isOpen}
-      >
-        <Icon size={19} aria-hidden />
-        <span>{label}</span>
-        <ChevronDown size={12} aria-hidden className="etb__caret" />
-      </button>
-    </div>
+    <span className={cx(TOOLBAR_BTN, open && "bg-[var(--surface-soft)] text-[var(--ink)]")}>
+      <Icon size={16} aria-hidden />
+      <span>{label}</span>
+      <ChevronDown size={11} aria-hidden className={cx("transition-transform motion-reduce:transition-none", open && "rotate-180")} />
+    </span>
   );
 }
 
 export function EditorToolbar({ onInsert, onUndo }: {
   onInsert: (kind: string) => void; onUndo: () => void;
 }) {
-  const [open, setOpen] = useState<string | null>(null);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const away = (e: MouseEvent) => { if (!rootRef.current?.contains(e.target as Node)) setOpen(null); };
-    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(null); };
-    document.addEventListener("mousedown", away);
-    document.addEventListener("keydown", esc);
-    return () => { document.removeEventListener("mousedown", away); document.removeEventListener("keydown", esc); };
-  }, [open]);
-
   return (
-    <div className="etb" ref={rootRef} role="toolbar" aria-label="Insert block">
-      <Menu id="card" label="Flashcard" Icon={Layers} header="Flashcards" items={CARD_TYPES}
-        open={open} setOpen={setOpen} onPick={onInsert} />
-      <Menu id="heading" label="Heading" Icon={Heading1} items={HEADINGS}
-        open={open} setOpen={setOpen} onPick={onInsert} />
-      <button className="etb__btn" onClick={() => onInsert("todo")}>
-        <ListChecks size={19} aria-hidden /><span>Todo</span>
+    <div role="toolbar" aria-label="Insert block" className="mt-3 flex flex-wrap items-center gap-1 rounded-[12px] border border-[var(--line)] bg-[var(--surface)] p-1.5">
+      <Menu label="Flashcard" trigger={(open) => <ToolbarTrigger icon={Layers} label="Flashcard" open={open} />}>
+        <div className="px-2.5 pb-1 pt-1.5 text-[10.5px] font-bold uppercase tracking-wide text-[var(--faint)]">Flashcards</div>
+        {CARD_TYPES.map((item) => (
+          <MenuItem key={item.id} onClick={() => onInsert(item.id)}>
+            <span className="grid gap-0.5 py-0.5 text-left">
+              <strong className="text-[13px] font-semibold text-[var(--ink)]">{item.label}</strong>
+              <span className="text-[11px] font-normal text-[var(--muted)]">{item.hint}</span>
+            </span>
+          </MenuItem>
+        ))}
+      </Menu>
+
+      <Menu label="Heading" trigger={(open) => <ToolbarTrigger icon={Heading1} label="Heading" open={open} />}>
+        {HEADINGS.map((item) => (
+          <MenuItem key={item.id} onClick={() => onInsert(item.id)}>{item.label}</MenuItem>
+        ))}
+      </Menu>
+
+      <button className={TOOLBAR_BTN} onClick={() => onInsert("todo")}>
+        <ListChecks size={16} aria-hidden /> Todo
       </button>
-      <button className="etb__btn" onClick={() => onInsert("image")}>
-        <Image size={19} aria-hidden /><span>Image</span>
+      <button className={TOOLBAR_BTN} onClick={() => onInsert("image")}>
+        <Image size={16} aria-hidden /> Image
       </button>
-      <Menu id="table" label="Table" Icon={Table} items={TABLES}
-        open={open} setOpen={setOpen} onPick={onInsert} />
-      <Menu id="more" label="More" Icon={Plus} items={MORE}
-        open={open} setOpen={setOpen} onPick={onInsert} />
-      <button className="etb__btn" onClick={onUndo}>
-        <Undo2 size={19} aria-hidden /><span>Undo</span>
+
+      <Menu label="Table" trigger={(open) => <ToolbarTrigger icon={Table} label="Table" open={open} />}>
+        {TABLES.map((item) => (
+          <MenuItem key={item.id} onClick={() => onInsert(item.id)}>{item.label}</MenuItem>
+        ))}
+      </Menu>
+
+      <Menu label="More" trigger={(open) => <ToolbarTrigger icon={Plus} label="More" open={open} />}>
+        {MORE.map((item) => (
+          <MenuItem key={item.id} onClick={() => onInsert(item.id)}>{item.label}</MenuItem>
+        ))}
+      </Menu>
+
+      <button className={cx(TOOLBAR_BTN, "ml-auto")} onClick={onUndo}>
+        <Undo2 size={16} aria-hidden /> Undo
       </button>
     </div>
   );
@@ -120,31 +114,25 @@ const DOC_MENU: { id: string; label: string; shortcut?: string; danger?: boolean
 ];
 
 export function DocumentMenu({ onPick }: { onPick: (id: string) => void }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const away = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", away);
-    return () => document.removeEventListener("mousedown", away);
-  }, [open]);
   return (
-    <div className="doc-menu" ref={ref}>
-      <button className="icon-button" onClick={() => setOpen((v) => !v)}
-        aria-haspopup="menu" aria-expanded={open} aria-label="Page options">
-        <MoreHorizontal size={18} />
-      </button>
-      {open && (
-        <div className="doc-menu__panel" role="menu">
-          {DOC_MENU.map((item) => (
-            <button key={item.id} role="menuitem" className={item.danger ? "is-danger" : ""}
-              onClick={() => { onPick(item.id); setOpen(false); }}>
-              {item.label}
-              {item.shortcut && <kbd>{item.shortcut}</kbd>}
-            </button>
-          ))}
-        </div>
+    <Menu
+      label="Page options"
+      align="end"
+      trigger={(open) => (
+        <span className={cx(
+          "grid size-9 place-items-center rounded-[10px] text-[var(--muted)] transition-colors motion-reduce:transition-none",
+          "hover:bg-[var(--surface-soft)] hover:text-[var(--ink)]",
+          open && "bg-[var(--surface-soft)] text-[var(--ink)]",
+        )}>
+          <MoreHorizontal size={18} aria-hidden />
+        </span>
       )}
-    </div>
+    >
+      {DOC_MENU.map((item) => (
+        <MenuItem key={item.id} danger={item.danger} shortcut={item.shortcut} onClick={() => onPick(item.id)}>
+          {item.label}
+        </MenuItem>
+      ))}
+    </Menu>
   );
 }
