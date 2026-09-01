@@ -4,6 +4,7 @@ import {
 import { useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { DOCS, FOLDERS } from "./data";
+import { materialRoute } from "../materials/data";
 
 /** The empty-state illustration: a dashed path threading page and folder shapes.
  *  Inline SVG rather than an asset - it themes with the palette and costs no
@@ -136,7 +137,7 @@ export function FolderPage() {
               <button
                 key={doc.docId}
                 className="folder__card"
-                onClick={() => navigate(`/app/notebook/${doc.docId}`)}
+                onClick={() => navigate(materialRoute(doc.docId))}
               >
                 <span className="folder__card-icon">
                   {doc.kind === "handwritten" ? <PenLine size={19} /> : <FileText size={19} />}

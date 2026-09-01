@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lesson: Comparing &amp; Puzzles</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&amp;family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#a1c9ff",
+                        "secondary-fixed-dim": "#e9c400",
+                        "tertiary-fixed-dim": "#ffb68d",
+                        "surface-container-high": "#e5e8f1",
+                        "on-secondary": "#ffffff",
+                        "background": "#f8f9ff",
+                        "secondary": "#705d00",
+                        "tertiary": "#9b4500",
+                        "on-primary-fixed": "#001c37",
+                        "outline-variant": "#bfc7d5",
+                        "on-secondary-container": "#6e5c00",
+                        "on-secondary-fixed": "#221b00",
+                        "tertiary-container": "#e1752c",
+                        "primary-fixed-dim": "#a1c9ff",
+                        "on-background": "#171c22",
+                        "primary-fixed": "#d2e4ff",
+                        "on-surface-variant": "#3f4753",
+                        "secondary-fixed": "#ffe16d",
+                        "outline": "#707884",
+                        "on-surface": "#171c22",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#ebeef7",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#544600",
+                        "on-tertiary-fixed": "#331200",
+                        "inverse-on-surface": "#edf1fa",
+                        "surface-tint": "#0061a7",
+                        "surface-dim": "#d7dae3",
+                        "primary-container": "#0096ff",
+                        "secondary-container": "#fcd400",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "surface-container-low": "#f0f3fd",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary-container": "#002d52",
+                        "on-primary-fixed-variant": "#00487f",
+                        "surface-variant": "#dfe2eb",
+                        "inverse-surface": "#2c3137",
+                        "on-primary": "#ffffff",
+                        "primary": "#0061a7",
+                        "on-tertiary-container": "#4b1e00",
+                        "on-tertiary-fixed-variant": "#763300",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#ffdbc9",
+                        "surface-container-highest": "#dfe2eb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "40px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "margin-desktop": "80px",
+                        "sm": "12px",
+                        "xl": "64px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Open Sans"],
+                        "display-lg": ["Quicksand"],
+                        "headline-md": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "label-lg": ["Open Sans"],
+                        "body-md": ["Open Sans"],
+                        "headline-lg-mobile": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .worked-example {
+            background-color: #fff9c4; /* Sunny Yellow light fill */
+            border: 2px dashed #fcd400; /* Secondary container color */
+        }
+        .travel-chip {
+            background-color: #e1f5fe; /* Soft blue pastel */
+            color: #0061a7;
+        }
+        .route-dotted {
+            border-bottom: 3px dotted #bfc7d5;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen font-body-md pt-20 pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-xs max-w-full bg-surface shadow-sm shadow-primary/10">
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">We the Travellers</h1>
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+</button>
+</header>
+<main class="max-w-4xl mx-auto px-margin-mobile md:px-margin-desktop mt-lg flex flex-col gap-xl">
+<!-- Concept 2 Header -->
+<section class="text-center">
+<div class="inline-flex items-center gap-2 travel-chip px-4 py-2 rounded-full font-label-lg text-label-lg mb-sm">
+<span class="material-symbols-outlined text-lg">public</span>
+<span>Concept 2: Comparing Cities</span>
+</div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Which City Has More Explorers?</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-sm">Learn the two golden rules for comparing large numbers on your journey.</p>
+</section>
+<!-- Rule Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Rule 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_-4px_12px_rgba(0,150,255,0.08)] hover:-translate-y-0.5 transition-transform">
+<div class="flex items-center gap-sm mb-sm">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined">looks_one</span>
+</div>
+<h3 class="font-headline-md text-headline-md">The Digit Count</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">The number with more digits is always bigger! It's like comparing a short trip to a long expedition.</p>
+<div class="mt-md bg-surface p-sm rounded-lg flex justify-center items-center gap-md">
+<span class="font-headline-md text-headline-md text-tertiary-container">9,875</span>
+<span class="material-symbols-outlined text-primary font-bold">chevron_left</span>
+<span class="font-headline-md text-headline-md text-primary">12,450</span>
+</div>
+<p class="text-center text-label-lg font-label-lg text-outline mt-xs">4 digits vs 5 digits</p>
+</div>
+<!-- Rule 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_-4px_12px_rgba(0,150,255,0.08)] hover:-translate-y-0.5 transition-transform">
+<div class="flex items-center gap-sm mb-sm">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined">looks_two</span>
+</div>
+<h3 class="font-headline-md text-headline-md">Left-to-Right Showdown</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">If the digit count is the same, start from the left and compare each digit until you find a difference.</p>
+</div>
+</div>
+<!-- See it Visually -->
+<section class="bg-surface-container-low rounded-xl p-md">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-primary text-3xl">visibility</span>
+<h3 class="font-headline-md text-headline-md">See it Visually: The Showdown</h3>
+</div>
+<div class="flex flex-col items-center gap-sm">
+<div class="flex gap-xs font-display-lg text-display-lg">
+<span class="text-outline">3</span><span class="text-outline">4</span><span class="text-outline">,</span><span class="text-tertiary-container">5</span><span class="text-outline">1</span><span class="text-outline">0</span>
+</div>
+<div class="font-headline-md text-headline-md text-on-surface-variant">vs</div>
+<div class="flex gap-xs font-display-lg text-display-lg">
+<span class="text-outline">3</span><span class="text-outline">4</span><span class="text-outline">,</span><span class="text-primary">8</span><span class="text-outline">1</span><span class="text-outline">0</span>
+</div>
+<div class="mt-md text-center bg-white p-sm rounded-lg border border-surface-variant w-full max-w-sm">
+<p class="font-body-md text-body-md text-on-surface-variant">The ten-thousands and thousands are the same. But in the hundreds place, <strong class="text-primary">8</strong> is greater than <strong class="text-tertiary-container">5</strong>!</p>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile py-sm bg-surface rounded-t-xl border-t-2 border-surface-variant/30 shadow-[0_-4px_12px_rgba(0,150,255,0.08)]">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 hover:bg-primary-container/50 transition-colors rounded-xl">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">chevron_left</span>
+<span class="font-label-lg text-label-lg mt-1">Back</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-6 py-2 border-b-2 border-primary/20 hover:bg-primary-container/80 transition-colors translate-y-0.5 transition-all duration-100 shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">chevron_right</span>
+<span class="font-label-lg text-label-lg mt-1">Next Concept</span>
+</button>
+</nav>
+</body></html>

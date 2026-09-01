@@ -6,6 +6,7 @@ import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { NotebookDoc } from "@vidya/contracts";
 import { DOCS, FOLDERS } from "./data";
+import { materialRoute } from "../materials/data";
 
 type Facet = "all" | "documents" | "folders" | "pdfs" | "tags" | "cards";
 type Sort = "newest" | "oldest" | "az";
@@ -91,7 +92,7 @@ export function NotebookIndex() {
   return (
     <div className="page nb-index">
       <header className="nb-index__head">
-        <h1>Notebook</h1>
+        <h1>Materials</h1>
         <div className="nb-index__actions">
           <button className="nb-index__upload">
             <Upload size={16} aria-hidden /> Upload &amp; learn PDF
@@ -108,8 +109,8 @@ export function NotebookIndex() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search notebook…"
-            aria-label="Search notebook"
+            placeholder="Search materials…"
+            aria-label="Search materials"
           />
           {query && (
             <button onClick={() => setQuery("")} aria-label="Clear search"><X size={14} /></button>
@@ -176,7 +177,7 @@ export function NotebookIndex() {
                 <span className={`nb-row__icon${doc.kind === "pdf" ? " nb-row__icon--pdf" : ""}`}>
                   <FileText size={16} />
                 </span>
-                <button className="nb-row__body" onClick={() => navigate(`/app/notebook/${doc.docId}`)}>
+                <button className="nb-row__body" onClick={() => navigate(materialRoute(doc.docId))}>
                   <strong>{doc.title}</strong>
                   <span>{doc.path.join(" › ")}</span>
                 </button>
@@ -191,7 +192,7 @@ export function NotebookIndex() {
                 </button>
                 {menuFor === doc.docId && (
                   <div className="nb-row__menu" role="menu">
-                    <button role="menuitem" onClick={() => navigate(`/app/notebook/${doc.docId}`)}>Open</button>
+                    <button role="menuitem" onClick={() => navigate(materialRoute(doc.docId))}>Open</button>
                     <button role="menuitem">Rename</button>
                     <button role="menuitem">Move to…</button>
                     <button role="menuitem">Export</button>

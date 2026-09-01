@@ -8,7 +8,7 @@ import { SubjectSwitcher } from "./SubjectSwitcher";
 
 const nav: Record<UserRole, Array<{ to: string; label: string; icon: typeof Home }>> = {
   student: [
-    { to: "/app/home", label: "Home", icon: Home }, { to: "/app/syllabus", label: "Learn", icon: LibraryBig }, { to: "/app/notebook", label: "Notebook", icon: NotebookPen }, { to: "/app/practice", label: "Practice", icon: Sparkles }, { to: "/app/tutor", label: "Ask VIDYA", icon: Bot }, { to: "/app/progress", label: "Progress", icon: BrainCircuit },
+    { to: "/app/home", label: "Home", icon: Home }, { to: "/app/syllabus", label: "Learn", icon: LibraryBig }, { to: "/app/notebook", label: "Materials", icon: NotebookPen }, { to: "/app/practice", label: "Practice", icon: Sparkles }, { to: "/app/tutor", label: "Ask VIDYA", icon: Bot }, { to: "/app/progress", label: "Progress", icon: BrainCircuit },
     { to: "/app/flashcards", label: "Flashcards", icon: BookOpen }, { to: "/app/calendar", label: "Schedule", icon: CalendarDays }, { to: "/app/teachers", label: "Teachers", icon: UsersRound }, { to: "/app/settings", label: "Settings", icon: Settings }
   ],
   parent: [{ to: "/parent/overview", label: "Overview", icon: Home }, { to: "/parent/goals", label: "Exam goals", icon: CalendarDays }, { to: "/parent/bookings", label: "Bookings", icon: UsersRound }, { to: "/parent/plan", label: "Plan", icon: Sparkles }],
@@ -56,9 +56,9 @@ export function Shell() {
       </div>
     </header>
     <aside className={`sidebar ${open ? "is-open" : ""}`} aria-label="Primary navigation" onPointerEnter={() => sidebarCollapsed && setPeek(true)} onPointerLeave={() => setPeek(false)}>
-      <div className="sidebar__context"><span className="avatar">{role === "student" ? "AS" : role === "parent" ? "PS" : role === "teacher" ? "MI" : "AU"}</span><div><strong>{role === "student" ? "Aarav Sharma" : role === "parent" ? "Priya Sharma" : role === "teacher" ? "Meera Iyer" : "Content team"}</strong><span>{role === "student" ? "CBSE · Class 7" : `${role[0]!.toUpperCase()}${role.slice(1)} workspace`}</span></div></div>
+      <div className="sidebar__context"><span className="avatar">{role === "student" ? "AS" : role === "parent" ? "PS" : role === "teacher" ? "MI" : "AU"}</span><div><strong>{role === "student" ? "Aarav Sharma" : role === "parent" ? "Priya Sharma" : role === "teacher" ? "Meera Iyer" : "Content team"}</strong><span>{role === "student" ? "CBSE · Class 5" : `${role[0]!.toUpperCase()}${role.slice(1)} workspace`}</span></div></div>
       <nav>{nav[role].map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} title={sidebarCollapsed ? label : undefined} aria-label={sidebarCollapsed ? label : undefined} className={({ isActive }) => isActive ? "active" : ""}><Icon size={19} /><span>{label}</span></NavLink>)}</nav>
-      <div className="sidebar__footer"><span className="signal-dot" />Mock workspace · all systems safe</div>
+      <div className="sidebar__footer"><span className="signal-dot" />Class 5 pilot · materials ready</div>
     </aside>
     <main id="main-content" className="main-content" tabIndex={-1}><Outlet /></main>
     <nav className="bottom-nav" aria-label="Mobile navigation">{nav[role].slice(0, 5).map(({ to, label, icon: Icon }, index) => <NavLink key={to} to={to} className={index === 2 ? "bottom-nav__primary" : ""}><Icon size={21} /><span>{label}</span></NavLink>)}</nav>

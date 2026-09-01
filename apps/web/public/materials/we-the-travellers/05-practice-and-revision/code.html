@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Practice &amp; Revision - Chapter 1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&amp;family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#0061a7",
+                        "on-tertiary-container": "#4b1e00",
+                        "tertiary": "#9b4500",
+                        "surface-container-low": "#f0f3fd",
+                        "inverse-primary": "#a1c9ff",
+                        "surface-dim": "#d7dae3",
+                        "inverse-surface": "#2c3137",
+                        "error": "#ba1a1a",
+                        "primary": "#0061a7",
+                        "on-tertiary-fixed-variant": "#763300",
+                        "on-surface-variant": "#3f4753",
+                        "primary-container": "#0096ff",
+                        "on-secondary": "#ffffff",
+                        "outline": "#707884",
+                        "primary-fixed-dim": "#a1c9ff",
+                        "primary-fixed": "#d2e4ff",
+                        "on-secondary-fixed-variant": "#544600",
+                        "surface-container-highest": "#dfe2eb",
+                        "on-background": "#171c22",
+                        "on-primary-fixed": "#001c37",
+                        "on-secondary-fixed": "#221b00",
+                        "background": "#f8f9ff",
+                        "outline-variant": "#bfc7d5",
+                        "surface-container": "#ebeef7",
+                        "on-secondary-container": "#6e5c00",
+                        "on-surface": "#171c22",
+                        "surface": "#f8f9ff",
+                        "secondary-fixed-dim": "#e9c400",
+                        "on-primary-container": "#002d52",
+                        "on-tertiary-fixed": "#331200",
+                        "tertiary-container": "#e1752c",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#ffe16d",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#dfe2eb",
+                        "secondary-container": "#fcd400",
+                        "secondary": "#705d00",
+                        "surface-container-high": "#e5e8f1",
+                        "tertiary-fixed-dim": "#ffb68d",
+                        "on-primary-fixed-variant": "#00487f",
+                        "tertiary-fixed": "#ffdbc9",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#edf1fa",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f8f9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "lg": "40px",
+                        "base": "8px",
+                        "xl": "64px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "margin-desktop": "80px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Quicksand"],
+                        "body-md": ["Open Sans"],
+                        "headline-lg-mobile": ["Quicksand"],
+                        "label-lg": ["Open Sans"],
+                        "body-lg": ["Open Sans"],
+                        "headline-md": ["Quicksand"],
+                        "display-lg": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f8f9ff; }
+        .bento-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 150, 255, 0.08);
+            transition: all 0.2s ease-in-out;
+            padding: 24px;
+        }
+        .bento-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 150, 255, 0.12);
+        }
+        .worked-example {
+            background-color: #fff9e6; /* Soft sunny yellow fallback */
+            border: 2px dashed #fcd400; /* Secondary container color */
+            border-radius: 0.75rem;
+            padding: 24px;
+        }
+        .primary-btn {
+            background-color: #0061a7; /* Primary */
+            color: #ffffff;
+            border-bottom: 3px solid #00487f; /* Darker primary for 3D effect */
+            border-radius: 0.75rem;
+            padding: 16px 32px;
+            font-family: "Open Sans", sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.1s ease;
+        }
+        .primary-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 1px;
+            margin-bottom: 2px;
+        }
+        .checkbox-custom {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #707884;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            background-color: #ffffff;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .checkbox-custom:checked {
+            background-color: #0096ff;
+            border-color: #0096ff;
+        }
+        .checkbox-custom:checked::after {
+            content: '\e5ca'; /* Material Icons check */
+            font-family: 'Material Symbols Outlined';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface antialiased bg-background pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile py-xs max-w-full bg-surface shadow-sm shadow-primary/10 h-16">
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity p-2 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">We the Travellers</h1>
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity p-2 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">account_circle</span>
+</button>
+</header>
+<!-- Main Content Container -->
+<main class="max-w-5xl mx-auto px-margin-mobile md:px-margin-desktop pt-24 space-y-lg">
+<!-- Header Section -->
+<div class="text-center space-y-sm">
+<span class="inline-flex items-center gap-2 bg-secondary-container text-on-secondary-container px-4 py-1 rounded-full font-label-lg text-label-lg">
+<span class="material-symbols-outlined text-[18px]">flight_takeoff</span>
+                Chapter 1
+            </span>
+<h2 class="font-display-lg text-display-lg text-on-surface">Practice &amp; Revision</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Let's pack our bags and make sure we have everything we need for the next adventure!</p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Quick Revision Section -->
+<div class="bento-card lg:col-span-7 flex flex-col gap-sm">
+<div class="flex items-center gap-3 mb-2 border-b border-surface-variant pb-4">
+<div class="bg-primary-container/20 p-3 rounded-full text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">timer</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Chapter in 2 Minutes</h3>
+</div>
+<ul class="space-y-4 mt-2">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary-container mt-1 shrink-0">location_on</span>
+<div>
+<strong class="font-label-lg text-label-lg text-on-surface block">Ten-Thousands:</strong>
+<span class="font-body-md text-body-md text-on-surface-variant">The 5th place value. Comma before hundreds.</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary-container mt-1 shrink-0">compare_arrows</span>
+<div>
+<strong class="font-label-lg text-label-lg text-on-surface block">Comparing:</strong>
+<span class="font-body-md text-body-md text-on-surface-variant">Count digits first. Then compare left-to-right.</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary-container mt-1 shrink-0">architecture</span>
+<div>
+<strong class="font-label-lg text-label-lg text-on-surface block">Building:</strong>
+<span class="font-body-md text-body-md text-on-surface-variant">Largest (descending), Smallest (ascending - no zero first!).</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary-container mt-1 shrink-0">all_out</span>
+<div>
+<strong class="font-label-lg text-label-lg text-on-surface block">Rounding:</strong>
+<span class="font-body-md text-body-md text-on-surface-variant">Look at the neighbour. 0-4 (rest), 5-9 (raise).</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary-container mt-1 shrink-0">directions_bus</span>
+<div>
+<strong class="font-label-lg text-label-lg text-on-surface block">Travel Math:</strong>
+<span class="font-body-md text-body-md text-on-surface-variant">Total ÷ Capacity = Vehicles.</span>
+</div>
+</li>
+</ul>
+</div>
+<!-- Decorative Image / Example Box -->
+<div class="lg:col-span-5 flex flex-col gap-gutter">
+<div class="worked-example flex-grow flex flex-col justify-center items-center text-center gap-4">
+<span class="material-symbols-outlined text-5xl text-secondary">explore</span>
+<h4 class="font-headline-md text-headline-md text-on-secondary-container">Traveller's Tip</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Always double-check your map (and your commas!) before setting off on a big math journey.</p>
+</div>
+<div class="rounded-xl overflow-hidden h-48 relative shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A bright, cheerful cartoon illustration of a friendly map and compass sitting on a wooden desk alongside a toy airplane and binoculars. The lighting is soft and sunny, suggesting an early morning start to an adventure. The colors are predominantly sky blue, sunny yellow, and soft greens, matching a child-friendly, optimistic learning environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZu6x54apc8_51d4QT78CDkqQlOjOX6xBkF_LTYLezvhTEYBkkw_Dqgxd8oX5gP0g-DlfXuGO7XMLUAOFb-SCT7Md3X9MAzDGcnlU0OrriorjwHo3SZhQzWcbo6YtCH_ZYC-09K2i9AzJrRaBmxbJNL3KNfVcVnbt5f7u1U1yls3ItHLtcpfGDXdDzSbZ25wxf14QEaxXEmKPomwQ2kvDyTIHfpwHzzN_p9qgNPyQhOTLqsx8ey0JizQ"/>
+</div>
+</div>
+<!-- Mastery Checklist Section -->
+<div class="bento-card lg:col-span-12 flex flex-col gap-sm">
+<div class="flex items-center gap-3 mb-4 border-b border-surface-variant pb-4">
+<div class="bg-primary-container/20 p-3 rounded-full text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">fact_check</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Can I Do This?</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<label class="flex items-start gap-3 p-3 hover:bg-surface-container rounded-lg cursor-pointer transition-colors">
+<input class="checkbox-custom" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface select-none pt-0.5">I can read and write five-digit numbers using correct comma placement.</span>
+</label>
+<label class="flex items-start gap-3 p-3 hover:bg-surface-container rounded-lg cursor-pointer transition-colors">
+<input class="checkbox-custom" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface select-none pt-0.5">I can compare large numbers using &lt;, &gt;, and =.</span>
+</label>
+<label class="flex items-start gap-3 p-3 hover:bg-surface-container rounded-lg cursor-pointer transition-colors">
+<input class="checkbox-custom" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface select-none pt-0.5">I can build the largest and smallest numbers from a set of digits, even with zero.</span>
+</label>
+<label class="flex items-start gap-3 p-3 hover:bg-surface-container rounded-lg cursor-pointer transition-colors">
+<input class="checkbox-custom" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface select-none pt-0.5">I can round numbers to the nearest hundred.</span>
+</label>
+<label class="flex items-start gap-3 p-3 hover:bg-surface-container rounded-lg cursor-pointer transition-colors">
+<input class="checkbox-custom" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface select-none pt-0.5">I can round numbers to the nearest thousand.</span>
+</label>
+<label class="flex items-start gap-3 p-3 hover:bg-surface-container rounded-lg cursor-pointer transition-colors">
+<input class="checkbox-custom" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface select-none pt-0.5">I can divide to find out how many vehicles are needed.</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="flex justify-center mt-xl pb-lg">
+<button class="primary-btn flex items-center gap-2 text-lg">
+<span class="material-symbols-outlined">celebration</span>
+                Finish Chapter
+            </button>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile py-sm bg-surface border-t-2 border-surface-variant/30 shadow-[0_-4px_12px_rgba(0,150,255,0.08)] rounded-t-xl h-[80px]">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 hover:bg-primary-container/50 transition-colors rounded-xl">
+<span class="material-symbols-outlined text-2xl mb-1">chevron_left</span>
+<span class="font-label-lg text-label-lg">Back</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-6 py-2 border-b-2 border-primary/20 hover:bg-primary-container/50 transition-colors translate-y-0.5">
+<span class="material-symbols-outlined text-2xl mb-1" style="font-variation-settings: 'FILL' 1;">chevron_right</span>
+<span class="font-label-lg text-label-lg">Next Concept</span>
+</button>
+</nav>
+<script>
+        // Simple micro-interaction for checkboxes to create a "celebration" effect when all are checked
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkboxes = document.querySelectorAll('.checkbox-custom');
+            const finishBtn = document.querySelector('.primary-btn');
+            
+            function checkAllCompleted() {
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                if(allChecked) {
+                    finishBtn.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        finishBtn.style.transform = 'scale(1)';
+                    }, 200);
+                }
+            }
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', checkAllCompleted);
+            });
+        });
+    </script>
+</body></html>
