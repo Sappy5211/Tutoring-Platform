@@ -13,19 +13,18 @@ const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boo
 /** Mock deck. Real cards arrive from the repository at P3.5; the shapes are the
  *  contract types so swapping the source is a data change, not a rewrite. */
 const DECK: Flashcard[] = [
-  { flashcardId: "c1", type: "concept", deck: "mastery", direction: "both", enabled: true,
-    front: "Equivalent fractions", back: "Fractions with different numerators and denominators that represent the same value.",
-    backLatex: "\\frac{1}{2}=\\frac{2}{4}=\\frac{3}{6}", sourceBlockId: "b-fractions", skillIds: ["s-fractions"], status: "published" },
-  { flashcardId: "c2", type: "descriptor", deck: "mastery", direction: "forward", enabled: true,
-    front: "To add fractions with different denominators, you first…", back: "…rewrite them over a common denominator.",
-    backLatex: "\\frac{1}{3}+\\frac{1}{4}=\\frac{4}{12}+\\frac{3}{12}=\\frac{7}{12}", sourceBlockId: "b-fractions", skillIds: ["s-fractions"], status: "published" },
-  { flashcardId: "c3", type: "basic", deck: "mastery", direction: "forward", enabled: true,
-    front: "What is 25% of 80?", back: "20", backLatex: "0.25\\times 80 = 20", sourceBlockId: "b-percent", skillIds: ["s-percentages"], status: "published" },
-  { flashcardId: "c4", type: "cloze", deck: "mastery", direction: "forward", enabled: true,
-    front: "The ratio 3 : 4 means for every 3 parts of the first there are ⟨…⟩ parts of the second.",
-    back: "4", sourceBlockId: "b-ratio", skillIds: ["s-ratio"], status: "published" },
-  { flashcardId: "c5", type: "basic", deck: "exam_rehearsal", direction: "forward", enabled: true,
-    front: "Which is largest?  0.7,  ⅔,  0.68", back: "0.7", sourceBlockId: "b-decimals", skillIds: ["s-decimals"], status: "published" },
+  { flashcardId: "travellers-1", type: "basic", deck: "mastery", direction: "forward", enabled: true,
+    front: "What is the new place value that comes just after Thousands?", back: "Ten-Thousands (TTh)", sourceBlockId: "travellers-place-value", skillIds: ["s-large-numbers"], status: "published" },
+  { flashcardId: "travellers-2", type: "basic", deck: "mastery", direction: "forward", enabled: true,
+    front: "How do you read the number 82,045 in words?", back: "Eighty-two thousand, forty-five. (Don't say ‘zero hundred’!)", sourceBlockId: "travellers-reading", skillIds: ["s-large-numbers"], status: "published" },
+  { flashcardId: "travellers-3", type: "concept", deck: "mastery", direction: "forward", enabled: true,
+    front: "Which number is larger: 12,500 or 9,999? Why?", back: "12,500. A number with 5 digits is always larger than a number with 4 digits.", sourceBlockId: "travellers-comparing", skillIds: ["s-comparing-numbers"], status: "published" },
+  { flashcardId: "travellers-4", type: "basic", deck: "mastery", direction: "forward", enabled: true,
+    front: "What is the smallest 5-digit number you can make using 0, 5, 8, 2, 9?", back: "20,589. Watch out for the Zero Trap: you can never put 0 first!", sourceBlockId: "travellers-forming", skillIds: ["s-forming-numbers"], status: "published" },
+  { flashcardId: "travellers-5", type: "basic", deck: "mastery", direction: "forward", enabled: true,
+    front: "Round 14,620 to the nearest thousand.", back: "15,000. The neighbour digit is 6, so round 14 thousand up to 15 thousand.", sourceBlockId: "travellers-rounding", skillIds: ["s-rounding"], status: "published" },
+  { flashcardId: "travellers-6", type: "basic", deck: "mastery", direction: "forward", enabled: true,
+    front: "If 60 people travel in boats that hold 15 people each, how many boats are needed?", back: "Use division: 60 ÷ 15 = 4 boats.", sourceBlockId: "travellers-division", skillIds: ["s-division"], status: "published" },
 ];
 
 /** Matches the pattern already used in PracticePage and the notes reader.

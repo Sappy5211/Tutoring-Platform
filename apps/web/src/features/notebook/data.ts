@@ -3,12 +3,8 @@ import type { Folder, NotebookDoc, OutlineNode } from "@vidya/contracts";
 /** Mock notebook. Shapes are the contract types, so swapping in the repository
  *  at P1.2 is a data change rather than a component rewrite. */
 export const FOLDERS: Folder[] = [
-  { folderId: "f-maths", kind: "book", parentId: null, title: "Mathematics", owner: "platform", order: 0, colour: "primary" },
-  { folderId: "f-number", kind: "chapter", parentId: "f-maths", title: "Number", owner: "platform", order: 0 },
-  { folderId: "f-algebra", kind: "chapter", parentId: "f-maths", title: "Algebra", owner: "platform", order: 1 },
-  { folderId: "f-geometry", kind: "chapter", parentId: "f-maths", title: "Geometry", owner: "platform", order: 2 },
-  { folderId: "f-mine", kind: "book", parentId: null, title: "My notes", owner: "student", order: 1, colour: "accent" },
-  { folderId: "f-mine-revision", kind: "chapter", parentId: "f-mine", title: "Revision", owner: "student", order: 0 },
+  { folderId: "f-class-5-maths", kind: "book", parentId: null, title: "Class 5 Mathematics", owner: "platform", order: 0, colour: "primary" },
+  { folderId: "f-large-numbers-place-value", kind: "chapter", parentId: "f-class-5-maths", title: "Large Numbers and Place Value", owner: "platform", order: 0 },
 ];
 
 /** Dates are relative to today so the date-grouped index never goes stale. */
@@ -17,16 +13,11 @@ const daysAgo = (n: number) => {
 };
 
 export const DOCS: NotebookDoc[] = [
-  { docId: "d-fractions", folderId: "f-number", title: "Fractions", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Mathematics", "Number"], tags: ["Class 7"], cardCount: 12 },
-  { docId: "d-ratio", folderId: "f-number", title: "Ratio and proportion", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Mathematics", "Number"], tags: ["Class 7"], cardCount: 9 },
-  { docId: "d-percent", folderId: "f-number", title: "Percentages", owner: "platform", updatedAt: daysAgo(1), kind: "document", path: ["Mathematics", "Number"], tags: ["Class 7", "Exam"], cardCount: 14 },
-  { docId: "d-linear", folderId: "f-algebra", title: "Simple equations", owner: "platform", updatedAt: daysAgo(1), kind: "document", path: ["Mathematics", "Algebra"], tags: ["Class 7"], cardCount: 11 },
-  { docId: "d-angles", folderId: "f-geometry", title: "Lines and angles", owner: "platform", updatedAt: daysAgo(2), kind: "document", path: ["Mathematics", "Geometry"], tags: ["Class 7"], cardCount: 8 },
-  { docId: "d-integers", folderId: "f-number", title: "Integers", owner: "platform", updatedAt: daysAgo(3), kind: "document", path: ["Mathematics", "Number"], tags: [], cardCount: 10 },
-  { docId: "d-my-fractions", folderId: "f-mine-revision", title: "Fractions — my summary", owner: "student", updatedAt: daysAgo(3), kind: "document", path: ["My notes", "Revision"], tags: ["Mine"], cardCount: 4 },
-  { docId: "d-mensuration", folderId: "f-geometry", title: "Perimeter and area", owner: "platform", updatedAt: daysAgo(6), kind: "document", path: ["Mathematics", "Geometry"], tags: ["Exam"], cardCount: 7 },
-  { docId: "d-worksheet", folderId: "f-number", title: "Half-yearly worksheet.pdf", owner: "platform", updatedAt: daysAgo(9), kind: "pdf", path: ["Mathematics", "Number"], tags: ["Exam"], cardCount: 0 },
-  { docId: "d-formula", folderId: "f-mine", title: "Formula sheet.pdf", owner: "student", updatedAt: daysAgo(14), kind: "pdf", path: ["My notes"], tags: ["Mine"], cardCount: 0 },
+  { docId: "material-moving-beyond-thousands", folderId: "f-large-numbers-place-value", title: "Moving Beyond Thousands", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "Large Numbers and Place Value"], tags: ["Class 5", "Large numbers"], cardCount: 1 },
+  { docId: "material-which-city-has-more-explorers", folderId: "f-large-numbers-place-value", title: "Which City Has More Explorers?", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "Large Numbers and Place Value"], tags: ["Class 5", "Comparing numbers"], cardCount: 1 },
+  { docId: "material-building-the-ultimate-destination", folderId: "f-large-numbers-place-value", title: "Building the Ultimate Destination", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "Large Numbers and Place Value"], tags: ["Class 5", "Place value"], cardCount: 2 },
+  { docId: "material-the-journey-ahead", folderId: "f-large-numbers-place-value", title: "The Journey Ahead", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "Large Numbers and Place Value"], tags: ["Class 5", "Rounding", "Division"], cardCount: 2 },
+  { docId: "material-practice-and-revision", folderId: "f-large-numbers-place-value", title: "Practice & Revision", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "Large Numbers and Place Value"], tags: ["Class 5", "Revision"], cardCount: 6 },
 ];
 
 const n = (

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import type { NotebookDoc } from "@vidya/contracts";
 import { Button, EmptyState, HoverRow, Input, Menu, MenuItem, revealOnHover, Toast } from "@vidya/ui";
 import { DOCS, FOLDERS } from "./data";
+import { materialRoute } from "../materials/data";
 
 const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
 
@@ -123,7 +124,7 @@ export function NotebookIndex() {
       <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--line)] pb-6">
         <div>
           <h1 className="font-display text-[30px] font-bold leading-none tracking-tight text-[var(--ink)] text-balance sm:text-[34px]">
-            Notebook
+            Materials
           </h1>
           <p className="mt-2 text-sm text-[var(--muted)]">Course notes, your own pages, and uploaded PDFs.</p>
         </div>
@@ -147,8 +148,8 @@ export function NotebookIndex() {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search notebook…"
-            aria-label="Search notebook"
+            placeholder="Search materials…"
+            aria-label="Search materials"
             className="pl-9 pr-8"
           />
           {query && (

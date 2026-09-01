@@ -10,6 +10,7 @@ import { FolderPage } from "./features/notebook/FolderPage";
 import { HandwrittenPage } from "./features/notebook/HandwrittenPage";
 import { NotebookIndex } from "./features/notebook/NotebookIndex";
 import { NotebookPage } from "./features/notebook/NotebookPage";
+import { MaterialPage } from "./features/materials/MaterialPage";
 import {
   HomePage,
   NotesPage,
@@ -60,6 +61,7 @@ export const router = createBrowserRouter([
       { path: "/app/notebook/folder/:folderId", element: <FolderPage /> },
       { path: "/app/notebook/new/handwritten", element: <HandwrittenPage /> },
       { path: "/app/notebook/:docId", element: <NotebookPage /> },
+      { path: "/app/materials/:materialId", element: <MaterialPage /> },
       {
         path: "/app/notes/:noteId?",
         element: <NotesPage />,

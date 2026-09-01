@@ -656,3 +656,46 @@ is on screen before attributing it to the thing you just changed.**
 
 Verified: typecheck clean, 17/17 tests, build 151 kB gzip (budget 200 kB); graph shows 9 nodes with
 6 dimmed and 2 edges lit on selection, 5 sliders, 4-band legend, and freeze halting the simulation.
+
+---
+## 2026-09-01 — Session 14: exact Stitch chapter replaces notebook placeholders
+
+The operator supplied five Google Stitch ZIP exports for Class 5 Mathematics, Chapter “We the
+Travellers,” and corrected an initial attempt to reinterpret their content as native cards. That
+reinterpretation was discarded. The ZIPs are now the canonical source and are preserved intact under
+`apps/web/public/materials/we-the-travellers/`, including each original `code.html`, `screen.png`, and
+`DESIGN.md`.
+
+The ordered mapping is:
+
+1. unnumbered ZIP → Moving Beyond Thousands
+2. `(1)` → Which City Has More Explorers?
+3. `(2)` → Building the Ultimate Destination
+4. `(3)` → The Journey Ahead
+5. `(4)` → Practice & Revision
+
+VIDYA mounts the supplied `code.html` directly in a lesson frame. Only a thin application-level bar was
+added for Materials, previous/next navigation, and opening the untouched source in a separate tab. The
+lesson’s HTML and styling were not translated or rewritten. The old visible Class 7 notebook fixtures
+were replaced with these five Class 5 records and a real Class 5 Mathematics → We the Travellers
+hierarchy. The flashcard review deck was also replaced with the six chapter cards supplied by the
+operator; scheduling behaviour remains unchanged.
+
+Google Stitch itself was not available as a connected MCP server or plugin in this Codex session. The
+exported ZIP files were therefore used as the exact source rather than attempting to recreate the
+screens from screenshots.
+
+Verified: all five source documents return HTTP 200, the first exact source visually renders, typecheck
+is clean, 17/17 tests pass, production build succeeds, and initial JS remains within budget at 152.1 kB
+gzip / 200 kB.
+
+Follow-up correction from the operator: the canonical chapter hierarchy is **Class 5 Mathematics →
+Large Numbers and Place Value**. All five Stitch lessons sit beneath that single chapter. “We the
+Travellers” remains untouched only where it is part of the original Stitch document content; it is not
+the VIDYA chapter-folder name.
+
+The Stitch controls were subsequently wired from the VIDYA wrapper without modifying any exported
+`code.html`: header/profile controls, Back/Previous, Next/Finish, and chapter completion now navigate;
+the first lesson's two answer fields validate on Check Answers or Enter with accessible inline feedback;
+and the final lesson flows into the supplied flashcard deck. Keeping the behaviour in the wrapper
+preserves byte-identical source exports while making the mounted experience functional.

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button, EmptyState, Menu, MenuItem, Toast } from "@vidya/ui";
 import { DOCS, FOLDERS } from "./data";
+import { materialRoute } from "../materials/data";
 
 const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
 
@@ -180,7 +181,7 @@ export function FolderPage() {
             {docs.map((doc) => (
               <button
                 key={doc.docId}
-                onClick={() => navigate(`/app/notebook/${doc.docId}`)}
+                onClick={() => navigate(materialRoute(doc.docId))}
                 className="flex flex-col items-start gap-3 rounded-[16px] border border-[var(--line)] bg-[var(--surface)] p-5 text-left transition-colors hover:border-[var(--line-strong)] hover:bg-[var(--surface-soft)] motion-reduce:transition-none cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
               >
                 <span className="grid size-9 place-items-center rounded-[8px] bg-[var(--surface-strong)] text-[var(--ink-soft)]">

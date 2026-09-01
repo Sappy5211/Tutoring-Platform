@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lesson: Comparing &amp; Puzzles - Concept 3</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&amp;family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#a1c9ff",
+                        "secondary-fixed-dim": "#e9c400",
+                        "tertiary-fixed-dim": "#ffb68d",
+                        "surface-container-high": "#e5e8f1",
+                        "on-secondary": "#ffffff",
+                        "background": "#f8f9ff",
+                        "secondary": "#705d00",
+                        "tertiary": "#9b4500",
+                        "on-primary-fixed": "#001c37",
+                        "outline-variant": "#bfc7d5",
+                        "on-secondary-container": "#6e5c00",
+                        "on-secondary-fixed": "#221b00",
+                        "tertiary-container": "#e1752c",
+                        "primary-fixed-dim": "#a1c9ff",
+                        "on-background": "#171c22",
+                        "primary-fixed": "#d2e4ff",
+                        "on-surface-variant": "#3f4753",
+                        "secondary-fixed": "#ffe16d",
+                        "outline": "#707884",
+                        "on-surface": "#171c22",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#ebeef7",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#544600",
+                        "on-tertiary-fixed": "#331200",
+                        "inverse-on-surface": "#edf1fa",
+                        "surface-tint": "#0061a7",
+                        "surface-dim": "#d7dae3",
+                        "primary-container": "#0096ff",
+                        "secondary-container": "#fcd400",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "surface-container-low": "#f0f3fd",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary-container": "#002d52",
+                        "on-primary-fixed-variant": "#00487f",
+                        "surface-variant": "#dfe2eb",
+                        "inverse-surface": "#2c3137",
+                        "on-primary": "#ffffff",
+                        "primary": "#0061a7",
+                        "on-tertiary-container": "#4b1e00",
+                        "on-tertiary-fixed-variant": "#763300",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#ffdbc9",
+                        "surface-container-highest": "#dfe2eb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "40px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "margin-desktop": "80px",
+                        "sm": "12px",
+                        "xl": "64px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Open Sans"],
+                        "display-lg": ["Quicksand"],
+                        "headline-md": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "label-lg": ["Open Sans"],
+                        "body-md": ["Open Sans"],
+                        "headline-lg-mobile": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .worked-example {
+            background-color: #fff9c4; /* Sunny Yellow light fill */
+            border: 2px dashed #fcd400; /* Secondary container color */
+        }
+        .travel-chip {
+            background-color: #e1f5fe; /* Soft blue pastel */
+            color: #0061a7;
+        }
+        .route-dotted {
+            border-bottom: 3px dotted #bfc7d5;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen font-body-md pt-20 pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-xs max-w-full bg-surface shadow-sm shadow-primary/10">
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">We the Travellers</h1>
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+</button>
+</header>
+<main class="max-w-4xl mx-auto px-margin-mobile md:px-margin-desktop mt-lg flex flex-col gap-xl">
+<!-- Concept 3 Header -->
+<section class="text-center">
+<div class="inline-flex items-center gap-2 travel-chip px-4 py-2 rounded-full font-label-lg text-label-lg mb-sm">
+<span class="material-symbols-outlined text-lg">extension</span>
+<span>Concept 3: Number Puzzles</span>
+</div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Building the Ultimate Destination</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-sm">Use your digits to create the largest or smallest possible coordinates.</p>
+</section>
+<!-- Worked Example -->
+<div class="worked-example rounded-xl p-md">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-secondary-fixed-dim text-3xl">lightbulb</span>
+<h3 class="font-headline-md text-headline-md text-on-secondary-fixed">Worked Example</h3>
+</div>
+<p class="font-body-md text-body-md text-on-secondary-fixed-variant mb-md">Let's build the <strong>largest</strong> and <strong>smallest</strong> 5-digit number using these digits:</p>
+<div class="flex justify-center gap-sm mb-lg">
+<div class="w-12 h-12 bg-white rounded shadow flex items-center justify-center font-headline-md text-headline-md">7</div>
+<div class="w-12 h-12 bg-white rounded shadow flex items-center justify-center font-headline-md text-headline-md">1</div>
+<div class="w-12 h-12 bg-white rounded shadow flex items-center justify-center font-headline-md text-headline-md">9</div>
+<div class="w-12 h-12 bg-white rounded shadow flex items-center justify-center font-headline-md text-headline-md">3</div>
+<div class="w-12 h-12 bg-white rounded shadow flex items-center justify-center font-headline-md text-headline-md">4</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+<div class="bg-white/80 p-sm rounded-lg text-center">
+<div class="font-label-lg text-label-lg text-outline uppercase tracking-wider mb-xs">Largest (Descending)</div>
+<div class="font-headline-md text-headline-md text-primary">97,431</div>
+</div>
+<div class="bg-white/80 p-sm rounded-lg text-center">
+<div class="font-label-lg text-label-lg text-outline uppercase tracking-wider mb-xs">Smallest (Ascending)</div>
+<div class="font-headline-md text-headline-md text-tertiary-container">13,479</div>
+</div>
+</div>
+</div>
+<!-- Watch Out! -->
+<div class="bg-error-container/30 rounded-xl p-md border border-error-container flex items-start gap-md">
+<span class="material-symbols-outlined text-error text-4xl mt-1">warning</span>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-error-container mb-xs">Watch Out! The Zero Trap</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">When making the smallest number, a '0' cannot be the first digit. <br/> <span class="line-through text-error">02,589</span> is only a 4-digit number (2,589)! Swap it with the next smallest digit: <strong class="text-primary">20,589</strong>.</p>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile py-sm bg-surface rounded-t-xl border-t-2 border-surface-variant/30 shadow-[0_-4px_12px_rgba(0,150,255,0.08)]">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 hover:bg-primary-container/50 transition-colors rounded-xl">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">chevron_left</span>
+<span class="font-label-lg text-label-lg mt-1">Back</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-6 py-2 border-b-2 border-primary/20 hover:bg-primary-container/80 transition-colors translate-y-0.5 transition-all duration-100 shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">done</span>
+<span class="font-label-lg text-label-lg mt-1">Finish</span>
+</button>
+</nav>
+</body></html>

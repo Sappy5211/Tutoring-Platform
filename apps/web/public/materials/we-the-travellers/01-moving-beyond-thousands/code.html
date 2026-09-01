@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Moving Beyond Thousands</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&amp;family=Quicksand:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#a1c9ff",
+                        "secondary-fixed-dim": "#e9c400",
+                        "tertiary-fixed-dim": "#ffb68d",
+                        "surface-container-high": "#e5e8f1",
+                        "on-secondary": "#ffffff",
+                        "background": "#f8f9ff",
+                        "secondary": "#705d00",
+                        "tertiary": "#9b4500",
+                        "on-primary-fixed": "#001c37",
+                        "outline-variant": "#bfc7d5",
+                        "on-secondary-container": "#6e5c00",
+                        "on-secondary-fixed": "#221b00",
+                        "tertiary-container": "#e1752c",
+                        "primary-fixed-dim": "#a1c9ff",
+                        "on-background": "#171c22",
+                        "primary-fixed": "#d2e4ff",
+                        "on-surface-variant": "#3f4753",
+                        "secondary-fixed": "#ffe16d",
+                        "outline": "#707884",
+                        "on-surface": "#171c22",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#ebeef7",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#544600",
+                        "on-tertiary-fixed": "#331200",
+                        "inverse-on-surface": "#edf1fa",
+                        "surface-tint": "#0061a7",
+                        "surface-dim": "#d7dae3",
+                        "primary-container": "#0096ff",
+                        "secondary-container": "#fcd400",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "surface-container-low": "#f0f3fd",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary-container": "#002d52",
+                        "on-primary-fixed-variant": "#00487f",
+                        "surface-variant": "#dfe2eb",
+                        "inverse-surface": "#2c3137",
+                        "on-primary": "#ffffff",
+                        "primary": "#0061a7",
+                        "on-tertiary-container": "#4b1e00",
+                        "on-tertiary-fixed-variant": "#763300",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#ffdbc9",
+                        "surface-container-highest": "#dfe2eb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "40px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "margin-desktop": "80px",
+                        "sm": "12px",
+                        "xl": "64px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Open Sans"],
+                        "display-lg": ["Quicksand"],
+                        "headline-md": ["Quicksand"],
+                        "headline-lg": ["Quicksand"],
+                        "label-lg": ["Open Sans"],
+                        "body-md": ["Open Sans"],
+                        "headline-lg-mobile": ["Quicksand"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-lg antialiased min-h-screen flex flex-col pt-[72px] pb-[88px] md:pb-0">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile py-xs max-w-full bg-surface shadow-sm shadow-primary/10 h-[72px]">
+<button class="w-12 h-12 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity text-primary">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<div class="font-headline-md text-headline-md font-bold text-primary">We the Travellers</div>
+<button class="w-12 h-12 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity text-primary">
+<span class="material-symbols-outlined text-[24px]">account_circle</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-5xl mx-auto px-margin-mobile md:px-margin-desktop py-lg space-y-xl">
+<!-- Header Section -->
+<section class="text-center space-y-sm">
+<div class="inline-flex items-center gap-2 bg-tertiary-container/20 text-tertiary px-4 py-1 rounded-full font-label-lg text-label-lg uppercase tracking-wider mb-2">
+<span class="material-symbols-outlined text-[16px]">explore</span>
+                Concept 1
+            </div>
+<h1 class="font-display-lg text-display-lg text-on-primary-fixed md:text-[56px] leading-tight">Moving Beyond Thousands</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+                Sometimes, 4 digits just aren't enough! Think about measuring the distance across an ocean or counting the people in a big city. We need more space for bigger numbers!
+            </p>
+</section>
+<!-- See it Visually (Place Value Chart) -->
+<section class="bg-surface-container-lowest rounded-[24px] p-md md:p-lg shadow-[0_8px_24px_rgba(0,97,167,0.06)] border border-outline-variant/30 relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-tertiary-container"></div>
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">visibility</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-primary-fixed">See it Visually</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-8">Let's look at the number <strong class="text-primary font-headline-md text-headline-md">45,231</strong> in our Place Value House.</p>
+<div class="grid grid-cols-5 gap-2 md:gap-4">
+<!-- TTh -->
+<div class="flex flex-col items-center bg-error-container/40 rounded-xl p-3 md:p-4 border-2 border-error-container hover:-translate-y-1 transition-transform cursor-pointer">
+<span class="font-label-lg text-label-lg text-[#1a1a1a] font-bold mb-2">TTh</span>
+<span class="font-body-md text-body-md text-[#1a1a1a] text-center text-[10px] md:text-[12px] uppercase tracking-wider h-8">Ten-Thous.</span>
+<div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-error-container text-[#1a1a1a] flex items-center justify-center font-display-lg text-[24px] md:text-[32px] mt-2 shadow-sm">4</div>
+</div>
+<!-- Th -->
+<div class="flex flex-col items-center bg-tertiary-container/20 rounded-xl p-3 md:p-4 border-2 border-tertiary-container/40 hover:-translate-y-1 transition-transform cursor-pointer">
+<span class="font-label-lg text-label-lg text-[#1a1a1a] font-bold mb-2">Th</span>
+<span class="font-body-md text-body-md text-[#1a1a1a] text-center text-[10px] md:text-[12px] uppercase tracking-wider h-8">Thousands</span>
+<div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-tertiary-container/30 text-[#1a1a1a] flex items-center justify-center font-display-lg text-[24px] md:text-[32px] mt-2 shadow-sm">5</div>
+</div>
+<!-- H -->
+<div class="flex flex-col items-center bg-secondary-container/30 rounded-xl p-3 md:p-4 border-2 border-secondary-container/50 hover:-translate-y-1 transition-transform cursor-pointer">
+<span class="font-label-lg text-label-lg text-[#1a1a1a] font-bold mb-2">H</span>
+<span class="font-body-md text-body-md text-[#1a1a1a] text-center text-[10px] md:text-[12px] uppercase tracking-wider h-8">Hundreds</span>
+<div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-secondary-container/50 text-[#1a1a1a] flex items-center justify-center font-display-lg text-[24px] md:text-[32px] mt-2 shadow-sm">2</div>
+</div>
+<!-- T -->
+<div class="flex flex-col items-center bg-primary-container/20 rounded-xl p-3 md:p-4 border-2 border-primary-container/30 hover:-translate-y-1 transition-transform cursor-pointer">
+<span class="font-label-lg text-label-lg text-[#1a1a1a] font-bold mb-2">T</span>
+<span class="font-body-md text-body-md text-[#1a1a1a] text-center text-[10px] md:text-[12px] uppercase tracking-wider h-8">Tens</span>
+<div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary-container/30 text-[#1a1a1a] flex items-center justify-center font-display-lg text-[24px] md:text-[32px] mt-2 shadow-sm">3</div>
+</div>
+<!-- O -->
+<div class="flex flex-col items-center bg-surface-variant rounded-xl p-3 md:p-4 border-2 border-outline-variant/50 hover:-translate-y-1 transition-transform cursor-pointer">
+<span class="font-label-lg text-label-lg text-[#1a1a1a] font-bold mb-2">O</span>
+<span class="font-body-md text-body-md text-[#1a1a1a] text-center text-[10px] md:text-[12px] uppercase tracking-wider h-8">Ones</span>
+<div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-surface-dim text-[#1a1a1a] flex items-center justify-center font-display-lg text-[24px] md:text-[32px] mt-2 shadow-sm">1</div>
+</div>
+</div>
+</section>
+<!-- How do we read it? -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-md items-center">
+<div class="order-2 md:order-1 rounded-[24px] overflow-hidden shadow-sm h-64 md:h-full min-h-[250px] relative">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A vibrant, modern flat illustration style graphic showing a magnifying glass zooming in on a comma placed inside a large number '45,231'. The background is a soft sky blue with abstract geometric shapes floating. The style is educational, friendly, and uses the primary blue and sunny yellow palette." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBN2XIAoFzgvT2BitIuURqazVfHG98SLP85uPb3epC15od9YlNwrkQAantgpFMtNJp3oYxf_GWP_ycoQX2WS38As9fSF2Mutq3Uy-p_QXsU_vqn6DMYdM2PDxlP1LqdpPhQNLIpT0SC-oTf8yNMkhQv7bAgg3B3HpLKiVT25YEQbUcLUTuB9K6ZFreA1VeACym3tP5bDemQM0MuV-LAwvOa2jJtpAkYUcUH3WvyN6plOPR8QHazE5pAbg')"></div>
+</div>
+<div class="order-1 md:order-2 space-y-md p-md bg-surface-container-lowest rounded-[24px] shadow-[0_4px_16px_rgba(0,97,167,0.04)]">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/20 flex items-center justify-center text-tertiary-container">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-primary-fixed">How do we read it?</h2>
+</div>
+<ul class="space-y-4">
+<li class="flex items-start gap-3">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-headline-md text-[16px]">1</div>
+<p class="font-body-md text-body-md text-on-surface-variant pt-1">Start from the right side (the Ones).</p>
+</li>
+<li class="flex items-start gap-3">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-headline-md text-[16px]">2</div>
+<p class="font-body-md text-body-md text-on-surface-variant pt-1">Count three spots to the left: <strong>1, 2, 3...</strong></p>
+</li>
+<li class="flex items-start gap-3">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center font-headline-md text-[16px]">3</div>
+<p class="font-body-md text-body-md text-on-surface-variant pt-1">Put a comma! This comma says <strong>"Thousand"</strong>.</p>
+</li>
+</ul>
+<div class="bg-primary-container/10 rounded-lg p-3 text-center border border-primary-container/20 mt-4">
+<p class="font-headline-md text-headline-md text-primary tracking-widest">45<span class="text-tertiary-container text-display-lg leading-[0]">,</span>231</p>
+<p class="font-label-lg text-label-lg text-on-surface-variant mt-2 text-[12px] uppercase">"Forty-five thousand, two hundred thirty-one"</p>
+</div>
+</div>
+</section>
+<!-- Worked Example -->
+<section class="bg-secondary-container/20 rounded-[24px] p-md md:p-lg border-2 border-dashed border-secondary-container relative">
+<div class="absolute -top-4 -left-2 transform rotate-[-10deg]">
+<div class="bg-surface text-on-surface px-4 py-1 rounded-full shadow-md border border-outline-variant font-label-lg text-label-lg flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary-container text-[18px]">lightbulb</span>
+                    Worked Example
+                </div>
+</div>
+<div class="mt-4 flex flex-col md:flex-row gap-6 items-start">
+<div class="flex-1 space-y-4">
+<h3 class="font-headline-md text-headline-md text-on-secondary-container">Write the number 82,045 in words.</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Notice where the comma is. The digits before the comma are "82". We read those, then say "Thousand".</p>
+</div>
+<div class="flex-1 bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant/30 w-full">
+<div class="font-label-lg text-label-lg text-outline mb-2 uppercase">Answer:</div>
+<p class="font-headline-md text-headline-md text-primary">Eighty-two thousand, forty-five.</p>
+</div>
+</div>
+</section>
+<!-- Watch Out! -->
+<section class="bg-error-container/20 rounded-xl p-md border-l-4 border-error flex items-start gap-4">
+<div class="text-error mt-1">
+<span class="material-symbols-outlined text-[32px]">warning</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-error-container mb-1">Watch Out!</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    When you see a zero, like in <strong class="text-error">30,050</strong>, we don't say the zero out loud. We just skip over it when reading! It's "Thirty thousand, fifty", NOT "Thirty thousand, zero hundred, fifty".
+                </p>
+</div>
+</section>
+<!-- Your Turn -->
+<section class="space-y-md pt-lg">
+<div class="flex items-center gap-3 border-b-2 border-surface-variant pb-4">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined">edit</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-primary-fixed">Your Turn</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Q1 -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-sm border-2 border-surface-variant focus-within:border-primary transition-colors">
+<label class="block font-label-lg text-label-lg text-on-surface-variant mb-3">1. Where does the comma go in 67492?</label>
+<input class="w-full bg-surface-container-low border-2 border-outline-variant rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Type here..." type="text"/>
+</div>
+<!-- Q2 -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-sm border-2 border-surface-variant focus-within:border-primary transition-colors">
+<label class="block font-label-lg text-label-lg text-on-surface-variant mb-3">2. Read this number: 12,504</label>
+<input class="w-full bg-surface-container-low border-2 border-outline-variant rounded-lg px-4 py-3 font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Type the words..." type="text"/>
+</div>
+</div>
+<div class="flex justify-end mt-6">
+<button class="bg-primary text-on-primary font-label-lg text-label-lg px-8 py-3 rounded-full border-b-4 border-primary-fixed-variant hover:-translate-y-0.5 active:translate-y-0 active:border-b-0 transition-all shadow-sm">
+                    Check Answers
+                </button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile py-sm bg-surface rounded-t-xl border-t-2 border-surface-variant/30 shadow-[0_-4px_12px_rgba(0,150,255,0.08)] md:hidden">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2 hover:bg-primary-container/50 transition-colors rounded-xl">
+<span class="material-symbols-outlined mb-1">chevron_left</span>
+<span class="font-label-lg text-label-lg text-[10px]">Back</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-6 py-2 border-b-2 border-primary/20 hover:bg-primary-container/50 transition-colors">
+<span class="material-symbols-outlined mb-1">chevron_right</span>
+<span class="font-label-lg text-label-lg text-[10px]">Next Concept</span>
+</button>
+</nav>
+</body></html>
