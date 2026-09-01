@@ -701,3 +701,50 @@ of work survived; only `RolePages.tsx` was unreached and was finished by a follo
 Verified: typecheck clean, 17/17 tests, build ~170 kB gzip against the 200 kB budget, and home,
 materials, outliner (`--` trigger, no layout select), flashcards, practice and the teacher dashboard all
 rendered and exercised in the browser.
+
+---
+## 2026-09-02 — Session 15: IA restructure — ten nav items to five
+
+Operator's verdict: the redesign restyled things but *"too much faff, too many tabs and buttons."* Fair
+— restyling did not touch the real problem, which was structural. The student nav carried **ten**
+destinations. That is a menu, not a product.
+
+**Explored RemNote's live onboarding** in the browser session the operator left open (dummy account,
+explicit permission to interact). The pattern is better than the static screenshot suggested: number-key
+shortcuts on every option, a contextual `Continue ↵` that appears *beside* the selected row rather than
+fixed at the bottom, the key phrase bolded in each option, and a muted helper line justifying why each
+question is asked. Recorded in `design/IA_RESTRUCTURE.md`.
+
+**The restructure** (`design/IA_RESTRUCTURE.md`): five destinations —
+`Home · Learn · Progress · Schedule · Teachers`.
+- **Home** becomes a widget dashboard, not a feed.
+- **Learn is the hub.** Materials, Practice and Flashcards merge into it because they are not three
+  features but **one loop** — read the note, try questions on it, review the cards it generated.
+  Splitting them across tabs made the student assemble that loop themselves, and it contradicted our own
+  content model, since `TopicPage` already treated them as modes of one topic.
+- **Ask VIDYA stops being a tab** and becomes the floating bubble everywhere. A tutor is not a place you
+  go; it is help you summon where you are stuck. As a destination it forced students to *leave* the
+  thing they were stuck on in order to ask about it.
+- **Teachers deliberately kept** as its own destination despite being technically a scheduling action —
+  ADR-001 names it the moat, and burying the one thing no competitor has would be strategically wrong.
+
+**Google Stitch** designed the dashboard rather than the coordinator spending usage on it, per the
+operator's instruction. It independently produced the same five-item sidebar and single-accent widget
+grid — useful corroboration that the IA was coherent rather than idiosyncratic.
+
+**A coherence bug found while reviewing.** The app claimed **three different grades at once**: the
+sidebar said Class 5 (hardcoded by Codex's pilot), the Learn header said Class 7 (from the fixture), and
+onboarding said Classes 6–8. Root cause was three hardcoded strings and no single source. Fixed by
+putting `gradeLevel` in the store and having the chrome read it — **and wiring onboarding's class answer
+to actually set it**, since a question that changes nothing is theatre. Verified: choosing Class 8 in
+onboarding now shows "CBSE · Class 8" in the sidebar.
+Still outstanding for the operator: Codex's *pilot content* is Class 5 while ADR-005 sets the launch
+band at Class 6–8. That is a content/scope decision, not a bug to fix silently.
+
+**One agent oversight worth noting:** the dashboard lane edited `router.tsx` to wire its own route
+despite the packet forbidding it. The change was small and correct, so it stands — but it is the kind of
+boundary drift that causes conflicts when several lanes run at once.
+
+Verified: typecheck clean, 17/17 tests, nav shows five items, dashboard widgets render from real fixture
+data, Learn hub shows the read/practice/review loop per topic, and the onboarding flow was walked
+end-to-end by keyboard including the consent gate (Finish disabled until ticked).

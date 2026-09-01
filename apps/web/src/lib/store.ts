@@ -24,10 +24,15 @@ const mockEntitlement: Entitlement = {
 };
 
 interface AppState {
+  /** Single source of truth for the grade shown in chrome. Onboarding sets it;
+   *  the sidebar and page eyebrows read it instead of hardcoding a class, which
+   *  is how the app ended up claiming Class 5, Class 7 and Classes 6-8 at once. */
+  gradeLevel: number;
   theme: "light" | "dark";
   role: UserRole;
   subject: Subject;
   entitlement: Entitlement;
+  setGradeLevel: (grade: number) => void;
   setTheme: (theme: "light" | "dark") => void;
   setRole: (role: UserRole) => void;
   setSubject: (subject: Subject) => void;
@@ -36,10 +41,12 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
+  gradeLevel: 7,
   theme: "light",
   role: "student",
   subject: "maths",
   entitlement: mockEntitlement,
+  setGradeLevel: (gradeLevel) => set({ gradeLevel }),
   setTheme: (theme) => set({ theme }),
   setRole: (role) => set({ role }),
   /** Guard here too, not only in the UI - a locked subject must never become

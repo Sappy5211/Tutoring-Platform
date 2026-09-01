@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import type { FormEvent } from "react";
+import { lazy, Suspense, useEffect, useId, useRef, useState } from "react";
+import type { FormEvent, ReactNode } from "react";
 import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -12,7 +12,10 @@ import {
   CircleUserRound,
   Clock3,
   FileText,
+  GraduationCap,
   Layers3,
+  Megaphone,
+  MessageCircle,
   Mic,
   MoreHorizontal,
   Pencil,
@@ -25,6 +28,7 @@ import {
   UsersRound,
   X,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { Booking, DashboardData, Exam, SurfaceData } from "@vidya/contracts";
 import {
   BAND_LABEL,
@@ -42,12 +46,12 @@ import {
   revealOnHover,
 } from "@vidya/ui";
 import { services } from "../../lib/services";
+import { useAppStore } from "../../lib/store";
 
 const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
 
 const LazyEditor = lazy(() => import("./TiptapEditor"));
 
-const GRADES = [5, 6, 7, 8] as const;
 
 const TONE_TEXT: Record<string, string> = {
   neutral: "text-[var(--ink)]",
@@ -64,27 +68,226 @@ const teacherQuickLinks = [
   { to: "/teacher/reports", Icon: Target, title: "Review weak skills", meta: "Mastery by class" },
 ];
 
-/* ── Onboarding: first-run flow, three short steps with a visible way back ── */
+/* ── Onboarding option kit: labelled radios, tinted icon tile, number-key select ──
+   Shared by every question step below. `Continue ↵` replaces the shortcut badge
+   on the row you have selected; Enter submits the step's <form> the normal way,
+   so no bespoke Enter handling is needed. The digit shortcut is a bonus for
+   sighted keyboard users only — it listens on `window`, not inside the radio
+   group, and screen readers already own the digit keys in browse mode, so this
+   never fights or traps assistive-tech navigation. Standard Tab/Arrow/Space on
+   the real radio inputs keeps working regardless of whether the shortcut fires. */
+type OnboardingOption<T extends string> = { value: T; Icon: LucideIcon; bold: string; rest?: string };
+
+function OnboardingOptionGroup<T extends string>({
+  groupLabelId, options, selected, onSelect,
+}: {
+  groupLabelId: string;
+  options: OnboardingOption<T>[];
+  selected: T | null;
+  onSelect: (value: T) => void;
+}) {
+  const groupName = useId();
+
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target && target.tagName === "TEXTAREA") return;
+      if (target instanceof HTMLInputElement && target.type !== "radio" && target.type !== "checkbox") return;
+      const index = Number(event.key) - 1;
+      const option = options[index];
+      if (!option) return;
+      event.preventDefault();
+      onSelect(option.value);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [options, onSelect]);
+
+  return (
+    <div role="radiogroup" aria-labelledby={groupLabelId} className="grid gap-2.5">
+      {options.map(({ value, Icon, bold, rest }, index) => {
+        const inputId = `${groupName}-${index}`;
+        const isSelected = selected === value;
+        return (
+          <div
+            key={value}
+            className={cx(
+              "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[var(--primary)]",
+              "flex items-center gap-3 rounded-[14px] border-2 px-3.5 py-3 transition-colors motion-reduce:transition-none",
+              isSelected
+                ? "border-[var(--primary)] bg-[var(--primary-faint)]"
+                : "border-[var(--line)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-soft)]",
+            )}
+          >
+            <input
+              type="radio"
+              id={inputId}
+              name={groupName}
+              value={value}
+              checked={isSelected}
+              onChange={() => onSelect(value)}
+              className="sr-only"
+            />
+            <label htmlFor={inputId} className="flex min-w-0 flex-1 cursor-pointer items-center gap-3">
+              <span
+                aria-hidden
+                className={cx(
+                  "grid size-10 shrink-0 place-items-center rounded-[10px] transition-colors motion-reduce:transition-none",
+                  isSelected ? "bg-[var(--primary)] text-white" : "bg-[var(--surface-strong)] text-[var(--ink-soft)]",
+                )}
+              >
+                <Icon size={18} />
+              </span>
+              <span className="min-w-0 text-[14.5px] leading-snug text-[var(--ink)]">
+                <strong className="font-bold">{bold}</strong>
+                {rest && <span className="font-normal text-[var(--muted)]">{rest}</span>}
+              </span>
+            </label>
+            {isSelected ? (
+              <button
+                type="submit"
+                className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full bg-[var(--primary)] px-3 py-1.5 text-[12.5px] font-semibold text-white hover:bg-[var(--primary-strong)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+              >
+                Continue <span aria-hidden>↵</span>
+              </button>
+            ) : (
+              <kbd
+                aria-hidden
+                className="shrink-0 rounded-[6px] border border-[var(--line-strong)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--muted)]"
+              >
+                {index + 1}
+              </kbd>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** One question, one screen: eyebrow, heading, optional justifying helper line,
+ *  the option group, and the quiet step-progress indicator. Mounting a fresh
+ *  instance per step (the parent keys/branches on `step`) moves focus to the new
+ *  heading on mount, which is how the step change gets announced to assistive
+ *  tech, alongside the `aria-live="polite"` region the caller wraps this in. */
+function OnboardingQuestionStep<T extends string>({
+  stepNumber, totalSteps, eyebrow, question, helper, options, selected, onSelect, onSubmit,
+}: {
+  stepNumber: number;
+  totalSteps: number;
+  eyebrow: string;
+  question: string;
+  helper?: string;
+  options: OnboardingOption<T>[];
+  selected: T | null;
+  onSelect: (value: T) => void;
+  onSubmit: () => void;
+}) {
+  const headingId = useId();
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => { headingRef.current?.focus(); }, []);
+
+  return (
+    <form
+      onSubmit={(event) => { event.preventDefault(); if (selected) onSubmit(); }}
+      className="grid gap-6"
+    >
+      <div className="grid gap-1.5">
+        <span className="text-[12px] font-semibold uppercase tracking-wide text-[var(--muted)]">{eyebrow}</span>
+        <h1
+          ref={headingRef}
+          id={headingId}
+          tabIndex={-1}
+          className="text-balance font-display text-[26px] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--ink)] outline-none"
+        >
+          {question}
+        </h1>
+        {helper && <p className="text-sm leading-relaxed text-[var(--muted)]">{helper}</p>}
+      </div>
+
+      <OnboardingOptionGroup groupLabelId={headingId} options={options} selected={selected} onSelect={onSelect} />
+    </form>
+  );
+}
+
+/* ── Onboarding: RemNote-style question flow — one question per screen, keyboard-first ── */
+type OnboardingRole = "student" | "parent" | "teacher";
+type OnboardingClass = "6" | "7" | "8";
+type OnboardingGoal = "school-exams" | "specific-test" | "stronger";
+type OnboardingSource = "friend" | "school" | "social" | "search" | "ad";
+
+const ONBOARDING_STEPS = ["role", "class", "goal", "source", "consent"] as const;
+type OnboardingStep = (typeof ONBOARDING_STEPS)[number];
+
+const ROLE_OPTIONS: OnboardingOption<OnboardingRole>[] = [
+  { value: "student", Icon: GraduationCap, bold: "Student", rest: " — it's me, learning" },
+  { value: "parent", Icon: UsersRound, bold: "Parent", rest: " setting this up for my child" },
+  { value: "teacher", Icon: BookOpenCheck, bold: "Teacher", rest: " — using VIDYA with my class" },
+];
+
+const CLASS_OPTIONS: OnboardingOption<OnboardingClass>[] = [
+  { value: "6", Icon: Layers3, bold: "Class 6" },
+  { value: "7", Icon: Layers3, bold: "Class 7" },
+  { value: "8", Icon: Layers3, bold: "Class 8" },
+];
+
+const GOAL_OPTIONS: OnboardingOption<OnboardingGoal>[] = [
+  { value: "school-exams", Icon: CalendarCheck2, bold: "School exams", rest: " — staying ahead of what's coming up in class" },
+  { value: "specific-test", Icon: Target, bold: "A specific test", rest: " — NTSE, Olympiad, or something similar" },
+  { value: "stronger", Icon: Sparkles, bold: "Getting stronger at maths", rest: " — just steady practice, no test in mind" },
+];
+
+const SOURCE_OPTIONS: OnboardingOption<OnboardingSource>[] = [
+  { value: "friend", Icon: UsersRound, bold: "A friend or family member" },
+  { value: "school", Icon: BookOpenCheck, bold: "School or a teacher" },
+  { value: "social", Icon: MessageCircle, bold: "Social media" },
+  { value: "search", Icon: Search, bold: "Searching online" },
+  { value: "ad", Icon: Megaphone, bold: "An advertisement" },
+];
+
+const GOAL_LABEL: Record<OnboardingGoal, string> = {
+  "school-exams": "School exams",
+  "specific-test": "A specific test",
+  stronger: "Getting stronger at maths",
+};
+
 export function OnboardingPage() {
   const navigate = useNavigate();
-  const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [grade, setGrade] = useState<(typeof GRADES)[number]>(7);
-  const [examTitle, setExamTitle] = useState("Annual mathematics exam");
-  const [examDate, setExamDate] = useState("2027-03-12");
+  const setGradeLevel = useAppStore((state) => state.setGradeLevel);
+  const [stepIndex, setStepIndex] = useState(0);
+  const [role, setRole] = useState<OnboardingRole | null>(null);
+  const [classLevel, setClassLevel] = useState<OnboardingClass | null>(null);
+  const [goal, setGoal] = useState<OnboardingGoal | null>(null);
+  const [source, setSource] = useState<OnboardingSource | null>(null);
   const [consented, setConsented] = useState(false);
 
-  const examDateObj = examDate ? new Date(examDate) : null;
-  const examDateLabel = examDateObj && !Number.isNaN(examDateObj.getTime())
-    ? new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "long", year: "numeric" }).format(examDateObj)
-    : null;
+  const step: OnboardingStep = ONBOARDING_STEPS[stepIndex] ?? "role";
+  const totalSteps = ONBOARDING_STEPS.length;
+  const stepNumber = stepIndex + 1;
 
-  const goToExam = (event: FormEvent) => { event.preventDefault(); setStep(2); };
-  const goToConsent = (event: FormEvent) => { event.preventDefault(); setStep(3); };
+  const goNext = () => setStepIndex((i) => Math.min(i + 1, ONBOARDING_STEPS.length - 1));
+  const goBack = () => setStepIndex((i) => Math.max(i - 1, 0));
+
   const finish = (event: FormEvent) => {
     event.preventDefault();
     if (!consented) return;
+    // The class answer has to actually change the app, or the question is
+    // theatre. The shell and page eyebrows read this one value.
+    if (classLevel) setGradeLevel(Number(classLevel));
     navigate("/app/home");
   };
+
+  const classQuestion = role === "parent"
+    ? "Which class is your child in?"
+    : role === "teacher"
+      ? "Which class do you mainly teach?"
+      : "Which class are you in?";
+
+  const consentHeadingId = useId();
+  const consentHeadingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => { if (step === "consent") consentHeadingRef.current?.focus(); }, [step]);
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
@@ -96,7 +299,7 @@ export function OnboardingPage() {
 
         <div className="grid gap-3">
           <div className="flex items-center justify-between">
-            {step === 1 ? (
+            {stepIndex === 0 ? (
               <Link
                 to="/signin"
                 className="inline-flex items-center gap-1.5 rounded-[8px] text-[13px] font-medium text-[var(--muted)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
@@ -107,127 +310,99 @@ export function OnboardingPage() {
             ) : (
               <button
                 type="button"
-                onClick={() => setStep((s) => (s === 3 ? 2 : 1))}
+                onClick={goBack}
                 className="inline-flex cursor-pointer items-center gap-1.5 rounded-[8px] text-[13px] font-medium text-[var(--muted)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
               >
                 <ArrowLeft size={15} aria-hidden />
                 Back
               </button>
             )}
-            <span className="text-[12.5px] font-medium tabular-nums text-[var(--muted)]">Step {step} of 3</span>
+            <span className="text-[12.5px] font-medium tabular-nums text-[var(--muted)]">Step {stepNumber} of {totalSteps}</span>
           </div>
-          <ProgressBar value={(step / 3) * 100} label={`Step ${step} of 3`} />
+          <ProgressBar value={(stepNumber / totalSteps) * 100} label={`Step ${stepNumber} of ${totalSteps}`} />
         </div>
 
         <div aria-live="polite">
-          {step === 1 && (
-            <form onSubmit={goToExam} className="grid gap-6">
-              <div className="grid gap-1.5">
-                <span className="text-[12px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-                  CBSE Mathematics &middot; Classes 5&ndash;8
-                </span>
-                <h1 className="text-balance font-display text-[28px] font-bold leading-[1.1] tracking-[-0.03em] text-[var(--ink)]">
-                  Which class are you in?
-                </h1>
-                <p className="text-sm leading-relaxed text-[var(--muted)]">
-                  This sets your syllabus and keeps every recommendation relevant.
-                </p>
-              </div>
-              <div role="radiogroup" aria-label="Choose your class" className="grid grid-cols-2 gap-3">
-                {GRADES.map((item) => (
-                  <label
-                    key={item}
-                    className={cx(
-                      "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[var(--primary)]",
-                      "relative flex cursor-pointer flex-col items-center gap-0.5 rounded-[14px] border-2 px-4 py-6 text-center transition-colors motion-reduce:transition-none",
-                      grade === item
-                        ? "border-[var(--primary)] bg-[var(--primary-faint)]"
-                        : "border-[var(--line)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-soft)]",
-                    )}
-                  >
-                    <input
-                      type="radio"
-                      name="grade-level"
-                      value={item}
-                      checked={grade === item}
-                      onChange={() => setGrade(item)}
-                      className="sr-only"
-                    />
-                    <span className="text-[12px] font-semibold uppercase tracking-wide text-[var(--muted)]">Class</span>
-                    <strong className={cx(
-                      "font-display text-[32px] font-bold",
-                      grade === item ? "text-[var(--primary-strong)]" : "text-[var(--ink)]",
-                    )}>{item}</strong>
-                    {grade === item && <Check size={16} className="absolute right-3 top-3 text-[var(--primary)]" aria-hidden />}
-                  </label>
-                ))}
-              </div>
-              <Button type="submit">
-                Continue
-                <ArrowRight size={16} aria-hidden />
-              </Button>
-            </form>
+          {step === "role" && (
+            <OnboardingQuestionStep
+              stepNumber={stepNumber}
+              totalSteps={totalSteps}
+              eyebrow="CBSE Mathematics · Classes 6–8"
+              question="Who's studying with VIDYA?"
+              helper="This decides what your home screen looks like, so we get it right first."
+              options={ROLE_OPTIONS}
+              selected={role}
+              onSelect={setRole}
+              onSubmit={goNext}
+            />
           )}
 
-          {step === 2 && (
-            <form onSubmit={goToConsent} className="grid gap-6">
-              <div className="grid gap-1.5">
-                <span className="text-[12px] font-semibold uppercase tracking-wide text-[var(--muted)]">Your goal</span>
-                <h1 className="text-balance font-display text-[28px] font-bold leading-[1.1] tracking-[-0.03em] text-[var(--ink)]">
-                  When&rsquo;s your next school exam?
-                </h1>
-                <p className="text-sm leading-relaxed text-[var(--muted)]">
-                  We&rsquo;ll shape a daily plan that finishes in time, without a last-minute rush.
-                </p>
-              </div>
-              <Field label="Exam name">
-                {(id) => (
-                  <Input
-                    id={id}
-                    name="exam-title"
-                    autoComplete="off"
-                    required
-                    placeholder="Annual mathematics exam&hellip;"
-                    value={examTitle}
-                    onChange={(event) => setExamTitle(event.target.value)}
-                  />
-                )}
-              </Field>
-              <Field label="Date">
-                {(id) => (
-                  <Input
-                    id={id}
-                    name="exam-date"
-                    type="date"
-                    autoComplete="off"
-                    required
-                    value={examDate}
-                    onChange={(event) => setExamDate(event.target.value)}
-                  />
-                )}
-              </Field>
-              <Button type="submit">
-                Continue
-                <ArrowRight size={16} aria-hidden />
-              </Button>
-            </form>
+          {step === "class" && (
+            <OnboardingQuestionStep
+              stepNumber={stepNumber}
+              totalSteps={totalSteps}
+              eyebrow="Syllabus"
+              question={classQuestion}
+              helper="This sets the syllabus and keeps every question and note relevant."
+              options={CLASS_OPTIONS}
+              selected={classLevel}
+              onSelect={setClassLevel}
+              onSubmit={goNext}
+            />
           )}
 
-          {step === 3 && (
+          {step === "goal" && (
+            <OnboardingQuestionStep
+              stepNumber={stepNumber}
+              totalSteps={totalSteps}
+              eyebrow="Your goal"
+              question="What are you working towards?"
+              helper="We'll shape how your daily practice is paced around this."
+              options={GOAL_OPTIONS}
+              selected={goal}
+              onSelect={setGoal}
+              onSubmit={goNext}
+            />
+          )}
+
+          {step === "source" && (
+            <OnboardingQuestionStep
+              stepNumber={stepNumber}
+              totalSteps={totalSteps}
+              eyebrow="Almost done"
+              question="How did you hear about VIDYA?"
+              helper="This helps us understand what's working, so more students like you can find us."
+              options={SOURCE_OPTIONS}
+              selected={source}
+              onSelect={setSource}
+              onSubmit={goNext}
+            />
+          )}
+
+          {step === "consent" && (
             <form onSubmit={finish} className="grid gap-6">
               <div className="grid gap-1.5">
                 <span className="text-[12px] font-semibold uppercase tracking-wide text-[var(--muted)]">Parent or guardian</span>
-                <h1 className="text-balance font-display text-[26px] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--ink)]">
+                <h1
+                  ref={consentHeadingRef}
+                  id={consentHeadingId}
+                  tabIndex={-1}
+                  className="text-balance font-display text-[26px] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--ink)] outline-none"
+                >
                   One last thing: a grown-up&rsquo;s permission
                 </h1>
                 <p className="text-sm leading-relaxed text-[var(--muted)]">
-                  Learning data needs consent from a parent or guardian. No advertising profiles, no hidden sharing.
+                  Learning data needs consent from a parent or guardian under India&rsquo;s data protection law
+                  (DPDP). No advertising profiles, no hidden sharing.
                 </p>
               </div>
 
-              <p className="rounded-[10px] bg-[var(--surface-soft)] px-3 py-2 text-[12.5px] text-[var(--ink-soft)]">
-                Class {grade} &middot; {examTitle || "Exam name not set"}{examDateLabel ? ` · ${examDateLabel}` : ""}
-              </p>
+              {(classLevel || goal) && (
+                <p className="rounded-[10px] bg-[var(--surface-soft)] px-3 py-2 text-[12.5px] text-[var(--ink-soft)]">
+                  {classLevel ? `Class ${classLevel}` : "Class not set"}
+                  {goal ? ` · ${GOAL_LABEL[goal]}` : ""}
+                </p>
+              )}
 
               <Card className="flex items-center gap-3 p-4">
                 <CircleUserRound size={28} className="shrink-0 text-[var(--muted)]" aria-hidden />
@@ -251,12 +426,12 @@ export function OnboardingPage() {
               {!consented && (
                 <p className="-mt-4 flex items-start gap-2 text-[12px] text-[var(--muted)]">
                   <ShieldCheck size={14} className="mt-0.5 shrink-0" aria-hidden />
-                  A parent or guardian needs to confirm this before the plan is built.
+                  A parent or guardian needs to confirm this before we finish setup.
                 </p>
               )}
 
               <Button type="submit" disabled={!consented}>
-                Build my Class {grade} plan
+                Finish setup
                 <ArrowRight size={16} aria-hidden />
               </Button>
             </form>
@@ -266,6 +441,7 @@ export function OnboardingPage() {
     </div>
   );
 }
+
 
 /* ── Teacher: operationally dense, mastery bands doing the heavy lifting ── */
 export function TeacherDashboard() {

@@ -1,13 +1,13 @@
 import {
   BookOpen, Bot, BrainCircuit, CalendarDays, ChevronDown, CircleUserRound, FilePenLine,
-  GraduationCap, Home, LibraryBig, Menu, Moon, NotebookPen, PanelLeftClose, PanelLeftOpen,
+  GraduationCap, Home, LibraryBig, Menu as MenuIcon, Moon, NotebookPen, PanelLeftClose, PanelLeftOpen,
   Search, Settings, Sparkles, Sun, UsersRound, X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import type { UserRole } from "@vidya/contracts";
-import { Button, IconButton } from "@vidya/ui";
+import { Button, IconButton, Menu, MenuItem } from "@vidya/ui";
 import { useAppStore } from "../lib/store";
 import { AiCoachDrawer } from "../features/student/AiCoachDrawer";
 import { SubjectSwitcher } from "./SubjectSwitcher";
@@ -18,9 +18,15 @@ const THEME_STORAGE_KEY = "vidya:theme";
 const PREVIEW_ROLES: UserRole[] = ["student", "parent", "teacher", "author"];
 
 const nav: Record<UserRole, Array<{ to: string; label: string; icon: typeof Home }>> = {
+  // Cut from ten destinations to five per design/IA_RESTRUCTURE.md: Materials, Practice and
+  // Flashcards now live inside the Learn hub; Ask VIDYA is the floating bubble only; Settings
+  // moved into the account menu in the top bar.
   student: [
-    { to: "/app/home", label: "Home", icon: Home }, { to: "/app/syllabus", label: "Learn", icon: LibraryBig }, { to: "/app/notebook", label: "Materials", icon: NotebookPen }, { to: "/app/practice", label: "Practice", icon: Sparkles }, { to: "/app/tutor", label: "Ask VIDYA", icon: Bot }, { to: "/app/progress", label: "Progress", icon: BrainCircuit },
-    { to: "/app/flashcards", label: "Flashcards", icon: BookOpen }, { to: "/app/calendar", label: "Schedule", icon: CalendarDays }, { to: "/app/teachers", label: "Teachers", icon: UsersRound }, { to: "/app/settings", label: "Settings", icon: Settings }
+    { to: "/app/home", label: "Home", icon: Home },
+    { to: "/app/learn", label: "Learn", icon: LibraryBig },
+    { to: "/app/progress", label: "Progress", icon: BrainCircuit },
+    { to: "/app/calendar", label: "Schedule", icon: CalendarDays },
+    { to: "/app/teachers", label: "Teachers", icon: UsersRound },
   ],
   parent: [{ to: "/parent/overview", label: "Overview", icon: Home }, { to: "/parent/goals", label: "Exam goals", icon: CalendarDays }, { to: "/parent/bookings", label: "Bookings", icon: UsersRound }, { to: "/parent/plan", label: "Plan", icon: Sparkles }],
   teacher: [{ to: "/teacher/dashboard", label: "Dashboard", icon: Home }, { to: "/teacher/classes", label: "Classes", icon: UsersRound }, { to: "/teacher/assignments", label: "Assignments", icon: FilePenLine }, { to: "/teacher/availability", label: "Calls & availability", icon: CalendarDays }, { to: "/teacher/reports", label: "Reports", icon: BrainCircuit }],
@@ -30,11 +36,21 @@ const nav: Record<UserRole, Array<{ to: string; label: string; icon: typeof Home
 
 const startFor: Record<UserRole, string> = { student: "/app/home", parent: "/parent/overview", teacher: "/teacher/dashboard", author: "/author/library", admin: "/author/library" };
 
+// Materials, Practice, Flashcards and Settings are no longer nav destinations for students —
+// they live inside Learn or the account menu. The command palette is now the fast path to them,
+// so list them here for search even though they are absent from `nav.student`.
+const STUDENT_QUICK_PAGES: Array<{ to: string; label: string; icon: typeof Home }> = [
+  { to: "/app/notebook", label: "Materials", icon: NotebookPen },
+  { to: "/app/practice", label: "Practice", icon: Sparkles },
+  { to: "/app/flashcards", label: "Flashcards", icon: BookOpen },
+  { to: "/app/settings", label: "Settings", icon: Settings },
+];
+
 type PaletteItem = { id: string; label: string; hint: string; icon: typeof Home; onSelect: () => void; index: number };
 type PaletteGroup = { title: string; items: PaletteItem[] };
 
 export function Shell() {
-  const { theme, setTheme, role, setRole } = useAppStore();
+  const { theme, setTheme, role, setRole, gradeLevel } = useAppStore();
   const [open, setOpen] = useState(false);
   const [palette, setPalette] = useState(false);
   const [query, setQuery] = useState("");
@@ -81,12 +97,18 @@ export function Shell() {
 
   const chooseRole = (next: UserRole) => { setRole(next); navigate(startFor[next]); };
 
+  // Mobile bottom bar: same five student destinations as the sidebar, reordered so Learn takes
+  // the raised centre slot Practice used to hold — it is now where the work happens.
+  const bottomNavItems = role === "student"
+    ? [nav.student[0]!, nav.student[2]!, nav.student[1]!, nav.student[3]!, nav.student[4]!]
+    : nav[role].slice(0, 5);
+
   const openPalette = () => { lastFocusedRef.current = document.activeElement as HTMLElement; setPalette(true); };
   const closePalette = () => { setPalette(false); lastFocusedRef.current?.focus?.(); };
 
   const paletteGroups = useMemo<PaletteGroup[]>(() => {
     const q = query.trim().toLowerCase();
-    const pages = nav[role]
+    const pages = [...nav[role], ...(role === "student" ? STUDENT_QUICK_PAGES : [])]
       .filter((item) => item.label.toLowerCase().includes(q))
       .map((item) => ({ id: `page:${item.to}`, label: item.label, hint: "Go to page", icon: item.icon, onSelect: () => navigate(item.to) }));
     const actions = [
@@ -153,7 +175,7 @@ export function Shell() {
         aria-expanded={open}
         label={open ? "Close navigation" : "Open navigation"}
       >
-        {open ? <X size={20} /> : <Menu size={20} />}
+        {open ? <X size={20} /> : <MenuIcon size={20} />}
       </IconButton>
 
       <span className="sidebar-toggle-wrap hidden md:inline-flex" onPointerEnter={() => sidebarCollapsed && setPeek(true)}>
@@ -202,21 +224,37 @@ export function Shell() {
         >
           {theme === "light" ? <Moon size={19} /> : <Sun size={19} />}
         </IconButton>
-        <label className="relative hidden h-9 cursor-pointer items-center gap-1.5 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] pl-2.5 pr-7 hover:border-[var(--line-strong)] sm:flex">
-          <CircleUserRound size={16} aria-hidden className="text-[var(--muted)]" />
-          <select
-            value={role}
-            onChange={(event) => chooseRole(event.target.value as UserRole)}
-            aria-label="Preview persona"
-            className="cursor-pointer appearance-none bg-transparent text-[13px] font-semibold text-[var(--ink)] outline-none"
+        {/* Account/persona menu: also where Settings lives now that it is out of the student
+            nav (design/IA_RESTRUCTURE.md). */}
+        <div className="hidden sm:block">
+          <Menu
+            align="end"
+            label="Account menu"
+            trigger={() => (
+              <span className="flex h-9 items-center gap-1.5 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] pl-2.5 pr-2.5 hover:border-[var(--line-strong)]">
+                <CircleUserRound size={16} aria-hidden className="text-[var(--muted)]" />
+                <span className="text-[13px] font-semibold text-[var(--ink)]">{role[0]!.toUpperCase()}{role.slice(1)}</span>
+                <ChevronDown size={13} aria-hidden className="text-[var(--muted)]" />
+              </span>
+            )}
           >
-            <option value="student">Student</option>
-            <option value="parent">Parent</option>
-            <option value="teacher">Teacher</option>
-            <option value="author">Author</option>
-          </select>
-          <ChevronDown size={13} aria-hidden className="pointer-events-none absolute right-2.5 text-[var(--muted)]" />
-        </label>
+            {role === "student" && (
+              <>
+                <MenuItem onClick={() => navigate("/app/settings")}>
+                  <Settings size={15} aria-hidden /> Settings
+                </MenuItem>
+                <div role="separator" className="my-1 h-px bg-[var(--line)]" />
+              </>
+            )}
+            <p className="px-2.5 pb-1 pt-1 text-[10.5px] font-bold uppercase tracking-wider text-[var(--faint)]">Preview as</p>
+            {PREVIEW_ROLES.map((r) => (
+              <MenuItem key={r} onClick={() => chooseRole(r)} aria-current={r === role ? "true" : undefined}>
+                <CircleUserRound size={15} aria-hidden />
+                {r[0]!.toUpperCase()}{r.slice(1)}{r === role ? " · Current" : ""}
+              </MenuItem>
+            ))}
+          </Menu>
+        </div>
       </div>
     </header>
 
@@ -235,7 +273,7 @@ export function Shell() {
             {role === "student" ? "Aarav Sharma" : role === "parent" ? "Priya Sharma" : role === "teacher" ? "Meera Iyer" : "Content team"}
           </strong>
           <span className="truncate text-[11px] text-[var(--muted)]">
-            {role === "student" ? "CBSE · Class 5" : `${role[0]!.toUpperCase()}${role.slice(1)} workspace`}
+            {role === "student" ? `CBSE · Class ${gradeLevel}` : `${role[0]!.toUpperCase()}${role.slice(1)} workspace`}
           </span>
         </div>
       </div>
@@ -255,14 +293,14 @@ export function Shell() {
       </nav>
       <div className="mt-auto flex items-center gap-2 border-t border-[var(--line)] px-2 pb-0.5 pt-4 text-[11px] text-[var(--muted)]">
         <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-[var(--secure)]" />
-        Class 5 pilot · materials ready
+        Mock workspace · all systems safe
       </div>
     </aside>
 
     <main id="main-content" className="main-content" tabIndex={-1}><Outlet /></main>
 
     <nav className="bottom-nav" aria-label="Mobile navigation">
-      {nav[role].slice(0, 5).map(({ to, label, icon: Icon }, index) => (
+      {bottomNavItems.map(({ to, label, icon: Icon }, index) => (
         <NavLink key={to} to={to} className={index === 2 ? "bottom-nav__primary" : ""}>
           <Icon size={21} aria-hidden />
           <span>{label}</span>

@@ -11,6 +11,8 @@ import { HandwrittenPage } from "./features/notebook/HandwrittenPage";
 import { NotebookIndex } from "./features/notebook/NotebookIndex";
 import { NotebookPage } from "./features/notebook/NotebookPage";
 import { MaterialPage } from "./features/materials/MaterialPage";
+import { HomeDashboard } from "./features/home/HomeDashboard";
+import { LearnHub } from "./features/learn/LearnHub";
 import {
   HomePage,
   NotesPage,
@@ -43,9 +45,13 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/app/home",
-        element: <HomePage />,
+        element: <HomeDashboard />,
         loader: () => services.repository.getDashboard(),
       },
+      // Learn is the hub: Materials, Practice and Flashcards are reached through
+      // it rather than from the nav (design/IA_RESTRUCTURE.md). The old routes
+      // stay resolvable so nothing that links to them breaks.
+      { path: "/app/learn", element: <LearnHub /> },
       {
         path: "/app/syllabus",
         element: <SyllabusPage />,
