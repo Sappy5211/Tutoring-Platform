@@ -658,44 +658,46 @@ Verified: typecheck clean, 17/17 tests, build 151 kB gzip (budget 200 kB); graph
 6 dimmed and 2 edges lit on selection, 5 sliders, 4-band legend, and freeze halting the simulation.
 
 ---
-## 2026-09-01 — Session 14: exact Stitch chapter replaces notebook placeholders
+## 2026-09-01 — Session 14: full redesign (Notion-influenced), 6 parallel lanes
 
-The operator supplied five Google Stitch ZIP exports for Class 5 Mathematics, Chapter “We the
-Travellers,” and corrected an initial attempt to reinterpret their content as native cards. That
-reinterpretation was discarded. The ZIPs are now the canonical source and are preserved intact under
-`apps/web/public/materials/we-the-travellers/`, including each original `code.html`, `screen.png`, and
-`DESIGN.md`.
+Operator asked for a redesign using the design skills, cheaper sub-agents, and shared context on disk
+rather than per-agent explanation.
 
-The ordered mapping is:
+**Design thesis:** the old build was green-on-green everywhere, so nothing had hierarchy. New rule —
+**colour carries meaning or it does not appear.** On any screen the only saturated elements are the
+single primary action and the mastery bands.
 
-1. unnumbered ZIP → Moving Beyond Thousands
-2. `(1)` → Which City Has More Explorers?
-3. `(2)` → Building the Ultimate Destination
-4. `(3)` → The Journey Ahead
-5. `(4)` → Practice & Revision
+**Coordinator kept the shared contract** rather than delegating it, because five agents inventing five
+design systems is the predictable failure: rewrote the token set (paper-white surfaces, Plus Jakarta
+Sans over Inter, the four mastery bands as first-class semantic tokens, shadows only on floating layers,
+full light+dark) and grew `packages/ui` from 6 primitives to 16, each keyboard-operable and
+reduced-motion-aware so surfaces inherit compliance instead of re-deriving it.
 
-VIDYA mounts the supplied `code.html` directly in a lesson frame. Only a thin application-level bar was
-added for Materials, previous/next navigation, and opening the untouched source in a separate tab. The
-lesson’s HTML and styling were not translated or rewritten. The old visible Class 7 notebook fixtures
-were replaced with these five Class 5 records and a real Class 5 Mathematics → We the Travellers
-hierarchy. The flashcard review deck was also replaced with the six chapter cards supplied by the
-operator; scheduling behaviour remains unchanged.
+**Token efficiency:** the whole mandate went to `design/DESIGN_BRIEF.md` in the repo. Six agents read it
+by path; the design system was never re-explained in a prompt.
 
-Google Stitch itself was not available as a connected MCP server or plugin in this Codex session. The
-exported ZIP files were therefore used as the exact source rather than attempting to recreate the
-screens from screenshots.
+**Google Stitch** produced a home-screen direction reference against a design system encoding the same
+principles. It independently arrived at the brief — one dominant card, colour appearing exactly twice,
+hairline borders — which was useful corroboration that the brief was coherent rather than idiosyncratic.
+Saved to `design/stitch/` and passed to the lane owning the home screen.
 
-Verified: all five source documents return HTTP 200, the first exact source visually renders, typecheck
-is clean, 17/17 tests pass, production build succeeds, and initial JS remains within budget at 152.1 kB
-gzip / 200 kB.
+### Three real defects, all found by checking rather than assuming
+1. **My own API break.** I narrowed `Chip` to mastery bands only and dropped the semantic tones, which
+   broke every existing call site. A booking status is genuinely not a mastery band, so collapsing them
+   would force call sites to misuse `band` to get a colour. Restored both.
+2. **`revealOnHover` compiled to nothing, app-wide.** An agent flagged it; verified before acting —
+   `group-hover:opacity-100` appeared **zero times** in the built CSS while six files imported it.
+   Tailwind v4 only scans the app's own tree, so utility strings living in `packages/ui/src` were never
+   generated and every hover-revealed control silently rendered always-visible, defeating one of the
+   brief's core principles. Fixed centrally with an `@source` directive; verified the class now appears.
+3. **Concurrent write from Codex.** Codex pushed a Class 5 materials feature mid-flight, conflicting in
+   four files. Merged rather than forced: their content and routing (Class 5 pilot copy, `materialRoute`,
+   the Notebook→Materials rename) with the new visual language. Verified both survived in the browser.
 
-Follow-up correction from the operator: the canonical chapter hierarchy is **Class 5 Mathematics →
-Large Numbers and Place Value**. All five Stitch lessons sit beneath that single chapter. “We the
-Travellers” remains untouched only where it is part of the original Stitch document content; it is not
-the VIDYA chapter-folder name.
+### Salvage
+The session limit killed all five original lanes mid-flight. All had written to disk first, so 21 files
+of work survived; only `RolePages.tsx` was unreached and was finished by a follow-up lane.
 
-The Stitch controls were subsequently wired from the VIDYA wrapper without modifying any exported
-`code.html`: header/profile controls, Back/Previous, Next/Finish, and chapter completion now navigate;
-the first lesson's two answer fields validate on Check Answers or Enter with accessible inline feedback;
-and the final lesson flows into the supplied flashcard deck. Keeping the behaviour in the wrapper
-preserves byte-identical source exports while making the mounted experience functional.
+Verified: typecheck clean, 17/17 tests, build ~170 kB gzip against the 200 kB budget, and home,
+materials, outliner (`--` trigger, no layout select), flashcards, practice and the teacher dashboard all
+rendered and exercised in the browser.

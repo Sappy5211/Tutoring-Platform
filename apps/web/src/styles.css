@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Tailwind v4 only scans the app's own tree by default, so utility strings that
+   live in the shared kit (e.g. `revealOnHover`) were never generated and every
+   hover-revealed control silently rendered as always-visible. Point the scanner
+   at the workspace package too. */
+@source "../../../packages/ui/src";
+
 /* ═══════════════════════════════════════════════════════════════════════
    VIDYA design tokens — the single source of colour, type and spacing.
    Notion-influenced: near-monochrome, colour reserved for meaning.
