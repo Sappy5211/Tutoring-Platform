@@ -20,7 +20,7 @@ export function MaterialPage() {
         </Link>
         <div>
           <strong>{material.title}</strong>
-          <span>We the Travellers · Class 5 Mathematics · {index + 1} of {STITCH_MATERIALS.length}</span>
+          <span>Large Numbers and Place Value · Class 5 Mathematics · {index + 1} of {STITCH_MATERIALS.length}</span>
         </div>
         <nav aria-label="Lesson navigation">
           {previous ? (

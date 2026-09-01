@@ -4,7 +4,7 @@ import type { Folder, NotebookDoc, OutlineNode } from "@vidya/contracts";
  *  at P1.2 is a data change rather than a component rewrite. */
 export const FOLDERS: Folder[] = [
   { folderId: "f-class-5-maths", kind: "book", parentId: null, title: "Class 5 Mathematics", owner: "platform", order: 0, colour: "primary" },
-  { folderId: "f-we-the-travellers", kind: "chapter", parentId: "f-class-5-maths", title: "We the Travellers", owner: "platform", order: 0 },
+  { folderId: "f-large-numbers-place-value", kind: "chapter", parentId: "f-class-5-maths", title: "Large Numbers and Place Value", owner: "platform", order: 0 },
 ];
 
 /** Dates are relative to today so the date-grouped index never goes stale. */
@@ -13,11 +13,11 @@ const daysAgo = (n: number) => {
 };
 
 export const DOCS: NotebookDoc[] = [
-  { docId: "material-moving-beyond-thousands", folderId: "f-we-the-travellers", title: "Moving Beyond Thousands", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "We the Travellers"], tags: ["Class 5", "Large numbers"], cardCount: 1 },
-  { docId: "material-which-city-has-more-explorers", folderId: "f-we-the-travellers", title: "Which City Has More Explorers?", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "We the Travellers"], tags: ["Class 5", "Comparing numbers"], cardCount: 1 },
-  { docId: "material-building-the-ultimate-destination", folderId: "f-we-the-travellers", title: "Building the Ultimate Destination", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "We the Travellers"], tags: ["Class 5", "Place value"], cardCount: 2 },
-  { docId: "material-the-journey-ahead", folderId: "f-we-the-travellers", title: "The Journey Ahead", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "We the Travellers"], tags: ["Class 5", "Rounding", "Division"], cardCount: 2 },
-  { docId: "material-practice-and-revision", folderId: "f-we-the-travellers", title: "Practice & Revision", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "We the Travellers"], tags: ["Class 5", "Revision"], cardCount: 6 },
+  { docId: "material-moving-beyond-thousands", folderId: "f-large-numbers-place-value", title: "Moving Beyond Thousands", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "Large Numbers and Place Value"], tags: ["Class 5", "Large numbers"], cardCount: 1 },
+  { docId: "material-which-city-has-more-explorers", folderId: "f-large-numbers-place-value", title: "Which City Has More Explorers?", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "Large Numbers and Place Value"], tags: ["Class 5", "Comparing numbers"], cardCount: 1 },
+  { docId: "material-building-the-ultimate-destination", folderId: "f-large-numbers-place-value", title: "Building the Ultimate Destination", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "Large Numbers and Place Value"], tags: ["Class 5", "Place value"], cardCount: 2 },
+  { docId: "material-the-journey-ahead", folderId: "f-large-numbers-place-value", title: "The Journey Ahead", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "Large Numbers and Place Value"], tags: ["Class 5", "Rounding", "Division"], cardCount: 2 },
+  { docId: "material-practice-and-revision", folderId: "f-large-numbers-place-value", title: "Practice & Revision", owner: "platform", updatedAt: daysAgo(0), kind: "document", path: ["Class 5 Mathematics", "Large Numbers and Place Value"], tags: ["Class 5", "Revision"], cardCount: 6 },
 ];
 
 const n = (

@@ -688,3 +688,8 @@ screens from screenshots.
 Verified: all five source documents return HTTP 200, the first exact source visually renders, typecheck
 is clean, 17/17 tests pass, production build succeeds, and initial JS remains within budget at 152.1 kB
 gzip / 200 kB.
+
+Follow-up correction from the operator: the canonical chapter hierarchy is **Class 5 Mathematics →
+Large Numbers and Place Value**. All five Stitch lessons sit beneath that single chapter. “We the
+Travellers” remains untouched only where it is part of the original Stitch document content; it is not
+the VIDYA chapter-folder name.
