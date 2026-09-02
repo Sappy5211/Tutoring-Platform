@@ -54,3 +54,57 @@ Skipping the quickstart video triggers a confirm dialog: *"Are you sure? It's be
 now to save yourself hours of confusion later!"* That is a guilt-trip retention gate. On an adult
 power-user tool it is merely irritating; aimed at an 11-year-old it is manipulative, and it sits badly
 next to a product whose promise is trustworthy marking. Let students skip without an argument.
+
+---
+
+# The teaching sequence after the first card — the best design in their product
+
+Continued walkthrough, 2026-09-02. This is the part worth copying most, and it is not visible from any
+screenshot of a single screen — it only shows up if you walk it.
+
+## Beat 1 — the card lands in a real document
+After "Add this flashcard to my notes", the screen shows a document titled **"Class 7 Maths Notes"** —
+built from the free-text class name typed several steps earlier — with the card rendered **as a bullet
+inside it**: `FRONT OF CARD → BACK OF CARD`. A toast confirms *"We added your flashcard to your notes."*
+
+The student now has a real artifact in a real document named after their real class, before they have
+learned anything about the product.
+
+## Beat 2 — name the rule, after they have seen it
+The next beat replaces the toast with the rule stated plainly:
+
+> **"Any bullet with → is a flashcard"**
+
+Note the order. The rule is *not* taught first. It is named only once the student has already seen it
+happen. The CTA changes to **"Add another flashcard"**.
+
+## Beat 3 — a guided tutorial inside the real editor
+The final beat is a numbered checklist floating beside a live, empty bullet in the actual document:
+
+> **Now, type your own flashcard!**
+> 1. Type a question   `[ Type it for me ]`
+> 2. Type `==` on your keyboard to add an arrow   *(dimmed)*
+> 3. Type an answer   *(dimmed)*
+
+Three things make this good:
+- **Future steps are dimmed** until the current one is done — the student is never reading instructions
+  for something they cannot yet do.
+- **Completed steps are removed entirely**, so the checklist shrinks as they go. Progress is felt, not
+  reported.
+- **"Type it for me" is an escape hatch on the hardest step.** Nobody gets stuck on step one.
+
+And critically it happens **in the real editor on their own document**, not in a simulation. What they
+practise on is what they keep.
+
+## What we should build
+Our `--` trigger has no equivalent onboarding. A student meets the syntax cold in the outliner. We should
+build this sequence against our own trigger: land the onboarding card in a real note, name the rule
+(*"any bullet with → is a flashcard"*), then run a dimmed-and-shrinking three-step checklist beside a
+live bullet, with a "type it for me" fallback on step one.
+
+## One place our implementation is already better
+Typing `==` via programmatic text insertion did **not** convert in RemNote — the literal characters
+stayed in the bullet. Their trigger appears to be bound to real keystrokes, so paste, IME composition,
+and assistive input would all miss it. **Ours converts on the input's value ending with the trigger**, so
+it fires regardless of how the text arrived. Keep that; it is the more robust of the two, and it matters
+for students using a phone keyboard or a regional-language IME.

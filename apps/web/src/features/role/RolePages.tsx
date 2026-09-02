@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useId, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import {
+  ArrowDown,
   ArrowLeft,
   ArrowRight,
   BookOpenCheck,
@@ -69,13 +70,16 @@ const teacherQuickLinks = [
 ];
 
 /* ── Onboarding option kit: labelled radios, tinted icon tile, number-key select ──
-   Shared by every question step below. `Continue ↵` replaces the shortcut badge
-   on the row you have selected; Enter submits the step's <form> the normal way,
-   so no bespoke Enter handling is needed. The digit shortcut is a bonus for
-   sighted keyboard users only — it listens on `window`, not inside the radio
-   group, and screen readers already own the digit keys in browse mode, so this
-   never fights or traps assistive-tech navigation. Standard Tab/Arrow/Space on
-   the real radio inputs keeps working regardless of whether the shortcut fires. */
+   Shared by every question step below. Selecting an option — by click or by the
+   digit shortcut below — moves focus onto the `Continue ↵` affordance that
+   replaces that row's shortcut badge, so a plain Enter reliably confirms via the
+   browser's own "Enter activates the focused button" behaviour rather than a
+   bespoke keydown interception (radio inputs don't get implicit form submission
+   on Enter the way text fields do, so relying on that would be unreliable). The
+   digit shortcut listens on `window`, not inside the radio group, and screen
+   readers already own the digit keys in browse mode, so this never fights or
+   traps assistive-tech navigation. Standard Tab/Arrow/Space on the real radio
+   inputs keeps working regardless of whether the shortcut fires. */
 type OnboardingOption<T extends string> = { value: T; Icon: LucideIcon; bold: string; rest?: string };
 
 function OnboardingOptionGroup<T extends string>({
@@ -87,6 +91,7 @@ function OnboardingOptionGroup<T extends string>({
   onSelect: (value: T) => void;
 }) {
   const groupName = useId();
+  const continueRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -103,6 +108,13 @@ function OnboardingOptionGroup<T extends string>({
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [options, onSelect]);
+
+  // Selecting a row reveals its `Continue ↵` button in place of the shortcut
+  // badge; move focus there so Enter confirms immediately, whether the
+  // selection came from a click or from the digit shortcut above.
+  useEffect(() => {
+    if (selected != null) continueRef.current?.focus();
+  }, [selected]);
 
   return (
     <div role="radiogroup" aria-labelledby={groupLabelId} className="grid gap-2.5">
@@ -146,6 +158,7 @@ function OnboardingOptionGroup<T extends string>({
             </label>
             {isSelected ? (
               <button
+                ref={continueRef}
                 type="submit"
                 className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full bg-[var(--primary)] px-3 py-1.5 text-[12.5px] font-semibold text-white hover:bg-[var(--primary-strong)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
               >
@@ -207,7 +220,12 @@ function OnboardingQuestionStep<T extends string>({
         {helper && <p className="text-sm leading-relaxed text-[var(--muted)]">{helper}</p>}
       </div>
 
-      <OnboardingOptionGroup groupLabelId={headingId} options={options} selected={selected} onSelect={onSelect} />
+      <OnboardingOptionGroup
+        groupLabelId={headingId}
+        options={options}
+        selected={selected}
+        onSelect={onSelect}
+      />
     </form>
   );
 }
@@ -218,7 +236,7 @@ type OnboardingClass = "6" | "7" | "8";
 type OnboardingGoal = "school-exams" | "specific-test" | "stronger";
 type OnboardingSource = "friend" | "school" | "social" | "search" | "ad";
 
-const ONBOARDING_STEPS = ["role", "class", "goal", "source", "consent"] as const;
+const ONBOARDING_STEPS = ["role", "class", "goal", "source", "consent", "flashcard"] as const;
 type OnboardingStep = (typeof ONBOARDING_STEPS)[number];
 
 const ROLE_OPTIONS: OnboardingOption<OnboardingRole>[] = [
@@ -253,9 +271,101 @@ const GOAL_LABEL: Record<OnboardingGoal, string> = {
   stronger: "Getting stronger at maths",
 };
 
+/** One real, correct, age-appropriate CBSE example per class — this is the
+ *  sample the student's first flashcard is built from, not filler copy. */
+const CARD_SAMPLES: Record<OnboardingClass, { front: string; back: string }> = {
+  "6": { front: "What are all the factors of 12?", back: "1, 2, 3, 4, 6, 12" },
+  "7": { front: "What is the sum of the interior angles of a triangle?", back: "180°" },
+  "8": { front: "What is the value of 2³?", back: "8" },
+};
+
+/** The onboarding's final step: a pre-filled sample card, editable, that teaches
+ *  the front → back arrow metaphor before the student ever meets the editor's
+ *  `--` syntax. Mounted fresh only when the parent switches to this step, so the
+ *  lazy `useState` initialisers below pick up the class the student just chose. */
+function OnboardingFlashcardStep({
+  classLevel, goal, onAdd, onSkip,
+}: {
+  classLevel: OnboardingClass | null;
+  goal: OnboardingGoal | null;
+  onAdd: (front: string, back: string) => void;
+  onSkip: () => void;
+}) {
+  const sample = CARD_SAMPLES[classLevel ?? "7"];
+  const [front, setFront] = useState(sample.front);
+  const [back, setBack] = useState(sample.back);
+  const headingId = useId();
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => { headingRef.current?.focus(); }, []);
+
+  return (
+    <form
+      onSubmit={(event) => { event.preventDefault(); onAdd(front, back); }}
+      className="grid gap-6"
+    >
+      <div className="grid gap-1.5">
+        <span className="text-[12px] font-semibold uppercase tracking-wide text-[var(--muted)]">Last step</span>
+        <h1
+          ref={headingRef}
+          id={headingId}
+          tabIndex={-1}
+          className="text-balance font-display text-[26px] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--ink)] outline-none"
+        >
+          Make your first flashcard
+        </h1>
+        <p className="text-sm leading-relaxed text-[var(--muted)]">
+          A starter{classLevel ? ` for Class ${classLevel}` : ""}
+          {goal ? `, matched to ${GOAL_LABEL[goal].toLowerCase()}` : ""} &mdash; it&rsquo;s already yours, so
+          change it however you like.
+        </p>
+      </div>
+
+      <div className="grid gap-3" aria-labelledby={headingId}>
+        <Field label="Front of card">
+          {(id) => (
+            <Input
+              id={id}
+              name="card-front"
+              autoComplete="off"
+              value={front}
+              onChange={(event) => setFront(event.target.value)}
+            />
+          )}
+        </Field>
+        <div className="flex justify-center text-[var(--muted)]" aria-hidden>
+          <ArrowDown size={18} />
+        </div>
+        <Field label="Back of card">
+          {(id) => (
+            <Input
+              id={id}
+              name="card-back"
+              autoComplete="off"
+              value={back}
+              onChange={(event) => setBack(event.target.value)}
+            />
+          )}
+        </Field>
+      </div>
+
+      <div className="grid gap-2">
+        <Button type="submit">
+          Add this to my notes
+          <ArrowRight size={16} aria-hidden />
+        </Button>
+        <Button type="button" variant="ghost" onClick={onSkip}>
+          Skip for now
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 export function OnboardingPage() {
   const navigate = useNavigate();
   const setGradeLevel = useAppStore((state) => state.setGradeLevel);
+  const addPersonalNote = useAppStore((state) => state.addPersonalNote);
   const [stepIndex, setStepIndex] = useState(0);
   const [role, setRole] = useState<OnboardingRole | null>(null);
   const [classLevel, setClassLevel] = useState<OnboardingClass | null>(null);
@@ -270,11 +380,17 @@ export function OnboardingPage() {
   const goNext = () => setStepIndex((i) => Math.min(i + 1, ONBOARDING_STEPS.length - 1));
   const goBack = () => setStepIndex((i) => Math.max(i - 1, 0));
 
-  const finish = (event: FormEvent) => {
+  const confirmConsent = (event: FormEvent) => {
     event.preventDefault();
     if (!consented) return;
-    // The class answer has to actually change the app, or the question is
-    // theatre. The shell and page eyebrows read this one value.
+    goNext();
+  };
+
+  // The class answer has to actually change the app, or the question is
+  // theatre. The shell and page eyebrows read this one value. Both the
+  // primary "add" and the quiet "skip" finish onboarding the same way —
+  // skipping the last step is not a lesser path and gets no guilt-trip.
+  const finishOnboarding = () => {
     if (classLevel) setGradeLevel(Number(classLevel));
     navigate("/app/home");
   };
@@ -380,7 +496,7 @@ export function OnboardingPage() {
           )}
 
           {step === "consent" && (
-            <form onSubmit={finish} className="grid gap-6">
+            <form onSubmit={confirmConsent} className="grid gap-6">
               <div className="grid gap-1.5">
                 <span className="text-[12px] font-semibold uppercase tracking-wide text-[var(--muted)]">Parent or guardian</span>
                 <h1
@@ -431,10 +547,28 @@ export function OnboardingPage() {
               )}
 
               <Button type="submit" disabled={!consented}>
-                Finish setup
+                Continue
                 <ArrowRight size={16} aria-hidden />
               </Button>
             </form>
+          )}
+
+          {step === "flashcard" && (
+            <OnboardingFlashcardStep
+              classLevel={classLevel}
+              goal={goal}
+              onAdd={(front, back) => {
+                // The whole point of this step is that it leaves a real
+                // artifact. Persist the card before finishing, or it is a demo.
+                addPersonalNote({
+                  title: front.slice(0, 60) || "My first card",
+                  mode: "bullet",
+                  cards: [{ front, back }],
+                });
+                finishOnboarding();
+              }}
+              onSkip={finishOnboarding}
+            />
           )}
         </div>
       </div>

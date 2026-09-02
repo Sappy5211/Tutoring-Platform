@@ -1,13 +1,15 @@
 import {
   ChevronDown, ChevronRight, Clock, FileText, FolderClosed, FolderOpen, Layers, MoreHorizontal,
-  PenLine, Plus, Search, Tag, Upload, X,
+  Plus, Search, Tag, Upload, X,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { NotebookDoc } from "@vidya/contracts";
 import { Button, EmptyState, HoverRow, Input, Menu, MenuItem, revealOnHover, Toast } from "@vidya/ui";
+import { useAppStore } from "../../lib/store";
 import { DOCS, FOLDERS } from "./data";
 import { materialRoute } from "../materials/data";
+import { NewNoteChooser } from "./NewNoteChooser";
 
 const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
 
@@ -48,6 +50,7 @@ function groupByDay(docs: NotebookDoc[]) {
 }
 
 export function NotebookIndex() {
+  const personalNotes = useAppStore((state) => state.personalNotes);
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [facet, setFacet] = useState<Facet>("documents");
@@ -55,13 +58,6 @@ export function NotebookIndex() {
   const [createOpen, setCreateOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const chipsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!createOpen) return;
-    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setCreateOpen(false); };
-    document.addEventListener("keydown", esc);
-    return () => document.removeEventListener("keydown", esc);
-  }, [createOpen]);
 
   const notify = (message: string) => setToast(message);
 
@@ -86,8 +82,23 @@ export function NotebookIndex() {
     { id: "cards", label: "Flashcards", icon: Layers },
   ];
 
+  // Notes the student made are theirs and must appear alongside course
+  // material - a create flow that produces something you cannot then find is
+  // no better than one that produces nothing.
+  const ownDocs: NotebookDoc[] = useMemo(() => personalNotes.map((note) => ({
+    docId: note.noteId,
+    folderId: null,
+    title: note.title,
+    owner: "student",
+    updatedAt: note.createdAt.slice(0, 10),
+    kind: note.mode === "blank" ? "handwritten" : "document",
+    path: ["My notes"],
+    tags: ["Mine"],
+    cardCount: note.cards.length,
+  })), [personalNotes]);
+
   const rows = useMemo(() => {
-    let list = DOCS.filter((doc) => {
+    let list = [...ownDocs, ...DOCS].filter((doc) => {
       if (facet === "documents" && doc.kind !== "document") return false;
       if (facet === "pdfs" && doc.kind !== "pdf") return false;
       if (facet === "folders") return false;
@@ -106,7 +117,7 @@ export function NotebookIndex() {
         : sort === "oldest" ? a.updatedAt.localeCompare(b.updatedAt)
           : b.updatedAt.localeCompare(a.updatedAt));
     return list;
-  }, [facet, query, sort]);
+  }, [facet, query, sort, ownDocs]);
 
   // Folders must honour the search too. Filtering only the documents left every
   // folder on screen while the document list narrowed, which reads as broken.
@@ -290,48 +301,7 @@ export function NotebookIndex() {
         )}
       </div>
 
-      {createOpen && (
-        <div
-          role="presentation"
-          onMouseDown={() => setCreateOpen(false)}
-          className="fixed inset-0 z-[80] grid place-items-center bg-black/30 p-4"
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Create a page"
-            onMouseDown={(e) => e.stopPropagation()}
-            className="grid w-full max-w-[400px] gap-3 rounded-[16px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[var(--shadow)]"
-          >
-            <h2 className="font-display text-lg font-bold text-[var(--ink)]">Create a page</h2>
-            <button
-              onClick={() => { setCreateOpen(false); navigate("/app/notebook/d-fractions"); }}
-              className="flex items-center gap-3 rounded-[10px] border border-[var(--line)] p-3 text-left hover:bg-[var(--surface-soft)] cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
-            >
-              <span className="grid size-9 shrink-0 place-items-center rounded-[8px] bg-[var(--primary-faint)] text-[var(--primary)]">
-                <FileText size={17} aria-hidden />
-              </span>
-              <span className="grid gap-0.5">
-                <strong className="text-[13.5px] font-semibold text-[var(--ink)]">Bullet notes</strong>
-                <span className="text-[12px] text-[var(--muted)]">Typed outline. End a line with an arrow trigger to make a card.</span>
-              </span>
-            </button>
-            <button
-              onClick={() => { setCreateOpen(false); navigate("/app/notebook/new/handwritten"); }}
-              className="flex items-center gap-3 rounded-[10px] border border-[var(--line)] p-3 text-left hover:bg-[var(--surface-soft)] cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
-            >
-              <span className="grid size-9 shrink-0 place-items-center rounded-[8px] bg-[var(--primary-faint)] text-[var(--primary)]">
-                <PenLine size={17} aria-hidden />
-              </span>
-              <span className="grid gap-0.5">
-                <strong className="text-[13.5px] font-semibold text-[var(--ink)]">Handwritten</strong>
-                <span className="text-[12px] text-[var(--muted)]">Write with a stylus or finger.</span>
-              </span>
-            </button>
-            <Button variant="ghost" size="sm" onClick={() => setCreateOpen(false)} className="justify-self-start">Cancel</Button>
-          </div>
-        </div>
-      )}
+      <NewNoteChooser open={createOpen} onClose={() => setCreateOpen(false)} />
 
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
     </div>

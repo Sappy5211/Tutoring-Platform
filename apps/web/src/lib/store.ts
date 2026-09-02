@@ -23,6 +23,18 @@ const mockEntitlement: Entitlement = {
   callCreditsRemaining: 0,
 };
 
+/** A note the student made themselves, kept in the store so the "create" flows
+ *  actually produce something. Onboarding's first flashcard and the new-note
+ *  chooser both write here - without it both flows navigate somewhere and leave
+ *  nothing behind, which is the one thing that made the pattern worth copying. */
+export interface PersonalNote {
+  noteId: string;
+  title: string;
+  mode: "bullet" | "blank";
+  createdAt: string;
+  cards: { front: string; back: string }[];
+}
+
 interface AppState {
   /** Single source of truth for the grade shown in chrome. Onboarding sets it;
    *  the sidebar and page eyebrows read it instead of hardcoding a class, which
@@ -32,6 +44,8 @@ interface AppState {
   role: UserRole;
   subject: Subject;
   entitlement: Entitlement;
+  personalNotes: PersonalNote[];
+  addPersonalNote: (note: Omit<PersonalNote, "noteId" | "createdAt">) => string;
   setGradeLevel: (grade: number) => void;
   setTheme: (theme: "light" | "dark") => void;
   setRole: (role: UserRole) => void;
@@ -46,6 +60,17 @@ export const useAppStore = create<AppState>((set, get) => ({
   role: "student",
   subject: "maths",
   entitlement: mockEntitlement,
+  personalNotes: [],
+  addPersonalNote: (note) => {
+    const noteId = `own-${crypto.randomUUID().slice(0, 8)}`;
+    set((state) => ({
+      personalNotes: [
+        { ...note, noteId, createdAt: new Date().toISOString() },
+        ...state.personalNotes,
+      ],
+    }));
+    return noteId;
+  },
   setGradeLevel: (gradeLevel) => set({ gradeLevel }),
   setTheme: (theme) => set({ theme }),
   setRole: (role) => set({ role }),

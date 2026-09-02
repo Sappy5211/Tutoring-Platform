@@ -1,11 +1,12 @@
 import {
   ChevronRight, FileText, Flag, FolderPlus, Mic, Notebook, PenLine, Plus, Upload,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button, EmptyState, Menu, MenuItem, Toast } from "@vidya/ui";
 import { DOCS, FOLDERS } from "./data";
 import { materialRoute } from "../materials/data";
+import { NewNoteChooser } from "./NewNoteChooser";
 
 const cx = (...parts: (string | false | null | undefined)[]) => parts.filter(Boolean).join(" ");
 
@@ -53,16 +54,8 @@ export function FolderPage() {
   const [title, setTitle] = useState(folder?.title ?? "Untitled folder");
   const [createOpen, setCreateOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const dialogRef = useRef<HTMLDivElement>(null);
 
   const notify = (message: string) => setToast(message);
-
-  useEffect(() => {
-    if (!createOpen) return;
-    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setCreateOpen(false); };
-    document.addEventListener("keydown", esc);
-    return () => document.removeEventListener("keydown", esc);
-  }, [createOpen]);
 
   const children = useMemo(() => FOLDERS.filter((f) => f.parentId === folderId), [folderId]);
   const docs = useMemo(() => DOCS.filter((d) => d.folderId === folderId), [folderId]);
@@ -199,52 +192,11 @@ export function FolderPage() {
         )}
       </section>
 
-      {createOpen && (
-        <div
-          role="presentation"
-          onMouseDown={() => setCreateOpen(false)}
-          className="fixed inset-0 z-[80] grid place-items-center bg-black/30 p-4"
-        >
-          <div
-            ref={dialogRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Create notes"
-            onMouseDown={(e) => e.stopPropagation()}
-            className="grid w-full max-w-[400px] gap-3 rounded-[16px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[var(--shadow)]"
-          >
-            <div>
-              <h2 className="font-display text-lg font-bold text-[var(--ink)]">Create a page</h2>
-              <p className="mt-1 text-[13px] text-[var(--muted)]">Both kinds live in this {folder.kind === "book" ? "book" : "chapter"}, and both can hold cards.</p>
-            </div>
-            <button
-              onClick={() => { setCreateOpen(false); navigate("/app/notebook/d-fractions"); }}
-              className="flex items-center gap-3 rounded-[10px] border border-[var(--line)] p-3 text-left hover:bg-[var(--surface-soft)] cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
-            >
-              <span className="grid size-9 shrink-0 place-items-center rounded-[8px] bg-[var(--primary-faint)] text-[var(--primary)]">
-                <FileText size={17} aria-hidden />
-              </span>
-              <span className="grid gap-0.5">
-                <strong className="text-[13.5px] font-semibold text-[var(--ink)]">Bullet notes</strong>
-                <span className="text-[12px] text-[var(--muted)]">Typed outline. End a line with an arrow trigger to make a card.</span>
-              </span>
-            </button>
-            <button
-              onClick={() => { setCreateOpen(false); navigate("/app/notebook/new/handwritten"); }}
-              className="flex items-center gap-3 rounded-[10px] border border-[var(--line)] p-3 text-left hover:bg-[var(--surface-soft)] cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
-            >
-              <span className="grid size-9 shrink-0 place-items-center rounded-[8px] bg-[var(--primary-faint)] text-[var(--primary)]">
-                <PenLine size={17} aria-hidden />
-              </span>
-              <span className="grid gap-0.5">
-                <strong className="text-[13.5px] font-semibold text-[var(--ink)]">Handwritten</strong>
-                <span className="text-[12px] text-[var(--muted)]">Write with a stylus or finger. Add cards over your own writing.</span>
-              </span>
-            </button>
-            <Button variant="ghost" size="sm" onClick={() => setCreateOpen(false)} className="justify-self-start">Cancel</Button>
-          </div>
-        </div>
-      )}
+      <NewNoteChooser
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        contextLabel={folder.kind === "book" ? "book" : "chapter"}
+      />
 
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
     </div>
